@@ -1,0 +1,4 @@
+[submodule "sgltk"]
+	path = sgltk
+	url = git@github.com:pyth/sgltk
+	branch = master

@@ -15,6 +15,8 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 add_executable(${TARGET} ${BIN_SOURCE} ${BIN_HEADERS})
 
+add_dependencies(${TARGET} sgltk)
+
 target_link_libraries(${TARGET} sgltk)
 target_link_libraries(${TARGET} GL)
 target_link_libraries(${TARGET} GLEW)
