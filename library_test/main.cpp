@@ -1,4 +1,5 @@
 #include <sgltk/app.h>
+#include <sgltk/window.h>
 #include <sgltk/scene.h>
 #include <sgltk/camera.h>
 #include <sgltk/texture.h>
@@ -13,9 +14,10 @@
 
 using namespace sgltk;
 
-static GUI *app;
+static GUI *window;
 
 int main(int argc, char** argv) {
+	App::init(4, 0);
 	//change the current working directory to the one containing the executable
 	std::string path(argv[0]);
 	path = path.substr(0, path.find_last_of("\\/"));
@@ -29,10 +31,10 @@ int main(int argc, char** argv) {
 	Scene::add_path("../data/models");
 	Image::add_path("../data/textures");
 	Image::add_path("../data/fonts");
-	Shader::add_path("../data/shaders");
+	Shader::add_path("../library_test/shaders");
 
-	app = new GUI("Test", 1024, 768, 100, 100, 4, 0, 0);
+	window = new GUI("Test", 1024, 768, 100, 100, 0);
 
-	app->run();
+	window->run();
 	return 0;
 }

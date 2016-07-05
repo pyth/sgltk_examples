@@ -1,7 +1,7 @@
 #ifndef __GUI_H__
 #define __GUI_H__
 
-#include <sgltk/app.h>
+#include <sgltk/window.h>
 #include <sgltk/mesh.h>
 #include <sgltk/scene.h>
 #include <sgltk/camera.h>
@@ -18,7 +18,7 @@ typedef struct point_light {
 	float quadratic;
 } point_light;
 
-class GUI : public App {
+class GUI : public Window {
 	bool wireframe;
 	bool wireframe_change;
 	bool rel_mode;
@@ -64,8 +64,7 @@ class GUI : public App {
 	Mesh *create_sphere(unsigned int slices, unsigned int stacks);
 public:
 	GUI(const char *title, int res_x, int res_y, int offset_x,
-	    int offset_y, int gl_maj, int gl_min,
-	    unsigned int flags);
+	    int offset_y, unsigned int flags);
 
 	~GUI();
 

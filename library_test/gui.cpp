@@ -3,8 +3,8 @@
 #define NUM_TILES 400
 
 GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
-	 int offset_y, int gl_maj, int gl_min, unsigned int flags)
-	 :App(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
+	 int offset_y, unsigned int flags)
+	 :Window(title, res_x, res_y, offset_x, offset_y, flags) {
 
 	//enable textures and blending
 	glEnable(GL_TEXTURE_2D);

@@ -1,7 +1,7 @@
-set(BIN_SOURCE main.cpp gui.cpp)
-set(BIN_HEADERS gui.h)
+set(BIN_SOURCE main.cpp)
+set(BIN_HEADERS)
 
-set(TARGET library_test)
+set(TARGET hello_triangle)
 
 link_directories(${PROJECT_SOURCE_DIR}/sgltk/lib)
 include_directories(${PROJECT_SOURCE_DIR}/sgltk/include)
