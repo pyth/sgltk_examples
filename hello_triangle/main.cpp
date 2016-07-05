@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
 	//this should be done prior to using any of the classes and
 	//functions provided by sgltk
 	sgltk::App::init(3, 0);
-	sgltk::Window window("Tessellation test",
+	sgltk::Window window("Hello triangle",
 					RES_X, RES_Y,
 					100, 100, 0);
 
