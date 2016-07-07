@@ -17,7 +17,7 @@ using namespace sgltk;
 static GUI *window;
 
 int main(int argc, char** argv) {
-	App::init(4, 0);
+	App::init();
 	//change the current working directory to the one containing the executable
 	std::string path(argv[0]);
 	path = path.substr(0, path.find_last_of("\\/"));
@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 	Image::add_path("../data/fonts");
 	Shader::add_path("../library_test/shaders");
 
-	window = new GUI("Test", 1024, 768, 100, 100, 0);
+	window = new GUI("Test", 1024, 768, 100, 100, 4, 0, 0);
 
 	window->run();
 	return 0;

@@ -5,7 +5,7 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-	sgltk::App::get_sys_info();
+	sgltk::App::init();
 	cout<<"System info"<<endl<<endl;
 	cout<<"OS: "<<sgltk::App::sys_info.platform_name<<endl;
 	cout<<"CPU Cores: "<<sgltk::App::sys_info.num_logical_cores<<endl;

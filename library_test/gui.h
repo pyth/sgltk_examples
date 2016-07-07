@@ -64,7 +64,7 @@ class GUI : public Window {
 	Mesh *create_sphere(unsigned int slices, unsigned int stacks);
 public:
 	GUI(const char *title, int res_x, int res_y, int offset_x,
-	    int offset_y, unsigned int flags);
+	    int offset_y, int gl_maj, int gl_min, unsigned int flags);
 
 	~GUI();
 

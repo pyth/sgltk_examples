@@ -46,10 +46,11 @@ int main(int argc, char **argv) {
 	//initialize the library
 	//this should be done prior to using any of the classes and
 	//functions provided by sgltk
-	sgltk::App::init(3, 0);
+	sgltk::App::init();
 	sgltk::Window window("Hello triangle",
 					RES_X, RES_Y,
-					100, 100, 0);
+					100, 100,
+					3, 0, 0);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
