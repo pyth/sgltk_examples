@@ -12,10 +12,13 @@ int main(int argc, char **argv) {
 	cout<<"RAM: "<<sgltk::App::sys_info.system_ram<<"MB"<<endl;
 	cout<<"Number of displays: "<<sgltk::App::sys_info.num_displays<<endl;
 
+	SDL_Rect bounds;
 	SDL_DisplayMode mode;
 	for(int i = 0; i < sgltk::App::sys_info.num_displays; i++) {
 		mode = sgltk::App::sys_info.desktop_display_modes[i];
-		cout<<"Display "<<i<<": "<<mode.w<<"x"<<mode.h<<" @"<<mode.refresh_rate<<endl;
+		bounds = sgltk::App::sys_info.display_bounds[i];
+		cout<<"Display "<<i<<": "<<mode.w<<"x"<<mode.h<<"+"<<bounds.x<<
+			"+"<<bounds.y<<" @"<<mode.refresh_rate<<endl;
 	}
 
 	cout<<"Supported OpenGL version: "<<
