@@ -11,8 +11,9 @@ set(ExternalProjectCMakeArgs
 		-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
 
 add_subdirectory(system_info)
-add_subdirectory(library_test)
 add_subdirectory(hello_triangle)
+add_subdirectory(loading_models)
+add_subdirectory(library_test)
 
 if(EXISTS sgltk/CMakeLists.txt)
 	add_subdirectory(sgltk)

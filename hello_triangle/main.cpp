@@ -67,8 +67,8 @@ int main(int argc, char **argv) {
 
 	//compile and link the shaders
 	sgltk::Shader shader;
-	shader.attach_file("shader.vs", GL_VERTEX_SHADER);
-	shader.attach_file("shader.fs", GL_FRAGMENT_SHADER);
+	shader.attach_file("vertex_shader.glsl", GL_VERTEX_SHADER);
+	shader.attach_file("fragment_shader.glsl", GL_FRAGMENT_SHADER);
 	shader.link();
 
 	sgltk::Camera cam(glm::vec3(0, 0, 20), glm::vec3(0, 0, -1),
