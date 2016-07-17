@@ -13,6 +13,7 @@ set(ExternalProjectCMakeArgs
 add_subdirectory(system_info)
 add_subdirectory(hello_triangle)
 add_subdirectory(loading_models)
+add_subdirectory(controller_handling)
 add_subdirectory(library_test)
 
 if(EXISTS sgltk/CMakeLists.txt)
