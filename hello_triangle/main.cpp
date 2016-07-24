@@ -16,12 +16,27 @@
 
 static sgltk::Mesh *mesh;
 
-void sgltk::Window::handle_keyboard() {
+class Win : public sgltk::Window {
+public:
+	Win(const char *title, int res_x, int res_y, int offset_x,
+		int offset_y, int gl_maj, int gl_min, unsigned int flags);
+	~Win();
+	void handle_keyboard();
+	void display();
+};
+
+Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
+	sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
+}
+
+Win::~Win() {}
+
+void Win::handle_keyboard() {
 	if(key_pressed("Escape"))
 		exit(0);
 }
 
-void sgltk::Window::display() {
+void Win::display() {
 	glClearColor(0, 0, 0, 1);
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -47,7 +62,7 @@ int main(int argc, char **argv) {
 	//this should be done prior to using any of the classes and
 	//functions provided by sgltk
 	sgltk::App::init();
-	sgltk::Window window("Hello triangle",
+	Win window("Hello triangle",
 					RES_X, RES_Y,
 					100, 100,
 					3, 0, 0);

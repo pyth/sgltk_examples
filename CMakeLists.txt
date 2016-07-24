@@ -1,8 +1,16 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(sgltk_example)
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -Wno-int-to-pointer-cast")
+set(TARGETS system_info
+	hello_triangle
+	loading_models
+	controller_handling
+	library_test)
+
+set(TYPE DYNAMIC)
+
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wno-int-to-pointer-cast")
 endif()
 
 set(ExternalProjectCMakeArgs
@@ -10,11 +18,27 @@ set(ExternalProjectCMakeArgs
 		-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
 		-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
 
-add_subdirectory(system_info)
-add_subdirectory(hello_triangle)
-add_subdirectory(loading_models)
-add_subdirectory(controller_handling)
-add_subdirectory(library_test)
+set(LIBS sgltk)
+if(WIN32)
+	set(LIBS OpenGL32 glew32 ${LIBS})
+else()
+	set(LIBS GL GLEW ${LIBS})
+endif()
+
+find_library(SGLTK_FOUND sgltk)
+if(${SGLTK_FOUND})
+	message(STATUS "FOUND sgltk")
+endif()
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
+	string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${PROJECT_BINARY_DIR}/bin)
+endforeach()
+
+foreach(target ${TARGETS})
+	add_subdirectory(${target})
+endforeach()
 
 if(EXISTS sgltk/CMakeLists.txt)
 	add_subdirectory(sgltk)
