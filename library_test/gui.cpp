@@ -285,9 +285,10 @@ void GUI::display() {
 		time_cnt -= 1.0;
 	}
 	Image fps_text;
+	Texture fps_tex;
 	fps_text.create_text("FPS: " + std::to_string(fps),
 			     "Oswald-Medium.ttf", 40, 255, 0, 0, 255);
-	Texture fps_tex = Texture(&fps_text);
+	fps_tex.load_texture(&fps_text);
 
 	fps_shader->bind();
 	int texture_loc = glGetUniformLocation(fps_shader->program,
@@ -344,7 +345,7 @@ void GUI::handle_resize() {
 
 void GUI::handle_keyboard() {
 	float mov_speed = 0.1;
-	float rot_speed = 0.05;
+	float rot_speed = 0.01;
 	float dt = 1000 * delta_time;
 	if(dt < 2.0)
 		dt = 2.0;
