@@ -69,10 +69,11 @@ public:
 	~GUI();
 
 	void handle_resize();
-	void handle_keyboard();
+	void handle_keyboard(std::string key, bool pressed);
+	void handle_key_press(std::string key, bool pressed);
 	void handle_mouse_motion(int x, int y);
 	void handle_mouse_wheel(int x, int y);
-	void handle_mouse_button(int x, int y, MOUSE_BUTTON button, bool state, int clicks);
+	void handle_mouse_button(int x, int y, int button, bool state, int clicks);
 	void display();
 };
 

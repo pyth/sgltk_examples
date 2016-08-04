@@ -21,7 +21,7 @@ public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
 	~Win();
-	void handle_keyboard();
+	void handle_key_press(std::string key, bool pressed);
 	void display();
 };
 
@@ -31,9 +31,9 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 Win::~Win() {}
 
-void Win::handle_keyboard() {
-	if(key_pressed("Escape"))
-		exit(0);
+void Win::handle_key_press(std::string key, bool pressed) {
+	if(key == "Escape")
+		stop();
 }
 
 void Win::display() {

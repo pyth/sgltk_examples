@@ -12,7 +12,7 @@ public:
 	void handle_gamepad_removed(unsigned int gamepad_id);
 	void handle_gamepad_button(unsigned int gamepad_id, int button, bool pressed);
 	void handle_gamepad_axis(unsigned int gamepad_id, unsigned int axis, int value);
-	void handle_keyboard();
+	void handle_key_press(std::string key, bool pressed);
 };
 
 Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
@@ -37,9 +37,9 @@ void Win::handle_gamepad_axis(unsigned int gamepad_id, unsigned int axis, int va
 	std::cout<<"player "<<gamepad_id<<": "<<"axis "<<axis<<" "<<value<<std::endl;
 }
 
-void Win::handle_keyboard() {
-	if(key_pressed("Escape"))
-		exit(0);
+void Win::handle_key_press(std::string key, bool pressed) {
+	if(key == "Escape")
+		stop();
 }
 
 int main(int argc, char **argv) {

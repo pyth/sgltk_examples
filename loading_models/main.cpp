@@ -30,7 +30,8 @@ public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
 	~Win();
-	void handle_keyboard();
+	void handle_keyboard(std::string key, bool pressed);
+	void handle_key_press(std::string key, bool pressed);
 	void handle_mouse_motion(int x, int y);
 	void display();
 };
@@ -92,48 +93,42 @@ void Win::display() {
 	box.draw(&mat);
 }
 
-void Win::handle_keyboard() {
+void Win::handle_keyboard(std::string key, bool pressed) {
 	float mov_speed = 0.1;
 	float rot_speed = 0.05;
 	float dt = 1000 * delta_time;
 	if (dt < 2.0)
 		dt = 2.0;
 
-	if (key_pressed("Escape"))
-		exit(0);
-	if (key_pressed("D")) {
+	if(key == "Escape") {
+		stop();
+	} else if(key == "D") {
 		camera->move_right(mov_speed * dt);
-	}
-	if (key_pressed("A")) {
+	} else if(key == "A") {
 		camera->move_right(-mov_speed * dt);
-	}
-	if (key_pressed("W")) {
+	} else if(key == "W") {
 		camera->move_forward(mov_speed * dt);
-	}
-	if (key_pressed("S")) {
+	} else if(key == "S") {
 		camera->move_forward(-mov_speed * dt);
-	}
-	if (key_pressed("R")) {
+	} else if(key == "R") {
 		camera->move_up(mov_speed * dt);
-	}
-	if (key_pressed("F")) {
+	} else if(key == "F") {
 		camera->move_up(-mov_speed * dt);
-	}
-	if (key_pressed("E")) {
+	} else if(key == "E") {
 		camera->roll(rot_speed * dt);
-	}
-	if (key_pressed("Q")) {
+	} else if(key == "Q") {
 		camera->roll(-rot_speed * dt);
 	}
-	if (key_pressed("M") && !mouse_mode_change) {
-		mouse_mode_change = true;
-		rel_mode = !rel_mode;
-		set_relative_mode(rel_mode);
-	}
-	else if (!key_pressed("M")) {
-		mouse_mode_change = false;
-	}
 	camera->update_view_matrix();
+}
+
+void Win::handle_key_press(std::string key, bool pressed) {
+	if(key == "M") {
+		if(pressed) {
+			rel_mode = !rel_mode;
+			set_relative_mode(rel_mode);
+		}
+	}
 }
 
 void Win::handle_mouse_motion(int x, int y) {

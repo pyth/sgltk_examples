@@ -29,19 +29,6 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 
 	time_cnt = 0;
 
-	//load an image
-	Image img1;
-	img1.load("earthmap1k.jpg");
-	//create an image from text
-	Image img2;
-	img2.create_text("TTF fonts are cool!", "Oswald-Medium.ttf",
-			 64, 255, 0, 0, 255);
-	//copy one image into the other
-	img1.copy_from(&img2, img1.width/2-img2.width/2,
-		       img1.height-img2.height);
-	//make a texture out of the image
-	tex = new Texture(&img1);
-
 	floor_diff = new Texture("tile_sandstone_d.png");
 	floor_diff->set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	floor_diff->set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -343,59 +330,52 @@ void GUI::handle_resize() {
 	camera->update_projection_matrix(width, height);
 }
 
-void GUI::handle_keyboard() {
+void GUI::handle_key_press(std::string key, bool pressed) {
+	if(key == "Escape") {
+		stop();
+	} else if(key == "M") {
+		if(pressed) {
+			rel_mode = !rel_mode;
+			set_relative_mode(rel_mode);
+		}
+	} else if(key == "P") {
+		if(pressed) {
+			material_shader->recompile();
+			textured_shader->recompile();
+			floor_shader->recompile();
+			point_shader->recompile();
+			fps_shader->recompile();
+		}
+	} else if(key == "L") {
+		if(pressed) {
+			wireframe = !wireframe;
+		}
+	}
+}
+
+void GUI::handle_keyboard(std::string key, bool pressed) {
 	float mov_speed = 0.1;
 	float rot_speed = 0.01;
 	float dt = 1000 * delta_time;
 	if(dt < 2.0)
 		dt = 2.0;
 
-	if(key_pressed("Escape")) {
-		exit(0);
-	}
-	if(key_pressed("M") && !mouse_mode_change) {
-		mouse_mode_change = true;
-		rel_mode = !rel_mode;
-		set_relative_mode(rel_mode);
-	} else if(!key_pressed("M")) {
-		mouse_mode_change = false;
-	}
-	if(key_pressed("D")) {
+	if(key == "D") {
 		camera->move_right(mov_speed * dt);
-	}
-	if(key_pressed("A")) {
+	} else if(key == "A") {
 		camera->move_right(-mov_speed * dt);
-	}
-	if(key_pressed("W")) {
+	}else if(key == "W") {
 		camera->move_forward(mov_speed * dt);
-	}
-	if(key_pressed("S")) {
+	} else if(key == "S") {
 		camera->move_forward(-mov_speed * dt);
-	}
-	if(key_pressed("R")) {
+	} else if(key == "R") {
 		camera->move_up(mov_speed * dt);
-	}
-	if(key_pressed("F")) {
+	} else if(key == "F") {
 		camera->move_up(-mov_speed * dt);
-	}
-	if(key_pressed("E")) {
+	} else if(key == "E") {
 		camera->roll(rot_speed * dt);
-	}
-	if(key_pressed("Q")) {
+	} else if(key == "Q") {
 		camera->roll(-rot_speed * dt);
-	}
-	if(key_pressed("P")) {
-		material_shader->recompile();
-		textured_shader->recompile();
-		floor_shader->recompile();
-		point_shader->recompile();
-		fps_shader->recompile();
-	}
-	if(key_pressed("L") && !wireframe_change) {
-		wireframe_change = true;
-		wireframe = !wireframe;
-	} else if(!key_pressed("L")) {
-		wireframe_change = false;
 	}
 	camera->update_view_matrix();
 }
@@ -411,7 +391,7 @@ void GUI::handle_mouse_motion(int x, int y) {
 void GUI::handle_mouse_wheel(int x, int y) {
 }
 
-void GUI::handle_mouse_button(int x, int y, MOUSE_BUTTON button, bool state, int clicks) {
+void GUI::handle_mouse_button(int x, int y, int button, bool state, int clicks) {
 	printf("%i %i\t%i %i %i\n", x, y, button, state, clicks);
 	fflush(stdout);
 }
