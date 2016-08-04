@@ -35,5 +35,9 @@ int main(int argc, char **argv) {
 		}
 		cout<<endl;
 	}
+#ifdef _WIN32
+	int foo;
+	std::cin >> foo;
+#endif
 	return 0;
 }
