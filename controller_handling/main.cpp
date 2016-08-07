@@ -10,8 +10,9 @@ public:
 	~Win();
 	void handle_gamepad_added(unsigned int gamepad_id);
 	void handle_gamepad_removed(unsigned int gamepad_id);
-	void handle_gamepad_button(unsigned int gamepad_id, int button, bool pressed);
-	void handle_gamepad_axis(unsigned int gamepad_id, unsigned int axis, int value);
+	void handle_gamepad_button(unsigned int gamepad_id, int button);
+	void handle_gamepad_button_press(unsigned int gamepad_id, int button, bool pressed);
+	void handle_gamepad_axis_change(unsigned int gamepad_id, unsigned int axis, int value);
 	void handle_key_press(std::string key, bool pressed);
 };
 
@@ -27,13 +28,19 @@ void Win::handle_gamepad_added(unsigned int gamepad_id) {
 void Win::handle_gamepad_removed(unsigned int gamepad_id) {
 }
 
-void Win::handle_gamepad_button(unsigned int gamepad_id, int button, bool pressed) {
-	std::cout<<"player "<<gamepad_id<<": "<<"button "<<button<<" "<<pressed<<std::endl;
+void Win::handle_gamepad_button(unsigned int gamepad_id, int button) {
+	std::cout<<"player "<<gamepad_id<<": "<<"button "<<button<<std::endl;
 	sgltk::Gamepad *gamepad = sgltk::Gamepad::id_map[gamepad_id];
 	gamepad->play_rumble(1, 200);
 }
 
-void Win::handle_gamepad_axis(unsigned int gamepad_id, unsigned int axis, int value) {
+void Win::handle_gamepad_button_press(unsigned int gamepad_id, int button, bool pressed) {
+	sgltk::Gamepad *gamepad = sgltk::Gamepad::id_map[gamepad_id];
+	if(!pressed)
+		gamepad->stop_rumble();
+}
+
+void Win::handle_gamepad_axis_change(unsigned int gamepad_id, unsigned int axis, int value) {
 	std::cout<<"player "<<gamepad_id<<": "<<"axis "<<axis<<" "<<value<<std::endl;
 }
 

@@ -227,7 +227,6 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	rel_mode = true;
 	mouse_mode_change = false;
 	set_relative_mode(true);
-	enable_vsync(true);
 }
 
 GUI::~GUI() {
@@ -353,7 +352,7 @@ void GUI::handle_key_press(std::string key, bool pressed) {
 	}
 }
 
-void GUI::handle_keyboard(std::string key, bool pressed) {
+void GUI::handle_keyboard(std::string key) {
 	float mov_speed = 0.1;
 	float rot_speed = 0.01;
 	float dt = 1000 * delta_time;

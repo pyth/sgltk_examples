@@ -30,7 +30,7 @@ public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
 	~Win();
-	void handle_keyboard(std::string key, bool pressed);
+	void handle_keyboard(std::string key);
 	void handle_key_press(std::string key, bool pressed);
 	void handle_mouse_motion(int x, int y);
 	void display();
@@ -93,16 +93,14 @@ void Win::display() {
 	box.draw(&mat);
 }
 
-void Win::handle_keyboard(std::string key, bool pressed) {
+void Win::handle_keyboard(std::string key) {
 	float mov_speed = 0.1;
 	float rot_speed = 0.05;
 	float dt = 1000 * delta_time;
 	if (dt < 2.0)
 		dt = 2.0;
 
-	if(key == "Escape") {
-		stop();
-	} else if(key == "D") {
+	if(key == "D") {
 		camera->move_right(mov_speed * dt);
 	} else if(key == "A") {
 		camera->move_right(-mov_speed * dt);
@@ -123,7 +121,9 @@ void Win::handle_keyboard(std::string key, bool pressed) {
 }
 
 void Win::handle_key_press(std::string key, bool pressed) {
-	if(key == "M") {
+	if(key == "Escape") {
+		stop();
+	} else if(key == "M") {
 		if(pressed) {
 			rel_mode = !rel_mode;
 			set_relative_mode(rel_mode);
