@@ -81,12 +81,12 @@ void Win::display() {
 	glUniform3fv(cam_loc, 1, glm::value_ptr(camera->pos));
 
 	//draw the models
-	bob.animate(timer.get_time());
+	bob.animate((float)timer.get_time());
 	bob.draw();
 
 	glm::mat4 mat = glm::translate(glm::vec3(4, 0, 0));
 
-	spikey.animate(timer.get_time());
+	spikey.animate((float)timer.get_time());
 	spikey.draw(&mat);
 
 	mat = glm::translate(glm::vec3(-4, 0, 0));
@@ -94,9 +94,9 @@ void Win::display() {
 }
 
 void Win::handle_keyboard(std::string key) {
-	float mov_speed = 0.1;
-	float rot_speed = 0.05;
-	float dt = 1000 * delta_time;
+	float mov_speed = 0.1f;
+	float rot_speed = 0.05f;
+	float dt = 1000 * (float)delta_time;
 	if (dt < 2.0)
 		dt = 2.0;
 
@@ -191,7 +191,7 @@ int main(int argc, char **argv) {
 	//create a camera
 	camera = new Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
 				glm::vec3(0,1,0), 70.0f,
-				window.width, window.height,
+				(float)window.width, (float)window.height,
 				0.1f, 800.0f);
 
 	//load the models and prepare them for rendering

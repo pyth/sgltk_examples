@@ -52,8 +52,8 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	//set up the cameras
 	fps_camera = new Camera(sgltk::ORTHOGRAPHIC);
 	camera = new Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
-			    glm::vec3(0,1,0), 70.0f, res_x,
-			    res_y, 0.1f, 800.0f);
+			    glm::vec3(0,1,0), 70.0f, (float)res_x,
+			    (float)res_y, 0.1f, 800.0f);
 
 	//load the shaders
 	material_shader = new Shader();
@@ -137,7 +137,7 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	//glm::mat4 floor_scale = glm::scale(glm::vec3(2.0, 0.0, 2.0));
 	glm::mat4 floor_rot = glm::rotate((float)(-M_PI / 2), glm::vec3(1.0, 0.0, 0.0));
 	glm::mat4 floor_transl;
-	int side = sqrt(floor_m.size());
+	int side = (int)sqrt(floor_m.size());
 	for(int i = -side / 2; i < side / 2; i++) {
 		for(int j = -side / 2; j < side / 2; j++) {
 			int index = (i + side / 2) * side + j + side / 2;
@@ -310,12 +310,12 @@ void GUI::display() {
 	floor->draw_instanced(GL_PATCHES, NUM_TILES);
 
 	for(unsigned int i = 0; i < spikey_trafos.size(); i++) {
-		material_model->animate(time.get_time());
+		material_model->animate((float)time.get_time());
 		material_model->draw(&spikey_trafos[i]);
 	}
 
 	for(unsigned int i = 0; i < bob_trafos.size(); i++) {
-		textured_model->animate(time.get_time());
+		textured_model->animate((float)time.get_time());
 		textured_model->draw(&bob_trafos[i]);
 	}
 
@@ -326,7 +326,7 @@ void GUI::display() {
 
 void GUI::handle_resize() {
 	glViewport(0, 0, width, height);
-	camera->update_projection_matrix(width, height);
+	camera->update_projection_matrix((float)width, (float)height);
 }
 
 void GUI::handle_key_press(std::string key, bool pressed) {
@@ -353,9 +353,9 @@ void GUI::handle_key_press(std::string key, bool pressed) {
 }
 
 void GUI::handle_keyboard(std::string key) {
-	float mov_speed = 0.1;
-	float rot_speed = 0.01;
-	float dt = 1000 * delta_time;
+	float mov_speed = 0.1f;
+	float rot_speed = 0.01f;
+	float dt = 1000 * (float)delta_time;
 	if(dt < 2.0)
 		dt = 2.0;
 
