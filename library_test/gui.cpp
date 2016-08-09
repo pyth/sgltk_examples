@@ -223,9 +223,9 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 
 	fps = 0;
 	wireframe = false;
-	wireframe_change = false;
+	windowed = true;
 	rel_mode = true;
-	mouse_mode_change = false;
+	ctrl = false;
 	set_relative_mode(true);
 }
 
@@ -330,6 +330,7 @@ void GUI::handle_resize() {
 }
 
 void GUI::handle_key_press(std::string key, bool pressed) {
+	SDL_DisplayMode mode;
 	if(key == "Escape") {
 		stop();
 	} else if(key == "M") {
@@ -348,6 +349,22 @@ void GUI::handle_key_press(std::string key, bool pressed) {
 	} else if(key == "L") {
 		if(pressed) {
 			wireframe = !wireframe;
+		}
+	} else if(key == "Left Ctrl") {
+		if(pressed)
+			ctrl = true;
+		else
+			ctrl = false;
+	} else if(key == "F") {
+		if(pressed && ctrl) {
+			if(windowed) {
+				mode = App::sys_info.desktop_display_modes[get_display_index()];
+				set_display_mode(&mode);
+				fullscreen_mode(FULLSCREEN);
+			} else {
+				fullscreen_mode(WINDOWED);
+			}
+			windowed = !windowed;
 		}
 	}
 }
@@ -370,7 +387,8 @@ void GUI::handle_keyboard(std::string key) {
 	} else if(key == "R") {
 		camera->move_up(mov_speed * dt);
 	} else if(key == "F") {
-		camera->move_up(-mov_speed * dt);
+		if(!ctrl)
+			camera->move_up(-mov_speed * dt);
 	} else if(key == "E") {
 		camera->roll(rot_speed * dt);
 	} else if(key == "Q") {

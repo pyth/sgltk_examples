@@ -19,10 +19,10 @@ typedef struct point_light {
 } point_light;
 
 class GUI : public Window {
+	bool windowed;
 	bool wireframe;
-	bool wireframe_change;
 	bool rel_mode;
-	bool mouse_mode_change;
+	bool ctrl;
 
 	glm::mat4 fps_trafo;
 	glm::mat4 light_trafo;
