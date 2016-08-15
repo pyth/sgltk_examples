@@ -8,7 +8,13 @@ This is a collection of examples intended to show how to use [sgltk](http://www.
 
 * **Windows**
 
-    Coming soon.
+    1. Generate the makefiles or project files using `cmake`:
+    
+        `cmake -G` to get the list of available generators
+
+        `cmake -G "generator_name" -DCMAKE_PREFIX_PATH="path/to/libraries/directory" .`
+    
+    2. Use `make` or open the project file in the appropriate IDE to build the project
 
 * **Linux**
 
