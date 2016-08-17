@@ -138,18 +138,11 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	glm::mat4 floor_rot = glm::rotate((float)(-M_PI / 2), glm::vec3(1.0, 0.0, 0.0));
 	glm::mat4 floor_transl;
 	int side = (int)sqrt(floor_m.size());
-	for(int i = -side / 2; i < side / 2; i++) {
-		for(int j = -side / 2; j < side / 2; j++) {
+	for(float i = -side / 2; i < side / 2; i+=1) {
+		for(float j = -side / 2; j < side / 2; j+=1) {
 			int index = (i + side / 2) * side + j + side / 2;
-			//std::cout<<index<<" "<<i<<" "<<j<<"\n\n";
-			floor_transl = glm::translate(glm::vec3(-40, 0, -40));
+			floor_transl = glm::translate(glm::vec3(4*i, 0, 4*j));
 			floor_m[index] = floor_transl * floor_rot;
-			/*for(int k=0;k<4;k++) {
-				for(int l=0;l<4;l++)
-					std::cout<<floor_m[index][l][k]<<" ";
-				std::cout<<"\n";
-			}
-			std::cout<<"\n";*/
 			floor_nm[index] = glm::mat3(glm::transpose(glm::inverse(floor_m[index])));
 		}
 	}
@@ -159,15 +152,17 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	loc = glGetAttribLocation(floor_shader->program, "model_matrix");
 	buf_ind = floor->attach_vertex_buffer<glm::mat4>(&floor_m);
 	for(int i = 0; i < 4; i++) {
-		floor->set_vertex_attribute(loc + i, buf_ind, 4, GL_FLOAT, sizeof(glm::mat4), (const void*)(i * vec4_size));
-		floor->set_vertex_attribute_divisor(loc + i, 1);
+		floor->set_vertex_attribute(loc + i, buf_ind, 4, GL_FLOAT,
+						sizeof(glm::mat4),
+						(const void*)(i * vec4_size), 1);
 	}
 
 	loc = glGetAttribLocation(floor_shader->program, "normal_matrix");
 	buf_ind = floor->attach_vertex_buffer<glm::mat3>(&floor_nm);
 	for(int i = 0; i < 3; i++) {
-		floor->set_vertex_attribute(loc + i, buf_ind, 3, GL_FLOAT, sizeof(glm::mat3), (const void*)(i * vec3_size));
-		floor->set_vertex_attribute_divisor(loc + i, 1);
+		floor->set_vertex_attribute(loc + i, buf_ind, 3, GL_FLOAT,
+						sizeof(glm::mat3),
+						(const void*)(i * vec3_size), 1);
 	}
 
 	floor->textures_diffuse = {floor_diff};

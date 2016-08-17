@@ -1,15 +1,16 @@
 #version 400
 
-in mat4 model_matrix;
-in mat3 normal_matrix;
+layout (location = 0) in mat4 model_matrix;
+layout (location = 4) in mat3 normal_matrix;
 
-in vec4 pos_in;
-in vec4 tang_in;
-in vec3 norm_in;
-in vec3 tex_coord_in0;
+layout (location = 7) in vec4 pos_in;
+layout (location = 8) in vec4 tang_in;
+layout (location = 9) in vec3 norm_in;
+layout (location = 10) in vec3 tex_coord_in0;
 
 out vec3 pos_v_tc;
 out vec3 pos_ts_tc;
+out vec3 norm_tc;
 out vec3 light_ts_tc;
 out vec3 tc_tc;
 
@@ -23,9 +24,7 @@ void main() {
 	vec3 tang = normalize(normal_matrix * tang_in.xyz);
 	vec3 bitang = normalize(cross(tang, norm));
 	mat3 tangent_matrix = transpose(mat3(tang, bitang, norm));
-
-	pos.x += 4 * (gl_InstanceID % 20);
-	pos.z += 4 * (gl_InstanceID / 20);
+	norm_tc = norm;
 
 	pos_v_tc = (view_matrix * pos).xyz;
 	pos_ts_tc = tangent_matrix * pos.xyz;

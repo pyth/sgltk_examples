@@ -4,6 +4,7 @@ project(sgltk_example)
 set(TARGETS system_info
 	hello_triangle
 	loading_models
+	instanced_rendering
 	controller_handling
 	library_test)
 

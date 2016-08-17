@@ -6,7 +6,9 @@ in vec3 pos_v_tc[];
 in vec3 pos_ts_tc[];
 in vec3 tc_tc[];
 in vec3 light_ts_tc[];
+in vec3 norm_tc[];
 
+out vec3 norm_te[];
 out vec3 tc_te[];
 out vec3 pos_ts_te[];
 out vec3 light_ts_te[];
@@ -43,6 +45,8 @@ void main(void){
 
 	gl_TessLevelInner[0] = gl_TessLevelOuter[1];
 	gl_TessLevelInner[1] = gl_TessLevelOuter[0];
+
+	norm_te[gl_InvocationID] = norm_tc[gl_InvocationID];
 
 	tc_te[gl_InvocationID] = tc_tc[gl_InvocationID];
 
