@@ -320,7 +320,6 @@ void GUI::display() {
 		textured_model->draw(&bob_trafos[i]);
 	}
 
-	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 	glPointSize(10);
 	light->draw(GL_POINTS, &light_trafo);
 }
