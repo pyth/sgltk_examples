@@ -12,7 +12,7 @@ This is a collection of examples intended to show how to use [sgltk](http://www.
     
         `cmake -G` to get the list of available generators
 
-        `cmake -G "generator_name" -DCMAKE_PREFIX_PATH="path/to/libraries/directory" .`
+        `cmake -G "generator_name" -DCMAKE_PREFIX_PATH="path/to/include;path/to/lib" .`
     
     2. Use `make` or open the project file in the appropriate IDE to build the project
 
