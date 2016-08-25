@@ -5,6 +5,7 @@ set(TARGETS system_info
 	hello_triangle
 	loading_models
 	instanced_rendering
+	instanced_rendering2
 	controller_handling
 	library_test)
 
