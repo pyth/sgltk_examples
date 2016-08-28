@@ -124,7 +124,7 @@ void Win::display() {
 	shader->bind();
 	int light_loc = glGetUniformLocation(shader->program,
 		"light_pos");
-	glUniform3f(light_loc, 5, 10, 0);
+	glUniform3f(light_loc, 25, 25, 20);
 	int cam_loc = glGetUniformLocation(shader->program,
 		"cam_pos");
 	glUniform3fv(cam_loc, 1, glm::value_ptr(cam->pos));

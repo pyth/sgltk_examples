@@ -42,6 +42,14 @@ foreach(target ${TARGETS})
 	add_subdirectory(${target})
 endforeach()
 
-if(EXISTS sgltk/CMakeLists.txt)
+if(EXISTS ${PROJECT_SOURCE_DIR}/sgltk/CMakeLists.txt)
 	add_subdirectory(sgltk)
+	foreach(target ${TARGETS})
+		if(WIN32)
+			add_custom_command(TARGET target PRE_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				${PROJECT_BINARY_DIR}/sgltk/lib/sgltk.dll
+				${PROJECT_BINARY_DIR}/bin)
+		endif()
+	endforeach()
 endif()
