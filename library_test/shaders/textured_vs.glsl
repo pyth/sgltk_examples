@@ -12,13 +12,12 @@ out vec3 cam_vec;
 out vec3 light_vec;
 out vec3 tc;
 
+uniform vec3 light_pos;
 uniform vec3 cam_pos;
 uniform mat4 model_matrix;
-uniform mat4 view_matrix;
 uniform mat4 view_proj_matrix;
 uniform mat3 normal_matrix;
 uniform mat4[100] bone_array;
-uniform vec3 light_pos;
 
 void main() {
 	mat4 bone_transformation =	bone_array[bone_ids_in[0]] * bone_weights_in[0];

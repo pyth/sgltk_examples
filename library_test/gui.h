@@ -35,7 +35,7 @@ class GUI : public Window {
 	Shader *fps_shader;
 	Shader *point_shader;
 
-	Texture *tex;
+	Texture *fps_tex;
 	Texture *floor_diff;
 	Texture *floor_spec;
 	Texture *floor_norm;
@@ -44,7 +44,6 @@ class GUI : public Window {
 
 	Mesh *fps_display;
 	Mesh *floor;
-	Mesh *earth;
 
 	Scene *material_model;
 	Scene *textured_model;
@@ -57,9 +56,10 @@ class GUI : public Window {
 	glm::vec3 light_pos;
 	std::vector<sgltk::Vertex> light_verts;
 	sgltk::Mesh *light;
-	double time_cnt;
+	double frame_sum;
 	unsigned int fps;
 	unsigned int frame_cnt;
+	TTF_Font *font;
 
 	Mesh *create_sphere(unsigned int slices, unsigned int stacks);
 public:

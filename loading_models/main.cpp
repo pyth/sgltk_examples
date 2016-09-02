@@ -13,19 +13,18 @@
 
 using namespace sgltk;
 
-static bool rel_mode;
-static bool mouse_mode_change;
-
-static Timer timer;
-static Scene box;
-static Scene bob;
-static Scene spikey;
-static Shader *box_shader;
-static Shader *bob_shader;
-static Shader *spikey_shader;
-static Camera *camera;
-
 class Win : public sgltk::Window {
+	Timer timer;
+	Scene box;
+	Scene bob;
+	Scene spikey;
+	Shader box_shader;
+	Shader bob_shader;
+	Shader spikey_shader;
+	Camera camera;
+
+	bool rel_mode;
+	bool mouse_mode_change;
 public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
@@ -38,6 +37,44 @@ public:
 
 Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
 	sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
+
+	rel_mode = true;
+	mouse_mode_change = false;
+
+	//create shaders
+	bob_shader.attach_file("bob_vs.glsl", GL_VERTEX_SHADER);
+	bob_shader.attach_file("bob_fs.glsl", GL_FRAGMENT_SHADER);
+	bob_shader.link();
+
+	spikey_shader.attach_file("spikey_vs.glsl", GL_VERTEX_SHADER);
+	spikey_shader.attach_file("spikey_fs.glsl", GL_FRAGMENT_SHADER);
+	spikey_shader.link();
+
+	box_shader.attach_file("box_vs.glsl", GL_VERTEX_SHADER);
+	box_shader.attach_file("box_fs.glsl", GL_FRAGMENT_SHADER);
+	box_shader.link();
+
+	//create a camera
+	camera = Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
+			glm::vec3(0,1,0), 70.0f, (float)width,
+			(float)height, 0.1f, 800.0f);
+
+	//load the models and prepare them for rendering
+	bob.setup_shader(&bob_shader);
+	bob.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	bob.load("bob_lamp.md5mesh");
+
+	spikey.setup_shader(&spikey_shader);
+	spikey.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	spikey.load("Spikey.dae");
+
+	box.setup_shader(&box_shader);
+	box.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	box.load("box.obj");
+
+	//start the timer
+	timer.start();
+
 }
 
 Win::~Win() {}
@@ -53,32 +90,17 @@ void Win::display() {
 
 	glm::vec3 light_pos(5, 10, 0);
 
-	bob_shader->bind();
-	int light_loc = glGetUniformLocation(bob_shader->program,
-		"light_pos");
-	glUniform3fv(light_loc, 1, glm::value_ptr(light_pos));
+	bob_shader.bind();
+	bob_shader.set_uniform("light_pos", light_pos);
+	bob_shader.set_uniform("cam_pos", camera.pos);
 
-	int cam_loc = glGetUniformLocation(bob_shader->program,
-		"cam_pos");
-	glUniform3fv(cam_loc, 1, glm::value_ptr(camera->pos));
+	spikey_shader.bind();
+	spikey_shader.set_uniform("light_pos", light_pos);
+	spikey_shader.set_uniform("cam_pos", camera.pos);
 
-	spikey_shader->bind();
-	light_loc = glGetUniformLocation(spikey_shader->program,
-		"light_pos");
-	glUniform3fv(light_loc, 1, glm::value_ptr(light_pos));
-
-	cam_loc = glGetUniformLocation(spikey_shader->program,
-		"cam_pos");
-	glUniform3fv(cam_loc, 1, glm::value_ptr(camera->pos));
-
-	box_shader->bind();
-	light_loc = glGetUniformLocation(box_shader->program,
-		"light_pos");
-	glUniform3fv(light_loc, 1, glm::value_ptr(light_pos));
-
-	cam_loc = glGetUniformLocation(box_shader->program,
-		"cam_pos");
-	glUniform3fv(cam_loc, 1, glm::value_ptr(camera->pos));
+	box_shader.bind();
+	box_shader.set_uniform("light_pos", light_pos);
+	box_shader.set_uniform("cam_pos", camera.pos);
 
 	//draw the models
 	bob.animate((float)timer.get_time());
@@ -101,23 +123,23 @@ void Win::handle_keyboard(std::string key) {
 		dt = 2.0;
 
 	if(key == "D") {
-		camera->move_right(mov_speed * dt);
+		camera.move_right(mov_speed * dt);
 	} else if(key == "A") {
-		camera->move_right(-mov_speed * dt);
+		camera.move_right(-mov_speed * dt);
 	} else if(key == "W") {
-		camera->move_forward(mov_speed * dt);
+		camera.move_forward(mov_speed * dt);
 	} else if(key == "S") {
-		camera->move_forward(-mov_speed * dt);
+		camera.move_forward(-mov_speed * dt);
 	} else if(key == "R") {
-		camera->move_up(mov_speed * dt);
+		camera.move_up(mov_speed * dt);
 	} else if(key == "F") {
-		camera->move_up(-mov_speed * dt);
+		camera.move_up(-mov_speed * dt);
 	} else if(key == "E") {
-		camera->roll(rot_speed * dt);
+		camera.roll(rot_speed * dt);
 	} else if(key == "Q") {
-		camera->roll(-rot_speed * dt);
+		camera.roll(-rot_speed * dt);
 	}
-	camera->update_view_matrix();
+	camera.update_view_matrix();
 }
 
 void Win::handle_key_press(std::string key, bool pressed) {
@@ -133,9 +155,9 @@ void Win::handle_key_press(std::string key, bool pressed) {
 
 void Win::handle_mouse_motion(int x, int y) {
 	if (rel_mode) {
-		camera->yaw(-glm::atan((float)x) / 500);
-		camera->pitch(-glm::atan((float)y) / 500);
-		camera->update_view_matrix();
+		camera.yaw(-glm::atan((float)x) / 500);
+		camera.pitch(-glm::atan((float)y) / 500);
+		camera.update_view_matrix();
 	}
 }
 
@@ -148,9 +170,6 @@ int main(int argc, char **argv) {
 #else
 	_chdir(path.c_str());
 #endif //__linux__
-
-	rel_mode = true;
-	mouse_mode_change = false;
 
 	//initialize the library
 	App::init();
@@ -167,48 +186,16 @@ int main(int argc, char **argv) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
+	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);
+	int x = sgltk::App::sys_info.display_bounds[0].x +
+		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].w);
+	int y = sgltk::App::sys_info.display_bounds[0].y +
+		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
 	//open a window
-	Win window("Loading models", 1024, 768, 100, 100, 3, 0, 0);
+	Win window("Loading models", w, h, x, y, 3, 0, 0);
 	window.set_relative_mode(true);
-
-	//create shaders
-	bob_shader = new Shader();
-	bob_shader->attach_file("bob_vs.glsl", GL_VERTEX_SHADER);
-	bob_shader->attach_file("bob_fs.glsl", GL_FRAGMENT_SHADER);
-	bob_shader->link();
-
-	spikey_shader = new Shader();
-	spikey_shader->attach_file("spikey_vs.glsl", GL_VERTEX_SHADER);
-	spikey_shader->attach_file("spikey_fs.glsl", GL_FRAGMENT_SHADER);
-	spikey_shader->link();
-
-	box_shader = new Shader();
-	box_shader->attach_file("box_vs.glsl", GL_VERTEX_SHADER);
-	box_shader->attach_file("box_fs.glsl", GL_FRAGMENT_SHADER);
-	box_shader->link();
-
-	//create a camera
-	camera = new Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
-				glm::vec3(0,1,0), 70.0f,
-				(float)window.width, (float)window.height,
-				0.1f, 800.0f);
-
-	//load the models and prepare them for rendering
-	bob.setup_shader(bob_shader);
-	bob.setup_camera(&camera->view_matrix, &camera->projection_matrix_persp);
-	bob.load("bob_lamp.md5mesh");
-
-	spikey.setup_shader(spikey_shader);
-	spikey.setup_camera(&camera->view_matrix, &camera->projection_matrix_persp);
-	spikey.load("Spikey.dae");
-
-	box.setup_shader(box_shader);
-	box.setup_camera(&camera->view_matrix, &camera->projection_matrix_persp);
-	box.load("box.obj");
-
-	//start the timer
-	timer.start();
 
 	//start the mainloop
 	window.run();

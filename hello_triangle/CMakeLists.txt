@@ -22,6 +22,12 @@ target_compile_definitions(${TARGET} PRIVATE ${TYPE})
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/sgltk/CMakeLists.txt)
 	add_dependencies(${TARGET} sgltk)
+	if(WIN32)
+		add_custom_command(TARGET ${TARGET} PRE_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			${PROJECT_BINARY_DIR}/sgltk/lib/sgltk.dll
+			${PROJECT_BINARY_DIR}/bin)
+	endif()
 endif()
 
 foreach(lib ${LIBS})

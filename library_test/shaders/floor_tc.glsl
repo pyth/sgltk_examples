@@ -13,23 +13,25 @@ out vec3 tc_te[];
 out vec3 pos_ts_te[];
 out vec3 light_ts_te[];
 
+uniform int max_tess_level;
+
 float get_tess_level(float dist0, float dist1) {
 	float dist = (dist0 + dist1) / 2.0;
 
 	if(dist <= 20.0)
-		return 64.0;
+		return max_tess_level;
 
-	else if(dist <= 40.0)
-		return 32.0;
+	else if(dist <= 60.0)
+		return max_tess_level / 2;
 
-	else if(dist <= 80.0)
-		return 16.0;
+	else if(dist <= 100.0)
+		return max_tess_level / 4;
 
-	else if(dist <= 160.0)
-		return 8.0;
+	else if(dist <= 180.0)
+		return max_tess_level / 8;
 
 	else
-		return 2.0;
+		return max_tess_level / 16;
 }
 
 void main(void){

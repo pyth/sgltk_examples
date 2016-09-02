@@ -51,8 +51,15 @@ void Win::handle_key_press(std::string key, bool pressed) {
 
 int main(int argc, char **argv) {
 	sgltk::App::init();
-	SDL_Rect rect = sgltk::App::sys_info.display_bounds[0];
-	Win window("Controller test", 600, 400, 100 + rect.x, 100 + rect.y, 3, 0, 0);
+
+	int w = (int)(0.25 * sgltk::App::sys_info.display_bounds[0].w);
+	int h = (int)(0.25 * sgltk::App::sys_info.display_bounds[0].h);
+	int x = sgltk::App::sys_info.display_bounds[0].x +
+		(int)(0.375 * sgltk::App::sys_info.display_bounds[0].w);
+	int y = sgltk::App::sys_info.display_bounds[0].y +
+		(int)(0.375 * sgltk::App::sys_info.display_bounds[0].h);
+
+	Win window("Controller test", w, h, x, y, 3, 0, 0);
 	window.run();
 	return 0;
 }

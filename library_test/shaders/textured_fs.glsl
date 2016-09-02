@@ -22,11 +22,10 @@ void main() {
 
 	vec3 norm = normalize(bump.xyz * 2 - vec3(1));
 	vec3 light = normalize(light_vec);
-	vec3 reflection = normalize(reflect(-light, norm));
+	vec3 reflection = normalize(reflect(light, norm));
 
-	float LN = max(0.0, dot(norm, light));
-	float VR = abs(max(0.0, dot(normalize(cam_vec), reflection)));
-	VR *= sign(LN);
+	float LN = dot(norm, light);
+	float VR = max(0.0, abs(dot(normalize(cam_vec), reflection)) * sign(LN));
 
 	float light_dist = length(light_vec);
 	float attenuation = 1.0 / (1.0 +
@@ -35,7 +34,7 @@ void main() {
 
 	vec4 amb = vec4(0.2 * tex.xyz, 1);
 
-	vec4 diff = vec4(LN * tex.xyz, 1);
+	vec4 diff = vec4(max(0.0, LN) * tex.xyz, 1);
 
 	vec4 spec = vec4(sp.xyz * pow(VR, 10), 1);
 

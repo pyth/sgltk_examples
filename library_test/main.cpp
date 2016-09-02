@@ -33,7 +33,14 @@ int main(int argc, char** argv) {
 	Image::add_path("../data/fonts");
 	Shader::add_path("../library_test/shaders");
 
-	window = new GUI("Test", 1024, 768, 100, 100, 4, 0, 0);
+	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
+	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);
+	int x = sgltk::App::sys_info.display_bounds[0].x +
+		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].w);
+	int y = sgltk::App::sys_info.display_bounds[0].y +
+		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
+
+	window = new GUI("Test", w, h, x, y, 4, 0, 0);
 
 	window->run();
 	return 0;

@@ -3,6 +3,7 @@ project(sgltk_example)
 
 set(TARGETS system_info
 	hello_triangle
+	cubemap
 	loading_models
 	instanced_rendering
 	instanced_rendering2
@@ -44,12 +45,4 @@ endforeach()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/sgltk/CMakeLists.txt)
 	add_subdirectory(sgltk)
-	foreach(target ${TARGETS})
-		if(WIN32)
-			add_custom_command(TARGET target PRE_BUILD
-				COMMAND ${CMAKE_COMMAND} -E copy_if_different
-				${PROJECT_BINARY_DIR}/sgltk/lib/sgltk.dll
-				${PROJECT_BINARY_DIR}/bin)
-		endif()
-	endforeach()
 endif()

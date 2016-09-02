@@ -10,11 +10,6 @@
 	#include <direct.h>
 #endif //__linux__
 
-
-#define RES_X 1024
-#define RES_Y 754
-
-
 class Win : public sgltk::Window {
 	sgltk::Mesh *mesh;
 	sgltk::Shader *shader;
@@ -49,7 +44,7 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 	cam = new sgltk::Camera(glm::vec3(25, 25, 100), glm::vec3(0, 0, -1),
 				glm::vec3(0, 1, 0),
-				70.0f, RES_X, RES_Y, 0.1f, 800.0f);
+				70.0f, (float)width, (float)height, 0.1f, 800.0f);
 
 	std::vector<glm::mat4> model_matrix(25);
 	for(unsigned int i = 0; i < model_matrix.size(); i++) {
@@ -58,10 +53,10 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 	//create the triangle mesh
 	mesh = new sgltk::Mesh();
-	int pos_buf = mesh->attach_vertex_buffer<glm::vec4>(&pos);
-	int color_buf = mesh->attach_vertex_buffer<glm::vec4>(&color);
-	int mat_buf = mesh->attach_vertex_buffer<glm::mat4>(&model_matrix);
-	mesh->attach_index_buffer(&ind);
+	int pos_buf = mesh->attach_vertex_buffer<glm::vec4>(pos);
+	int color_buf = mesh->attach_vertex_buffer<glm::vec4>(color);
+	int mat_buf = mesh->attach_vertex_buffer<glm::mat4>(model_matrix);
+	mesh->attach_index_buffer(ind);
 	mesh->setup_shader(shader);
 	mesh->setup_camera(&cam->view_matrix, &cam->projection_matrix_persp);
 	mesh->set_vertex_attribute(0, pos_buf, 4, GL_FLOAT, 0, 0);
@@ -113,10 +108,14 @@ int main(int argc, char **argv) {
 	//setup the shader files location
 	sgltk::Shader::add_path("../instanced_rendering/shaders");
 
-	Win window("Instanced rendering",
-					RES_X, RES_Y,
-					100, 100,
-					3, 3, 0);
+	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
+	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);
+	int x = sgltk::App::sys_info.display_bounds[0].x +
+		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].w);
+	int y = sgltk::App::sys_info.display_bounds[0].y +
+		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
+
+	Win window("Instanced rendering", w, h, x, y, 3, 3, 0);
 
 	window.run();
 

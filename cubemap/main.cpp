@@ -1,0 +1,241 @@
+#include <sgltk/app.h>
+#include <sgltk/window.h>
+#include <sgltk/mesh.h>
+#include <sgltk/scene.h>
+#include <sgltk/camera.h>
+#include <sgltk/shader.h>
+
+#ifdef __linux__
+	#include <unistd.h>
+#else
+	#include <direct.h>
+#endif //__linux__
+
+class Win : public sgltk::Window {
+	bool rel_mode;
+	bool wireframe;
+
+	glm::vec2 cam_pos;
+
+	glm::mat4 skybox_mat;
+	glm::mat4 obj_mat;
+	sgltk::Texture cubemap;
+	sgltk::Mesh skybox;
+	sgltk::Shader skybox_shader;
+	sgltk::Shader obj_shader;
+	sgltk::Camera *cam;
+	sgltk::Scene obj;
+public:
+	Win(const char *title, int res_x, int res_y, int offset_x,
+		int offset_y, int gl_maj, int gl_min, unsigned int flags);
+	~Win();
+	void handle_keyboard(std::string key);
+	void handle_key_press(std::string key, bool pressed);
+	void handle_mouse_motion(int x, int y);
+	void display();
+};
+
+Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
+		sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
+
+	rel_mode = true;
+	wireframe = false;
+
+	//skybox vertex positions
+	std::vector<glm::vec4> pos = {
+		//front 0, 1, 2, 3
+		glm::vec4(-1.0, -1.0, -1.0, 1.0),
+		glm::vec4( 1.0, -1.0, -1.0, 1.0),
+		glm::vec4(-1.0,  1.0, -1.0, 1.0),
+		glm::vec4( 1.0,  1.0, -1.0, 1.0),
+
+		//back 4, 5, 6, 7
+		glm::vec4(-1.0, -1.0, 1.0, 1.0),
+		glm::vec4( 1.0, -1.0, 1.0, 1.0),
+		glm::vec4(-1.0,  1.0, 1.0, 1.0),
+		glm::vec4( 1.0,  1.0, 1.0, 1.0),
+
+		//left 8, 9, 10, 11
+		glm::vec4(-1.0, -1.0,  1.0, 1.0),
+		glm::vec4(-1.0, -1.0, -1.0, 1.0),
+		glm::vec4(-1.0,  1.0,  1.0, 1.0),
+		glm::vec4(-1.0,  1.0,  -1.0, 1.0),
+
+		//right 12, 13, 14, 15
+		glm::vec4(1.0, -1.0,  1.0, 1.0),
+		glm::vec4(1.0, -1.0, -1.0, 1.0),
+		glm::vec4(1.0,  1.0,  1.0, 1.0),
+		glm::vec4(1.0,  1.0, -1.0, 1.0),
+
+		//bottom 16, 17, 18, 19
+		glm::vec4(-1.0, -1.0,  1.0, 1.0),
+		glm::vec4( 1.0, -1.0,  1.0, 1.0),
+		glm::vec4(-1.0, -1.0, -1.0, 1.0),
+		glm::vec4( 1.0, -1.0, -1.0, 1.0),
+
+		//top 20, 21, 22, 23
+		glm::vec4(-1.0, 1.0, -1.0, 1.0),
+		glm::vec4( 1.0, 1.0, -1.0, 1.0),
+		glm::vec4(-1.0, 1.0,  1.0, 1.0),
+		glm::vec4( 1.0, 1.0,  1.0, 1.0)
+	};
+
+	//triangle topology
+	std::vector<unsigned short> ind = {
+		//front
+		0, 1, 2, 2, 1, 3,
+		//back
+		4, 5, 6, 6, 5, 7,
+		//left
+		8, 9, 10, 10, 9, 11,
+		//right
+		12, 13, 14, 14, 13, 15,
+		//bottom
+		16, 17, 18, 18, 17, 19,
+		//top
+		20, 21, 22, 22, 21, 23
+	};
+
+	//compile and link the shaders
+	skybox_shader.attach_file("skybox_vs.glsl", GL_VERTEX_SHADER);
+	skybox_shader.attach_file("skybox_fs.glsl", GL_FRAGMENT_SHADER);
+	skybox_shader.link();
+
+	obj_shader.attach_file("obj_vs.glsl", GL_VERTEX_SHADER);
+	obj_shader.attach_file("obj_fs.glsl", GL_FRAGMENT_SHADER);
+	obj_shader.link();
+
+	//laod skybox textures
+	sgltk::Image pos_x("pond_r.jpg");
+	sgltk::Image neg_x("pond_l.jpg");
+	sgltk::Image pos_y("pond_u.jpg");
+	sgltk::Image neg_y("pond_d.jpg");
+	sgltk::Image pos_z("pond_b.jpg");
+	sgltk::Image neg_z("pond_f.jpg");
+	cubemap.set_target(GL_TEXTURE_CUBE_MAP);
+	cubemap.load_cubemap(pos_x, neg_x, pos_y, neg_y, pos_z, neg_z);
+
+	cam = new sgltk::Camera(glm::vec3(0, 0, 10), glm::vec3(0, 0, -1),
+				glm::vec3(0, 1, 0),
+				70.0f, (float)width, (float)height, 0.1f, 800.0f,
+				sgltk::INF_PERSPECTIVE);
+
+	//create the triangle mesh
+	skybox_mat = glm::scale(glm::vec3(200));
+	int pos_buf = skybox.attach_vertex_buffer<glm::vec4>(pos);
+	skybox.attach_index_buffer(ind);
+	skybox.setup_shader(&skybox_shader);
+	skybox.setup_camera(&cam->view_matrix, &cam->projection_matrix_persp_inf);
+	skybox.set_vertex_attribute("pos_in", pos_buf, 4, GL_FLOAT, 0, 0);
+	skybox.textures_ambient = {&cubemap};
+
+	obj_mat = glm::scale(glm::vec3(2));
+	obj.setup_camera(&cam->view_matrix, &cam->projection_matrix_persp_inf);
+	obj.setup_shader(&obj_shader);
+	obj.load("monkey.obj");
+	obj.meshes[0]->textures_ambient = {&cubemap};
+
+	set_relative_mode(rel_mode);
+}
+
+Win::~Win() {
+	delete cam;
+}
+
+void Win::handle_mouse_motion(int x, int y) {
+	float rot_speed = 0.005f;
+	if(rel_mode) {
+		cam_pos += glm::vec2(x, y);
+	}
+	cam->pos = glm::vec4(0, 0, 10, 1);
+	cam->pos = glm::rotate((float)(rot_speed * cam_pos.y), glm::vec3(1, 0, 0)) * cam->pos;
+	cam->pos = glm::rotate((float)(rot_speed * cam_pos.x), glm::vec3(0, 1, 0)) * cam->pos;
+	cam->dir = -cam->pos;
+	cam->update_view_matrix();
+}
+
+void Win::handle_key_press(std::string key, bool pressed) {
+	if(key == "Escape") {
+		stop();
+	} else if(key == "M") {
+		if(pressed) {
+			rel_mode = !rel_mode;
+			set_relative_mode(rel_mode);
+		}
+	} else if(key == "L") {
+		if(pressed) {
+			wireframe = !wireframe;
+		}
+	}
+}
+
+void Win::handle_keyboard(std::string key) {
+	float rot_speed = 0.005f;
+	float dt = 1000 * (float)delta_time;
+	if (dt < 2.0)
+		dt = 2.0;
+
+	if(key == "E") {
+		cam->roll(rot_speed * dt);
+	} else if(key == "Q") {
+		cam->roll(-rot_speed * dt);
+	}
+	cam->update_view_matrix();
+}
+
+void Win::display() {
+	glClearColor(0, 0, 0, 1);
+	glClearDepth(1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if(wireframe) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+
+	skybox.draw(GL_TRIANGLES, &skybox_mat);
+
+	obj_shader.bind();
+	obj_shader.set_uniform("cam_pos", cam->pos);
+	obj.draw(&obj_mat);
+}
+
+int main(int argc, char **argv) {
+	//change the current working directory to the location
+	//of the executable
+	std::string path(argv[0]);
+	path = path.substr(0, path.find_last_of("\\/"));
+	#ifdef __linux__
+		chdir(path.c_str());
+	#else
+		_chdir(path.c_str());
+	#endif //__linux__
+
+	//initialize the library
+	//this should be done prior to using any of the classes and
+	//functions provided by sgltk
+	sgltk::App::init();
+
+	//setup asset locations
+	sgltk::Shader::add_path("../cubemap/shaders");
+	sgltk::Image::add_path("../data/textures");
+	sgltk::Scene::add_path("../data/models");
+
+	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
+	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);
+	int x = sgltk::App::sys_info.display_bounds[0].x +
+		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].w);
+	int y = sgltk::App::sys_info.display_bounds[0].y +
+		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
+
+	Win window("Cubemap", w, h, x, y, 3, 0, 0);
+
+
+
+	window.run(100);
+
+	return 0;
+}

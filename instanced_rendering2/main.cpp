@@ -10,11 +10,6 @@
 	#include <direct.h>
 #endif //__linux__
 
-
-#define RES_X 1024
-#define RES_Y 754
-
-
 class Win : public sgltk::Window {
 	bool rel_mode;
 
@@ -45,7 +40,7 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 	cam = new sgltk::Camera(glm::vec3(25, 25, 100), glm::vec3(0, 0, -1),
 				glm::vec3(0, 1, 0),
-				70.0f, RES_X, RES_Y, 0.1f, 800.0f);
+				70.0f, (float)width, (float)height, 0.1f, 800.0f);
 
 	std::vector<glm::mat4> model_matrix(25);
 	for(unsigned int i = 0; i < model_matrix.size(); i++) {
@@ -58,7 +53,7 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	box->setup_shader(shader);
 	box->setup_camera(&cam->view_matrix, &cam->projection_matrix_persp);
 	box->load("box.obj");
-	box->setup_instanced_matrix(&model_matrix);
+	box->setup_instanced_matrix(model_matrix);
 }
 
 Win::~Win() {
@@ -122,15 +117,10 @@ void Win::display() {
 	glDepthFunc(GL_LESS);
 
 	shader->bind();
-	int light_loc = glGetUniformLocation(shader->program,
-		"light_pos");
-	glUniform3f(light_loc, 25, 25, 20);
-	int cam_loc = glGetUniformLocation(shader->program,
-		"cam_pos");
-	glUniform3fv(cam_loc, 1, glm::value_ptr(cam->pos));
+	shader->set_uniform_float("light_pos", 25, 25, 20);
+	shader->set_uniform("cam_pos", cam->pos);
 
 	box->draw_instanced(25);
-	//box->draw();
 }
 
 int main(int argc, char **argv) {
@@ -154,14 +144,14 @@ int main(int argc, char **argv) {
 	sgltk::Scene::add_path("../data/models");
 	sgltk::Image::add_path("../data/textures");
 
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
+	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);
+	int x = sgltk::App::sys_info.display_bounds[0].x +
+		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].w);
+	int y = sgltk::App::sys_info.display_bounds[0].y +
+		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
-	Win window("Instanced rendering 2",
-					RES_X, RES_Y,
-					100, 100,
-					3, 3, 0);
+	Win window("Instanced rendering 2", w, h, x, y, 3, 3, 0);
 
 	window.run();
 

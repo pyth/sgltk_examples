@@ -13,21 +13,20 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	GLint max_patch_vertices = 0;
-	GLint max_tess_gen_level = 0;
-	glGetIntegerv(GL_MAX_PATCH_VERTICES, &max_patch_vertices);
-	glGetIntegerv(GL_MAX_TESS_GEN_LEVEL, &max_tess_gen_level);
-	//printf("Max supported patch vertices %d\n", max_patch_vertices);
-	//printf("Max tessellation level %d\n", max_tess_gen_level);
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
 	//Face culling
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
-	//glPolygonMode(GL_FRONT, GL_FILL);
 
-	time_cnt = 0;
+	font = Image::open_font_file("Oswald-Medium.ttf", 40);
+
+	Image fps_text;
+	fps_text.create_text("FPS: " + std::to_string(0),
+			     font, 255, 0, 0, 255);
+	fps_tex = new Texture();
+	fps_tex->load_texture(fps_text);
 
 	floor_diff = new Texture("tile_sandstone_d.png");
 	floor_diff->set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -107,8 +106,8 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 
 	//create a mesh out of the vertices
 	fps_display = new Mesh();
-	fps_display->attach_vertex_buffer(&vert);
-	fps_display->attach_index_buffer(&fps_ind);
+	fps_display->attach_vertex_buffer(vert);
+	fps_display->attach_index_buffer(fps_ind);
 	fps_display->setup_shader(fps_shader);
 	fps_display->setup_camera(&fps_camera->view_matrix,
 			   &fps_camera->projection_matrix_ortho);
@@ -119,8 +118,8 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	fps_display->model_matrix = glm::scale(glm::vec3(12.0, 7.0, 0.0));
 
 	floor = new Mesh();
-	floor->attach_vertex_buffer(&vert);
-	floor->attach_index_buffer(&floor_ind);
+	floor->attach_vertex_buffer(vert);
+	floor->attach_index_buffer(floor_ind);
 	floor->setup_shader(floor_shader);
 	floor->setup_camera(&camera->view_matrix,
 			    &camera->projection_matrix_persp);
@@ -138,8 +137,8 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	glm::mat4 floor_rot = glm::rotate((float)(-M_PI / 2), glm::vec3(1.0, 0.0, 0.0));
 	glm::mat4 floor_transl;
 	int side = (int)sqrt(floor_m.size());
-	for(float i = -side / 2; i < side / 2; i+=1) {
-		for(float j = -side / 2; j < side / 2; j+=1) {
+	for(int i = -side / 2; i < side / 2; i+=1) {
+		for(int j = -side / 2; j < side / 2; j+=1) {
 			int index = (i + side / 2) * side + j + side / 2;
 			floor_transl = glm::translate(glm::vec3(4*i, 0, 4*j));
 			floor_m[index] = floor_transl * floor_rot;
@@ -149,16 +148,16 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	int loc, buf_ind;
 	unsigned int vec3_size = sizeof(glm::vec3);
 	unsigned int vec4_size = sizeof(glm::vec4);
-	loc = glGetAttribLocation(floor_shader->program, "model_matrix");
-	buf_ind = floor->attach_vertex_buffer<glm::mat4>(&floor_m);
+	loc = floor_shader->get_attribute_location("model_matrix");
+	buf_ind = floor->attach_vertex_buffer<glm::mat4>(floor_m);
 	for(int i = 0; i < 4; i++) {
 		floor->set_vertex_attribute(loc + i, buf_ind, 4, GL_FLOAT,
 						sizeof(glm::mat4),
 						(const void*)(i * vec4_size), 1);
 	}
 
-	loc = glGetAttribLocation(floor_shader->program, "normal_matrix");
-	buf_ind = floor->attach_vertex_buffer<glm::mat3>(&floor_nm);
+	loc = floor_shader->get_attribute_location("normal_matrix");
+	buf_ind = floor->attach_vertex_buffer<glm::mat3>(floor_nm);
 	for(int i = 0; i < 3; i++) {
 		floor->set_vertex_attribute(loc + i, buf_ind, 3, GL_FLOAT,
 						sizeof(glm::mat3),
@@ -195,8 +194,8 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	light_trafo = glm::mat4(1.0);
 	light_trafo = glm::translate(light_trafo, light_pos);
 	light = new sgltk::Mesh();
-	light->attach_vertex_buffer(&light_verts);
-	light->attach_index_buffer(&light_index);
+	light->attach_vertex_buffer(light_verts);
+	light->attach_index_buffer(light_index);
 	light->setup_shader(point_shader);
 	light->setup_camera(&camera->view_matrix, &camera->projection_matrix_persp);
 	light->set_vertex_attribute("pos_in", 0, 3, GL_FLOAT, sizeof(sgltk::Vertex),
@@ -225,7 +224,6 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 }
 
 GUI::~GUI() {
-	delete tex;
 	delete floor_diff;
 	delete floor_spec;
 	delete floor_norm;
@@ -246,6 +244,7 @@ GUI::~GUI() {
 	delete light;
 	delete material_model;
 	delete textured_model;
+	Image::close_font_file(font);
 }
 
 Mesh *GUI::create_sphere(unsigned int slices, unsigned int stacks) {
@@ -264,43 +263,26 @@ void GUI::display() {
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 
-	time_cnt += delta_time;
 	frame_cnt++;
-	if(time_cnt >= 1.0) {
-		fps = frame_cnt;
+	frame_sum += 1.0 / delta_time;
+	if(frame_cnt > 100) {
+		fps = (unsigned int)(frame_sum / frame_cnt);
+		Image fps_text;
+		fps_text.create_text("FPS: " + std::to_string(fps),
+				     font, 255, 0, 0, 255);
+		fps_tex->load_texture(fps_text);
 		frame_cnt = 0;
-		time_cnt -= 1.0;
+		frame_sum = 0;
 	}
-	Image fps_text;
-	Texture fps_tex;
-	fps_text.create_text("FPS: " + std::to_string(fps),
-			     "Oswald-Medium.ttf", 40, 255, 0, 0, 255);
-	fps_tex.load_texture(&fps_text);
-
-	fps_shader->bind();
-	int texture_loc = glGetUniformLocation(fps_shader->program,
-						    "Texture");
-	glUniform1i(texture_loc, 0);
-	int res_loc = glGetUniformLocation(fps_shader->program,
-						    "Resolution");
-	glUniform2f(res_loc, fps_camera->width, fps_camera->height);
-
-	material_shader->bind();
-	int light_loc = glGetUniformLocation(material_shader->program,
-					  "light_pos");
-	glUniform3fv(light_loc, 1, glm::value_ptr(light_pos));
-	textured_shader->bind();
-	light_loc = glGetUniformLocation(textured_shader->program,
-					  "light_pos");
-	glUniform3fv(light_loc, 1, glm::value_ptr(light_pos));
-	int cam_loc = glGetUniformLocation(textured_shader->program,
-					  "cam_pos");
-	glUniform3fv(cam_loc, 1, glm::value_ptr(camera->pos));
 
 	glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT, GL_FILL);
 
-	fps_tex.bind();
+	fps_shader->bind();
+	fps_shader->set_uniform_int("Texture", 0);
+	fps_shader->set_uniform_float("Resolution", fps_camera->width, fps_camera->height);
+	fps_tex->bind();
 	fps_display->draw(GL_TRIANGLES);
 
 	if(wireframe) {
@@ -308,13 +290,21 @@ void GUI::display() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
+	floor_shader->bind();
+	floor_shader->set_uniform("light_pos", light_pos);
+	floor_shader->set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
 	floor->draw_instanced(GL_PATCHES, NUM_TILES);
 
+	material_shader->bind();
+	material_shader->set_uniform("light_pos", light_pos);
 	for(unsigned int i = 0; i < spikey_trafos.size(); i++) {
 		material_model->animate((float)time.get_time());
 		material_model->draw(&spikey_trafos[i]);
 	}
 
+	textured_shader->bind();
+	textured_shader->set_uniform("light_pos", light_pos);
+	textured_shader->set_uniform("cam_pos", camera->pos);
 	for(unsigned int i = 0; i < bob_trafos.size(); i++) {
 		textured_model->animate((float)time.get_time());
 		textured_model->draw(&bob_trafos[i]);
@@ -359,7 +349,7 @@ void GUI::handle_key_press(std::string key, bool pressed) {
 		if(pressed && ctrl) {
 			if(windowed) {
 				mode = App::sys_info.desktop_display_modes[get_display_index()];
-				set_display_mode(&mode);
+				set_display_mode(mode);
 				fullscreen_mode(FULLSCREEN);
 			} else {
 				fullscreen_mode(WINDOWED);
@@ -375,6 +365,8 @@ void GUI::handle_keyboard(std::string key) {
 	float dt = 1000 * (float)delta_time;
 	if(dt < 2.0)
 		dt = 2.0;
+	if(dt > 3.0)
+		dt = 3.0;
 
 	if(key == "D") {
 		camera->move_right(mov_speed * dt);
