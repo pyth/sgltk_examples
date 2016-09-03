@@ -23,7 +23,7 @@ class Win : public sgltk::Window {
 	sgltk::Mesh skybox;
 	sgltk::Shader skybox_shader;
 	sgltk::Shader obj_shader;
-	sgltk::Camera *cam;
+	sgltk::Camera cam;
 	sgltk::Scene obj;
 public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
@@ -115,22 +115,22 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	cubemap.set_target(GL_TEXTURE_CUBE_MAP);
 	cubemap.load_cubemap(pos_x, neg_x, pos_y, neg_y, pos_z, neg_z);
 
-	cam = new sgltk::Camera(glm::vec3(0, 0, 10), glm::vec3(0, 0, -1),
-				glm::vec3(0, 1, 0),
-				70.0f, (float)width, (float)height, 0.1f, 800.0f,
-				sgltk::INF_PERSPECTIVE);
+	cam = sgltk::Camera(glm::vec3(0, 0, -10), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0),
+				70.f, (float)width, (float)height, 0.1f, 800.0f, sgltk::INF_PERSPECTIVE);
+	cam.pos = -10.f * glm::normalize(cam.dir);
+	cam.update_view_matrix();
 
 	//create the triangle mesh
 	skybox_mat = glm::scale(glm::vec3(200));
 	int pos_buf = skybox.attach_vertex_buffer<glm::vec4>(pos);
 	skybox.attach_index_buffer(ind);
 	skybox.setup_shader(&skybox_shader);
-	skybox.setup_camera(&cam->view_matrix, &cam->projection_matrix_persp_inf);
+	skybox.setup_camera(&cam.view_matrix, &cam.projection_matrix_persp_inf);
 	skybox.set_vertex_attribute("pos_in", pos_buf, 4, GL_FLOAT, 0, 0);
 	skybox.textures_ambient = {&cubemap};
 
 	obj_mat = glm::scale(glm::vec3(2));
-	obj.setup_camera(&cam->view_matrix, &cam->projection_matrix_persp_inf);
+	obj.setup_camera(&cam.view_matrix, &cam.projection_matrix_persp_inf);
 	obj.setup_shader(&obj_shader);
 	obj.load("monkey.obj");
 	obj.meshes[0]->textures_ambient = {&cubemap};
@@ -139,19 +139,15 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 }
 
 Win::~Win() {
-	delete cam;
 }
 
 void Win::handle_mouse_motion(int x, int y) {
-	float rot_speed = 0.005f;
 	if(rel_mode) {
-		cam_pos += glm::vec2(x, y);
+		cam.yaw(-glm::atan((float)x) / 500);
+		cam.pitch(-glm::atan((float)y) / 500);
+		cam.pos = -10.f * glm::normalize(cam.dir);
+		cam.update_view_matrix();
 	}
-	cam->pos = glm::vec4(0, 0, 10, 1);
-	cam->pos = glm::rotate((float)(rot_speed * cam_pos.y), glm::vec3(1, 0, 0)) * cam->pos;
-	cam->pos = glm::rotate((float)(rot_speed * cam_pos.x), glm::vec3(0, 1, 0)) * cam->pos;
-	cam->dir = -cam->pos;
-	cam->update_view_matrix();
 }
 
 void Win::handle_key_press(std::string key, bool pressed) {
@@ -176,11 +172,11 @@ void Win::handle_keyboard(std::string key) {
 		dt = 2.0;
 
 	if(key == "E") {
-		cam->roll(rot_speed * dt);
+		cam.roll(rot_speed * dt);
 	} else if(key == "Q") {
-		cam->roll(-rot_speed * dt);
+		cam.roll(-rot_speed * dt);
 	}
-	cam->update_view_matrix();
+	cam.update_view_matrix();
 }
 
 void Win::display() {
@@ -199,7 +195,7 @@ void Win::display() {
 	skybox.draw(GL_TRIANGLES, &skybox_mat);
 
 	obj_shader.bind();
-	obj_shader.set_uniform("cam_pos", cam->pos);
+	obj_shader.set_uniform("cam_pos", cam.pos);
 	obj.draw(&obj_mat);
 }
 
