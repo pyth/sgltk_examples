@@ -29,6 +29,7 @@ public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
 	~Win();
+	void handle_resize();
 	void handle_keyboard(std::string key);
 	void handle_key_press(std::string key, bool pressed);
 	void handle_mouse_motion(int x, int y);
@@ -44,40 +45,15 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	//skybox vertex positions
 	std::vector<glm::vec4> pos = {
 		//front 0, 1, 2, 3
-		glm::vec4(-1.0, -1.0, -1.0, 1.0),
-		glm::vec4( 1.0, -1.0, -1.0, 1.0),
-		glm::vec4(-1.0,  1.0, -1.0, 1.0),
-		glm::vec4( 1.0,  1.0, -1.0, 1.0),
+		glm::vec4(-1, -1, -1, 1),
+		glm::vec4( 1, -1, -1, 1),
+		glm::vec4(-1,  1, -1, 1),
+		glm::vec4( 1,  1, -1, 1),
 
-		//back 4, 5, 6, 7
-		glm::vec4(-1.0, -1.0, 1.0, 1.0),
-		glm::vec4( 1.0, -1.0, 1.0, 1.0),
-		glm::vec4(-1.0,  1.0, 1.0, 1.0),
-		glm::vec4( 1.0,  1.0, 1.0, 1.0),
-
-		//left 8, 9, 10, 11
-		glm::vec4(-1.0, -1.0,  1.0, 1.0),
-		glm::vec4(-1.0, -1.0, -1.0, 1.0),
-		glm::vec4(-1.0,  1.0,  1.0, 1.0),
-		glm::vec4(-1.0,  1.0,  -1.0, 1.0),
-
-		//right 12, 13, 14, 15
-		glm::vec4(1.0, -1.0,  1.0, 1.0),
-		glm::vec4(1.0, -1.0, -1.0, 1.0),
-		glm::vec4(1.0,  1.0,  1.0, 1.0),
-		glm::vec4(1.0,  1.0, -1.0, 1.0),
-
-		//bottom 16, 17, 18, 19
-		glm::vec4(-1.0, -1.0,  1.0, 1.0),
-		glm::vec4( 1.0, -1.0,  1.0, 1.0),
-		glm::vec4(-1.0, -1.0, -1.0, 1.0),
-		glm::vec4( 1.0, -1.0, -1.0, 1.0),
-
-		//top 20, 21, 22, 23
-		glm::vec4(-1.0, 1.0, -1.0, 1.0),
-		glm::vec4( 1.0, 1.0, -1.0, 1.0),
-		glm::vec4(-1.0, 1.0,  1.0, 1.0),
-		glm::vec4( 1.0, 1.0,  1.0, 1.0)
+		glm::vec4(-1, -1,  1, 1),
+		glm::vec4( 1, -1,  1, 1),
+		glm::vec4(-1,  1,  1, 1),
+		glm::vec4( 1,  1,  1, 1)
 	};
 
 	//triangle topology
@@ -87,13 +63,13 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 		//back
 		4, 5, 6, 6, 5, 7,
 		//left
-		8, 9, 10, 10, 9, 11,
+		4, 0, 6, 6, 0, 2,
 		//right
-		12, 13, 14, 14, 13, 15,
+		1, 5, 7, 1, 7, 2,
 		//bottom
-		16, 17, 18, 18, 17, 19,
+		0, 1, 4, 1, 4, 5,
 		//top
-		20, 21, 22, 22, 21, 23
+		2, 3, 6, 3, 6, 7
 	};
 
 	//compile and link the shaders
@@ -139,6 +115,11 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 }
 
 Win::~Win() {
+}
+
+void Win::handle_resize() {
+	glViewport(0, 0, width, height);
+	cam.update_projection_matrix((float)width, (float)height);
 }
 
 void Win::handle_mouse_motion(int x, int y) {

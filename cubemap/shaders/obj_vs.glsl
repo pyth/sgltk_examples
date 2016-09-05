@@ -1,4 +1,4 @@
-#version 330
+#version 130
 
 in vec4 pos_in;
 in vec3 tex_coord_in;
