@@ -13,13 +13,14 @@
 class Win : public sgltk::Window {
 	bool rel_mode;
 
-	sgltk::Scene *box;
-	sgltk::Shader *shader;
-	sgltk::Camera *cam;
+	sgltk::Scene box;
+	sgltk::Shader shader;
+	sgltk::Camera cam;
 public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
 	~Win();
+	void handle_resize();
 	void handle_mouse_motion(int x, int y);
 	void handle_key_press(std::string key, bool pressed);
 	void handle_keyboard(std::string key);
@@ -33,14 +34,13 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	set_relative_mode(true);
 
 	//compile and link the shaders
-	shader = new sgltk::Shader();
-	shader->attach_file("box_vs.glsl", GL_VERTEX_SHADER);
-	shader->attach_file("box_fs.glsl", GL_FRAGMENT_SHADER);
-	shader->link();
+	shader.attach_file("box_vs.glsl", GL_VERTEX_SHADER);
+	shader.attach_file("box_fs.glsl", GL_FRAGMENT_SHADER);
+	shader.link();
 
-	cam = new sgltk::Camera(glm::vec3(25, 25, 100), glm::vec3(0, 0, -1),
-				glm::vec3(0, 1, 0),
-				70.0f, (float)width, (float)height, 0.1f, 800.0f);
+	cam = sgltk::Camera(glm::vec3(35, 35, 100), glm::vec3(0, 0, -1),
+			    glm::vec3(0, 1, 0),
+			    70.0f, (float)width, (float)height, 0.1f, 800.0f);
 
 	std::vector<glm::mat4> model_matrix(25);
 	for(unsigned int i = 0; i < model_matrix.size(); i++) {
@@ -49,24 +49,25 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	}
 
 	//load a model
-	box = new sgltk::Scene();
-	box->setup_shader(shader);
-	box->setup_camera(&cam->view_matrix, &cam->projection_matrix_persp);
-	box->load("box.obj");
-	box->setup_instanced_matrix(model_matrix);
+	box.setup_shader(&shader);
+	box.setup_camera(&cam.view_matrix, &cam.projection_matrix_persp);
+	box.load("box.obj");
+	box.setup_instanced_matrix(model_matrix);
 }
 
 Win::~Win() {
-	delete box;
-	delete cam;
-	delete shader;
+}
+
+void Win::handle_resize() {
+	glViewport(0, 0, width, height);
+	cam.update_projection_matrix((float)width, (float)height);
 }
 
 void Win::handle_mouse_motion(int x, int y) {
 	if (rel_mode) {
-		cam->yaw(-glm::atan((float)x) / 500);
-		cam->pitch(-glm::atan((float)y) / 500);
-		cam->update_view_matrix();
+		cam.yaw(-glm::atan((float)x) / 500);
+		cam.pitch(-glm::atan((float)y) / 500);
+		cam.update_view_matrix();
 	}
 }
 
@@ -89,23 +90,23 @@ void Win::handle_keyboard(std::string key) {
 		dt = 1.0;
 
 	if(key == "D") {
-		cam->move_right(mov_speed * dt);
+		cam.move_right(mov_speed * dt);
 	} else if(key == "A") {
-		cam->move_right(-mov_speed * dt);
+		cam.move_right(-mov_speed * dt);
 	} else if(key == "W") {
-		cam->move_forward(mov_speed * dt);
+		cam.move_forward(mov_speed * dt);
 	} else if(key == "S") {
-		cam->move_forward(-mov_speed * dt);
+		cam.move_forward(-mov_speed * dt);
 	} else if(key == "R") {
-		cam->move_up(mov_speed * dt);
+		cam.move_up(mov_speed * dt);
 	} else if(key == "F") {
-		cam->move_up(-mov_speed * dt);
+		cam.move_up(-mov_speed * dt);
 	} else if(key == "E") {
-		cam->roll(rot_speed * dt);
+		cam.roll(rot_speed * dt);
 	} else if(key == "Q") {
-		cam->roll(-rot_speed * dt);
+		cam.roll(-rot_speed * dt);
 	}
-	cam->update_view_matrix();
+	cam.update_view_matrix();
 }
 
 void Win::display() {
@@ -116,11 +117,11 @@ void Win::display() {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	shader->bind();
-	shader->set_uniform_float("light_pos", 25, 25, 20);
-	shader->set_uniform("cam_pos", cam->pos);
+	shader.bind();
+	shader.set_uniform_float("light_pos", 25, 25, 20);
+	shader.set_uniform("cam_pos", cam.pos);
 
-	box->draw_instanced(25);
+	box.draw_instanced(25);
 }
 
 int main(int argc, char **argv) {

@@ -44,7 +44,6 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 	//skybox vertex positions
 	std::vector<glm::vec4> pos = {
-		//front 0, 1, 2, 3
 		glm::vec4(-1, -1, -1, 1),
 		glm::vec4( 1, -1, -1, 1),
 		glm::vec4(-1,  1, -1, 1),

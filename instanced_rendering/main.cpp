@@ -11,13 +11,14 @@
 #endif //__linux__
 
 class Win : public sgltk::Window {
-	sgltk::Mesh *mesh;
-	sgltk::Shader *shader;
-	sgltk::Camera *cam;
+	sgltk::Mesh mesh;
+	sgltk::Shader shader;
+	sgltk::Camera cam;
 public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
 	~Win();
+	void handle_resize();
 	void handle_key_press(std::string key, bool pressed);
 	void display();
 };
@@ -37,14 +38,13 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	std::vector<unsigned short> ind = {0, 1, 2};
 
 	//compile and link the shaders
-	shader = new sgltk::Shader();
-	shader->attach_file("vertex_shader.glsl", GL_VERTEX_SHADER);
-	shader->attach_file("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-	shader->link();
+	shader.attach_file("vertex_shader.glsl", GL_VERTEX_SHADER);
+	shader.attach_file("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+	shader.link();
 
-	cam = new sgltk::Camera(glm::vec3(25, 25, 100), glm::vec3(0, 0, -1),
-				glm::vec3(0, 1, 0),
-				70.0f, (float)width, (float)height, 0.1f, 800.0f);
+	cam = sgltk::Camera(glm::vec3(30, 30, 100), glm::vec3(0, 0, -1),
+			    glm::vec3(0, 1, 0),
+			    70.0f, (float)width, (float)height, 0.1f, 800.0f);
 
 	std::vector<glm::mat4> model_matrix(25);
 	for(unsigned int i = 0; i < model_matrix.size(); i++) {
@@ -52,28 +52,30 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	}
 
 	//create the triangle mesh
-	mesh = new sgltk::Mesh();
-	int pos_buf = mesh->attach_vertex_buffer<glm::vec4>(pos);
-	int color_buf = mesh->attach_vertex_buffer<glm::vec4>(color);
-	int mat_buf = mesh->attach_vertex_buffer<glm::mat4>(model_matrix);
-	mesh->attach_index_buffer(ind);
-	mesh->setup_shader(shader);
-	mesh->setup_camera(&cam->view_matrix, &cam->projection_matrix_persp);
-	mesh->set_vertex_attribute(0, pos_buf, 4, GL_FLOAT, 0, 0);
-	mesh->set_vertex_attribute(1, color_buf, 4, GL_FLOAT, 0, 0);
+	int pos_buf = mesh.attach_vertex_buffer<glm::vec4>(pos);
+	int color_buf = mesh.attach_vertex_buffer<glm::vec4>(color);
+	int mat_buf = mesh.attach_vertex_buffer<glm::mat4>(model_matrix);
+	mesh.attach_index_buffer(ind);
+	mesh.setup_shader(&shader);
+	mesh.setup_camera(&cam.view_matrix, &cam.projection_matrix_persp);
+	mesh.set_vertex_attribute("pos_in", pos_buf, 4, GL_FLOAT, 0, 0);
+	mesh.set_vertex_attribute("color_in", color_buf, 4, GL_FLOAT, 0, 0);
 
+	int trafo_loc = shader.get_attribute_location("mod_mat");
 	for(int i = 0; i < 4; i++) {
-		mesh->set_vertex_attribute(2 + i, mat_buf, 4, GL_FLOAT,
-					sizeof(glm::mat4),
-					(GLvoid *)(i * sizeof(glm::vec4)), 1);
+		mesh.set_vertex_attribute(trafo_loc + i, mat_buf, 4, GL_FLOAT,
+					  sizeof(glm::mat4),
+					  (GLvoid *)(i * sizeof(glm::vec4)), 1);
 	}
 
 }
 
 Win::~Win() {
-	delete cam;
-	delete shader;
-	delete mesh;
+}
+
+void Win::handle_resize() {
+	glViewport(0, 0, width, height);
+	cam.update_projection_matrix((float)width, (float)height);
 }
 
 void Win::handle_key_press(std::string key, bool pressed) {
@@ -86,7 +88,7 @@ void Win::display() {
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	mesh->draw_instanced(GL_TRIANGLES, 25);
+	mesh.draw_instanced(GL_TRIANGLES, 25);
 }
 
 int main(int argc, char **argv) {

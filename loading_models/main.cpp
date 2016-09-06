@@ -29,6 +29,7 @@ public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
 	~Win();
+	void handle_resize();
 	void handle_keyboard(std::string key);
 	void handle_key_press(std::string key, bool pressed);
 	void handle_mouse_motion(int x, int y);
@@ -78,6 +79,11 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 }
 
 Win::~Win() {}
+
+void Win::handle_resize() {
+	glViewport(0, 0, width, height);
+	camera.update_projection_matrix((float)width, (float)height);
+}
 
 void Win::display() {
 	//clear the screen
