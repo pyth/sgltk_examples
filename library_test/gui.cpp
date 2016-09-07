@@ -20,6 +20,7 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 
+#ifdef HAVE_SDL_TTF_H
 	font = Image::open_font_file("Oswald-Medium.ttf", 40);
 
 	Image fps_text;
@@ -27,6 +28,7 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 			     font, 255, 0, 0, 255);
 	fps_tex = new Texture();
 	fps_tex->load_texture(fps_text);
+#endif //HAVE_SDL_TTF_H
 
 	floor_diff = new Texture("tile_sandstone_d.png");
 	floor_diff->set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -48,11 +50,13 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	floor_light->set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	floor_light->set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
+#ifdef HAVE_SDL_TTF_H
 	//set up the cameras
 	fps_camera = new Camera(sgltk::ORTHOGRAPHIC);
 	camera = new Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
 			    glm::vec3(0,1,0), 70.0f, (float)res_x,
 			    (float)res_y, 0.1f, 800.0f);
+#endif //HAVE_SDL_TTF_H
 
 	//load the shaders
 	material_shader = new Shader();
@@ -72,10 +76,12 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	floor_shader->attach_file("floor_fs.glsl", GL_FRAGMENT_SHADER);
 	floor_shader->link();
 
+#ifdef HAVE_SDL_TTF_H
 	fps_shader = new Shader();
 	fps_shader->attach_file("fps_vs.glsl", GL_VERTEX_SHADER);
 	fps_shader->attach_file("fps_fs.glsl", GL_FRAGMENT_SHADER);
 	fps_shader->link();
+#endif
 
 	point_shader = new Shader();
 	point_shader->attach_file("point_shader_vs.glsl", GL_VERTEX_SHADER);
@@ -244,7 +250,10 @@ GUI::~GUI() {
 	delete light;
 	delete material_model;
 	delete textured_model;
+
+#ifdef HAVE_SDL_TTF_H
 	Image::close_font_file(font);
+#endif
 }
 
 Mesh *GUI::create_sphere(unsigned int slices, unsigned int stacks) {
@@ -263,6 +272,7 @@ void GUI::display() {
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 
+#ifdef HAVE_SDL_TTF_H
 	frame_cnt++;
 	frame_sum += 1.0 / delta_time;
 	if(frame_cnt > 100) {
@@ -274,6 +284,7 @@ void GUI::display() {
 		frame_cnt = 0;
 		frame_sum = 0;
 	}
+#endif //HAVE_SDL_TTF_H
 
 	glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

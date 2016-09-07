@@ -21,10 +21,6 @@ int main(int argc, char **argv) {
 			"+"<<bounds.y<<" @"<<mode.refresh_rate<<endl;
 	}
 
-	cout<<"Supported OpenGL version: "<<
-		sgltk::App::sys_info.gl_version_major<<"."<<
-		sgltk::App::sys_info.gl_version_minor<<endl<<endl;
-
 	int num_modes;
 	for(int i = 0; i < sgltk::App::sys_info.num_displays; i++) {
 		cout<<"Display "<<i<<" supports:"<<endl;

@@ -59,7 +59,9 @@ class GUI : public Window {
 	double frame_sum;
 	unsigned int fps;
 	unsigned int frame_cnt;
+#ifdef HAVE_SDL_TTF_H
 	TTF_Font *font;
+#endif //HAVE_SDL_TTF_H
 
 	Mesh *create_sphere(unsigned int slices, unsigned int stacks);
 public:
