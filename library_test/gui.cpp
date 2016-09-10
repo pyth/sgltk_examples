@@ -6,6 +6,8 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	 int offset_y, int gl_maj, int gl_min, unsigned int flags)
 	 :Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
 
+	sgltk::App::enable_vsync(true);
+
 	//enable textures and blending
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
@@ -328,6 +330,76 @@ void GUI::display() {
 void GUI::handle_resize() {
 	glViewport(0, 0, width, height);
 	camera->update_projection_matrix((float)width, (float)height);
+}
+
+void GUI::handle_gamepad_button_press(unsigned int id, int button, bool pressed) {
+	if(id != 0)
+		return;
+
+	if(pressed) {
+		switch(button) {
+			case 0:
+				wireframe = !wireframe;
+				break;
+		}
+	}
+}
+
+void GUI::handle_gamepad_button(unsigned int id, int button) {
+	if(id != 0)
+		return;
+
+	float dt = delta_time * 50;
+	if(dt < 0.01)
+		dt = 0.01;
+	if(dt > 0.03)
+		dt = 0.03;
+
+	switch(button) {
+		case 9: //L1
+			camera->roll(-dt);
+			camera->update_view_matrix();
+			break;
+		case 10: //R1
+			camera->roll(dt);
+			camera->update_view_matrix();
+			break;
+	}
+}
+
+void GUI::handle_gamepad_axis(unsigned int id, unsigned int axis, int value) {
+	if(id != 0)
+		return;
+
+	float dt = (float)delta_time * 50;
+	if(dt < 0.1)
+		dt = 0.1;
+	if(dt > 0.3)
+		dt = 0.3;
+
+	if(abs(value) > 1400) { //deadzone
+		switch(axis) {
+			case 0: //left stick x-axis
+				camera->move_right(0.0001 * value * dt);
+				break;
+			case 1: //left stick y-axis
+				camera->move_forward(-0.0001 * value * dt);
+				break;
+			case 2: //right stick x-axis
+				camera->yaw(-0.00001 * value * dt);
+				break;
+			case 3: //right stick y-axis
+				camera->pitch(-0.00001 * value * dt);
+				break;
+			case 4: //L2
+				camera->move_up(-0.0001 * value * dt);
+				break;
+			case 5: //R2
+				camera->move_up(0.0001 * value * dt);
+				break;
+		}
+		camera->update_view_matrix();
+	}
 }
 
 void GUI::handle_key_press(std::string key, bool pressed) {

@@ -71,6 +71,9 @@ public:
 	~GUI();
 
 	void handle_resize();
+	void handle_gamepad_button_press(unsigned int id, int button, bool pressed);
+	void handle_gamepad_button(unsigned int id, int button);
+	void handle_gamepad_axis(unsigned int id, unsigned int axis, int value);
 	void handle_keyboard(std::string key);
 	void handle_key_press(std::string key, bool pressed);
 	void handle_mouse_motion(int x, int y);
