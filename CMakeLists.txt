@@ -4,6 +4,7 @@ project(sgltk_example)
 set(TARGETS system_info
 	hello_triangle
 	cubemap
+	shadow_mapping
 	loading_models
 	instanced_rendering
 	instanced_rendering2

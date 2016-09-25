@@ -24,7 +24,6 @@ class Win : public sgltk::Window {
 	Camera camera;
 
 	bool rel_mode;
-	bool mouse_mode_change;
 public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
@@ -40,7 +39,6 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
 
 	rel_mode = true;
-	mouse_mode_change = false;
 
 	//create shaders
 	bob_shader.attach_file("bob_vs.glsl", GL_VERTEX_SHADER);

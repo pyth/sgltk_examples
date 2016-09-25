@@ -29,33 +29,32 @@ class GUI : public Window {
 	std::vector<glm::mat4> spikey_trafos;
 	std::vector<glm::mat4> bob_trafos;
 
-	Shader *material_shader;
-	Shader *textured_shader;
-	Shader *floor_shader;
-	Shader *fps_shader;
-	Shader *point_shader;
+	Shader material_shader;
+	Shader textured_shader;
+	Shader floor_shader;
+	Shader fps_shader;
+	Shader point_shader;
 
-	Texture *fps_tex;
-	Texture *floor_diff;
-	Texture *floor_spec;
-	Texture *floor_norm;
-	Texture *floor_displ;
-	Texture *floor_light;
+	Texture fps_tex;
+	Texture floor_diff;
+	Texture floor_spec;
+	Texture floor_norm;
+	Texture floor_displ;
+	Texture floor_light;
 
-	Mesh *fps_display;
-	Mesh *floor;
+	Mesh fps_display;
+	Mesh floor;
+	Mesh light;
 
-	Scene *material_model;
-	Scene *textured_model;
+	Scene material_model;
+	Scene textured_model;
 
-	Camera *fps_camera;
-	Camera *camera;
+	Camera camera;
 
 	sgltk::Timer time;
 
 	glm::vec3 light_pos;
 	std::vector<sgltk::Vertex> light_verts;
-	sgltk::Mesh *light;
 	double frame_sum;
 	unsigned int fps;
 	unsigned int frame_cnt;

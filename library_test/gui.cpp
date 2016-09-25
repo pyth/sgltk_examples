@@ -28,120 +28,108 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	Image fps_text;
 	fps_text.create_text("FPS: " + std::to_string(0),
 			     font, 255, 0, 0, 255);
-	fps_tex = new Texture();
-	fps_tex->load_texture(fps_text);
+	fps_tex.load_texture(fps_text);
 #endif //HAVE_SDL_TTF_H
 
-	floor_diff = new Texture("tile_sandstone_d.png");
-	floor_diff->set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	floor_diff->set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_diff.load_texture("tile_sandstone_d.png");
+	floor_diff.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_diff.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-	floor_spec = new Texture("tile_sandstone_s.png");
-	floor_spec->set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	floor_spec->set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_spec.load_texture("tile_sandstone_s.png");
+	floor_spec.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_spec.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-	floor_norm = new Texture("tile_sandstone_n.png");
-	floor_norm->set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	floor_norm->set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_norm.load_texture("tile_sandstone_n.png");
+	floor_norm.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_norm.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-	floor_displ = new Texture("tile_sandstone_h.png");
-	floor_displ->set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	floor_displ->set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_displ.load_texture("tile_sandstone_h.png");
+	floor_displ.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_displ.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-	floor_light = new Texture("tile_sandstone_a.png");
-	floor_light->set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	floor_light->set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_light.load_texture("tile_sandstone_a.png");
+	floor_light.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_light.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
 #ifdef HAVE_SDL_TTF_H
 	//set up the cameras
-	fps_camera = new Camera(sgltk::ORTHOGRAPHIC);
-	camera = new Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
-			    glm::vec3(0,1,0), 70.0f, (float)res_x,
-			    (float)res_y, 0.1f, 800.0f);
+	camera = Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
+			glm::vec3(0,1,0), 70.0f, (float)res_x,
+			(float)res_y, 0.1f, 800.0f);
 #endif //HAVE_SDL_TTF_H
 
 	//load the shaders
-	material_shader = new Shader();
-	material_shader->attach_file("material_vs.glsl", GL_VERTEX_SHADER);
-	material_shader->attach_file("material_fs.glsl", GL_FRAGMENT_SHADER);
-	material_shader->link();
+	material_shader.attach_file("material_vs.glsl", GL_VERTEX_SHADER);
+	material_shader.attach_file("material_fs.glsl", GL_FRAGMENT_SHADER);
+	material_shader.link();
 
-	textured_shader = new Shader();
-	textured_shader->attach_file("textured_vs.glsl", GL_VERTEX_SHADER);
-	textured_shader->attach_file("textured_fs.glsl", GL_FRAGMENT_SHADER);
-	textured_shader->link();
+	textured_shader.attach_file("textured_vs.glsl", GL_VERTEX_SHADER);
+	textured_shader.attach_file("textured_fs.glsl", GL_FRAGMENT_SHADER);
+	textured_shader.link();
 
-	floor_shader = new Shader();
-	floor_shader->attach_file("floor_vs.glsl", GL_VERTEX_SHADER);
-	floor_shader->attach_file("floor_tc.glsl", GL_TESS_CONTROL_SHADER);
-	floor_shader->attach_file("floor_te.glsl", GL_TESS_EVALUATION_SHADER);
-	floor_shader->attach_file("floor_fs.glsl", GL_FRAGMENT_SHADER);
-	floor_shader->link();
+	floor_shader.attach_file("floor_vs.glsl", GL_VERTEX_SHADER);
+	floor_shader.attach_file("floor_tc.glsl", GL_TESS_CONTROL_SHADER);
+	floor_shader.attach_file("floor_te.glsl", GL_TESS_EVALUATION_SHADER);
+	floor_shader.attach_file("floor_fs.glsl", GL_FRAGMENT_SHADER);
+	floor_shader.link();
 
 #ifdef HAVE_SDL_TTF_H
-	fps_shader = new Shader();
-	fps_shader->attach_file("fps_vs.glsl", GL_VERTEX_SHADER);
-	fps_shader->attach_file("fps_fs.glsl", GL_FRAGMENT_SHADER);
-	fps_shader->link();
+	fps_shader.attach_file("fps_vs.glsl", GL_VERTEX_SHADER);
+	fps_shader.attach_file("fps_fs.glsl", GL_FRAGMENT_SHADER);
+	fps_shader.link();
 #endif
 
-	point_shader = new Shader();
-	point_shader->attach_file("point_shader_vs.glsl", GL_VERTEX_SHADER);
-	point_shader->attach_file("point_shader_fs.glsl", GL_FRAGMENT_SHADER);
-	point_shader->link();
+	point_shader.attach_file("point_shader_vs.glsl", GL_VERTEX_SHADER);
+	point_shader.attach_file("point_shader_fs.glsl", GL_FRAGMENT_SHADER);
+	point_shader.link();
 
 	//arrange a few vertices into a square
 	std::vector<sgltk::Vertex> vert;
-	vert.push_back(sgltk::Vertex(glm::vec3(-2,-2,0.0),
-				     glm::vec3(0.0,0.0,1.0),
-				     glm::vec3(1.0,0.0,0.0),
-				     glm::vec3(0.0,1.0,0.0)));
-	vert.push_back(sgltk::Vertex(glm::vec3(2,-2,0.0),
-				     glm::vec3(0.0,0.0,1.0),
-				     glm::vec3(1.0,0.0,0.0),
-				     glm::vec3(1.0,1.0,0.0)));
-	vert.push_back(sgltk::Vertex(glm::vec3(-2,2,0.0),
-				     glm::vec3(0.0,0.0,1.0),
-				     glm::vec3(1.0,0.0,0.0),
-				     glm::vec3(0.0,0.0,0.0)));
-	vert.push_back(sgltk::Vertex(glm::vec3(2,2,0.0),
-				     glm::vec3(0.0,0.0,1.0),
-				     glm::vec3(1.0,0.0,0.0),
-				     glm::vec3(1.0,0.0,0.0)));
+	vert.push_back(sgltk::Vertex(glm::vec3(-0.5, -0.5, 0.0),
+				     glm::vec3( 0.0,  0.0, 1.0),
+				     glm::vec3( 1.0,  0.0, 0.0),
+				     glm::vec3( 0.0,  1.0, 0.0)));
+	vert.push_back(sgltk::Vertex(glm::vec3( 0.5, -0.5, 0.0),
+				     glm::vec3( 0.0,  0.0, 1.0),
+				     glm::vec3( 1.0,  0.0, 0.0),
+				     glm::vec3( 1.0,  1.0, 0.0)));
+	vert.push_back(sgltk::Vertex(glm::vec3(-0.5,  0.5, 0.0),
+				     glm::vec3( 0.0,  0.0, 1.0),
+				     glm::vec3( 1.0,  0.0, 0.0),
+				     glm::vec3( 0.0,  0.0, 0.0)));
+	vert.push_back(sgltk::Vertex(glm::vec3( 0.5,  0.5, 0.0),
+				     glm::vec3( 0.0,  0.0, 1.0),
+				     glm::vec3( 1.0,  0.0, 0.0),
+				     glm::vec3( 1.0,  0.0, 0.0)));
 
 	std::vector<unsigned short> floor_ind = {0, 1, 2, 3};
 	std::vector<unsigned short> fps_ind = {0, 1, 2, 1, 3, 2};
 
 	//create a mesh out of the vertices
-	fps_display = new Mesh();
-	fps_display->attach_vertex_buffer(vert);
-	fps_display->attach_index_buffer(fps_ind);
-	fps_display->setup_shader(fps_shader);
-	fps_display->setup_camera(&fps_camera->view_matrix,
-			   &fps_camera->projection_matrix_ortho);
-	fps_display->set_vertex_attribute("pos_in", 0, 4, GL_FLOAT, sizeof(sgltk::Vertex),
-				   (void*)offsetof(sgltk::Vertex, position));
-	fps_display->set_vertex_attribute("tex_coord_in0", 0, 3, GL_FLOAT, sizeof(sgltk::Vertex),
-				   (void*)offsetof(sgltk::Vertex, tex_coord));
-	fps_display->model_matrix = glm::scale(glm::vec3(12.0, 7.0, 0.0));
+	fps_display.attach_vertex_buffer(vert);
+	fps_display.attach_index_buffer(fps_ind);
+	fps_display.setup_shader(&fps_shader);
+	fps_display.set_vertex_attribute("pos_in", 0, 4, GL_FLOAT, sizeof(sgltk::Vertex),
+					 (void*)offsetof(sgltk::Vertex, position));
+	fps_display.set_vertex_attribute("tex_coord_in0", 0, 3, GL_FLOAT, sizeof(sgltk::Vertex),
+					 (void*)offsetof(sgltk::Vertex, tex_coord));
 
-	floor = new Mesh();
-	floor->attach_vertex_buffer(vert);
-	floor->attach_index_buffer(floor_ind);
-	floor->setup_shader(floor_shader);
-	floor->setup_camera(&camera->view_matrix,
-			    &camera->projection_matrix_persp);
-	floor->set_vertex_attribute("pos_in", 0, 4, GL_FLOAT, sizeof(sgltk::Vertex),
+	floor.attach_vertex_buffer(vert);
+	floor.attach_index_buffer(floor_ind);
+	floor.setup_shader(&floor_shader);
+	floor.setup_camera(&camera.view_matrix,
+			   &camera.projection_matrix_persp);
+	floor.set_vertex_attribute("pos_in", 0, 4, GL_FLOAT, sizeof(sgltk::Vertex),
 				   (void*)offsetof(sgltk::Vertex, position));
-	floor->set_vertex_attribute("norm_in", 0, 3, GL_FLOAT, sizeof(sgltk::Vertex),
+	floor.set_vertex_attribute("norm_in", 0, 3, GL_FLOAT, sizeof(sgltk::Vertex),
 				   (void*)offsetof(sgltk::Vertex, normal));
-	floor->set_vertex_attribute("tang_in", 0, 4, GL_FLOAT, sizeof(sgltk::Vertex),
+	floor.set_vertex_attribute("tang_in", 0, 4, GL_FLOAT, sizeof(sgltk::Vertex),
 				   (void*)offsetof(sgltk::Vertex, tangent));
-	floor->set_vertex_attribute("tex_coord_in0", 0, 3, GL_FLOAT, sizeof(sgltk::Vertex),
+	floor.set_vertex_attribute("tex_coord_in0", 0, 3, GL_FLOAT, sizeof(sgltk::Vertex),
 				   (void*)offsetof(sgltk::Vertex, tex_coord));
 	std::vector<glm::mat4> floor_m(NUM_TILES);
 	std::vector<glm::mat3> floor_nm(NUM_TILES);
-	//glm::mat4 floor_scale = glm::scale(glm::vec3(2.0, 0.0, 2.0));
+	glm::mat4 floor_scale = glm::scale(glm::vec3(4, 4, 1));
 	glm::mat4 floor_rot = glm::rotate((float)(-M_PI / 2), glm::vec3(1.0, 0.0, 0.0));
 	glm::mat4 floor_transl;
 	int side = (int)sqrt(floor_m.size());
@@ -149,66 +137,63 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 		for(int j = -side / 2; j < side / 2; j+=1) {
 			int index = (i + side / 2) * side + j + side / 2;
 			floor_transl = glm::translate(glm::vec3(4*i, 0, 4*j));
-			floor_m[index] = floor_transl * floor_rot;
+			floor_m[index] = floor_transl * floor_rot * floor_scale;
 			floor_nm[index] = glm::mat3(glm::transpose(glm::inverse(floor_m[index])));
 		}
 	}
 	int loc, buf_ind;
 	unsigned int vec3_size = sizeof(glm::vec3);
 	unsigned int vec4_size = sizeof(glm::vec4);
-	loc = floor_shader->get_attribute_location("model_matrix");
-	buf_ind = floor->attach_vertex_buffer<glm::mat4>(floor_m);
+	loc = floor_shader.get_attribute_location("model_matrix");
+	buf_ind = floor.attach_vertex_buffer<glm::mat4>(floor_m);
 	for(int i = 0; i < 4; i++) {
-		floor->set_vertex_attribute(loc + i, buf_ind, 4, GL_FLOAT,
+		floor.set_vertex_attribute(loc + i, buf_ind, 4, GL_FLOAT,
 						sizeof(glm::mat4),
 						(const void*)(i * vec4_size), 1);
 	}
 
-	loc = floor_shader->get_attribute_location("normal_matrix");
-	buf_ind = floor->attach_vertex_buffer<glm::mat3>(floor_nm);
+	loc = floor_shader.get_attribute_location("normal_matrix");
+	buf_ind = floor.attach_vertex_buffer<glm::mat3>(floor_nm);
 	for(int i = 0; i < 3; i++) {
-		floor->set_vertex_attribute(loc + i, buf_ind, 3, GL_FLOAT,
+		floor.set_vertex_attribute(loc + i, buf_ind, 3, GL_FLOAT,
 						sizeof(glm::mat3),
 						(const void*)(i * vec3_size), 1);
 	}
 
-	floor->textures_diffuse = {floor_diff};
-	floor->textures_normals = {floor_norm};
-	floor->textures_specular = {floor_spec};
-	floor->textures_lightmap = {floor_light};
-	floor->textures_displacement = {floor_displ};
+	floor.textures_diffuse.push_back(&floor_diff);
+	floor.textures_normals.push_back(&floor_norm);
+	floor.textures_specular.push_back(&floor_spec);
+	floor.textures_lightmap.push_back(&floor_light);
+	floor.textures_displacement.push_back(&floor_displ);
 
-	material_model = new Scene();
-	material_model->setup_shader(material_shader);
-	material_model->setup_camera(&camera->view_matrix, &camera->projection_matrix_persp);
-	material_model->load("Spikey.dae");
-	material_model->set_animation_speed(1.0);
+	material_model.setup_shader(&material_shader);
+	material_model.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	material_model.load("Spikey.dae");
+	material_model.set_animation_speed(1.0);
 
-	textured_model = new Scene();
-	textured_model->setup_shader(textured_shader);
-	textured_model->setup_camera(&camera->view_matrix, &camera->projection_matrix_persp);
-	textured_model->load("bob_lamp.md5mesh");
-	textured_model->set_animation_speed(1.0);
+	textured_model.setup_shader(&textured_shader);
+	textured_model.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	textured_model.load("bob_lamp.md5mesh");
+	textured_model.set_animation_speed(1.0);
 
 	time = sgltk::Timer();
 
 	light_pos = glm::vec3(0, 10, 0);
 	light_verts.push_back(sgltk::Vertex(glm::vec3(0.0, 0.0, 0.0),
-					  glm::vec3(0.0),
-					  glm::vec3(0.0),
-					  glm::vec4(1.0, 0.0, 0.0, 0.0),
-					  glm::vec3(0.0)));
+					    glm::vec3(0.0),
+					    glm::vec3(0.0),
+					    glm::vec4(1.0, 0.0, 0.0, 0.0),
+					    glm::vec3(0.0)));
 	std::vector<unsigned short> light_index = {0};
 	light_trafo = glm::mat4(1.0);
 	light_trafo = glm::translate(light_trafo, light_pos);
-	light = new sgltk::Mesh();
-	light->attach_vertex_buffer(light_verts);
-	light->attach_index_buffer(light_index);
-	light->setup_shader(point_shader);
-	light->setup_camera(&camera->view_matrix, &camera->projection_matrix_persp);
-	light->set_vertex_attribute("pos_in", 0, 3, GL_FLOAT, sizeof(sgltk::Vertex),
+	light.attach_vertex_buffer(light_verts);
+	light.attach_index_buffer(light_index);
+	light.setup_shader(&point_shader);
+	light.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	light.set_vertex_attribute("pos_in", 0, 3, GL_FLOAT, sizeof(sgltk::Vertex),
 					(void *)offsetof(sgltk::Vertex, position));
-	light->set_vertex_attribute("color_in", 0, 4, GL_FLOAT, sizeof(sgltk::Vertex),
+	light.set_vertex_attribute("color_in", 0, 4, GL_FLOAT, sizeof(sgltk::Vertex),
 					(void *)offsetof(sgltk::Vertex, color));
 
 	for(int i = 0; i < 1; i++) {
@@ -232,27 +217,6 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 }
 
 GUI::~GUI() {
-	delete floor_diff;
-	delete floor_spec;
-	delete floor_norm;
-	delete floor_displ;
-	delete floor_light;
-
-	delete fps_camera;
-	delete camera;
-
-	delete material_shader;
-	delete textured_shader;
-	delete floor_shader;
-	delete fps_shader;
-	delete point_shader;
-
-	delete floor;
-	delete fps_display;
-	delete light;
-	delete material_model;
-	delete textured_model;
-
 #ifdef HAVE_SDL_TTF_H
 	Image::close_font_file(font);
 #endif
@@ -282,7 +246,7 @@ void GUI::display() {
 		Image fps_text;
 		fps_text.create_text("FPS: " + std::to_string(fps),
 				     font, 255, 0, 0, 255);
-		fps_tex->load_texture(fps_text);
+		fps_tex.load_texture(fps_text);
 		frame_cnt = 0;
 		frame_sum = 0;
 	}
@@ -292,44 +256,43 @@ void GUI::display() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glPolygonMode(GL_FRONT, GL_FILL);
 
-	fps_shader->bind();
-	fps_shader->set_uniform_int("Texture", 0);
-	fps_shader->set_uniform_float("Resolution", fps_camera->width, fps_camera->height);
-	fps_tex->bind();
-	fps_display->draw(GL_TRIANGLES);
+	fps_shader.bind();
+	fps_shader.set_uniform_int("Texture", 0);
+	fps_tex.bind();
+	fps_display.draw(GL_TRIANGLES);
 
 	if(wireframe) {
 		glDisable(GL_CULL_FACE);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
-	floor_shader->bind();
-	floor_shader->set_uniform("light_pos", light_pos);
-	floor_shader->set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
-	floor->draw_instanced(GL_PATCHES, NUM_TILES);
+	floor_shader.bind();
+	floor_shader.set_uniform("light_pos", light_pos);
+	floor_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
+	floor.draw_instanced(GL_PATCHES, NUM_TILES);
 
-	material_shader->bind();
-	material_shader->set_uniform("light_pos", light_pos);
+	material_shader.bind();
+	material_shader.set_uniform("light_pos", light_pos);
 	for(unsigned int i = 0; i < spikey_trafos.size(); i++) {
-		material_model->animate((float)time.get_time());
-		material_model->draw(&spikey_trafos[i]);
+		material_model.animate((float)time.get_time());
+		material_model.draw(&spikey_trafos[i]);
 	}
 
-	textured_shader->bind();
-	textured_shader->set_uniform("light_pos", light_pos);
-	textured_shader->set_uniform("cam_pos", camera->pos);
+	textured_shader.bind();
+	textured_shader.set_uniform("light_pos", light_pos);
+	textured_shader.set_uniform("cam_pos", camera.pos);
 	for(unsigned int i = 0; i < bob_trafos.size(); i++) {
-		textured_model->animate((float)time.get_time());
-		textured_model->draw(&bob_trafos[i]);
+		textured_model.animate((float)time.get_time());
+		textured_model.draw(&bob_trafos[i]);
 	}
 
 	glPointSize(10);
-	light->draw(GL_POINTS, &light_trafo);
+	light.draw(GL_POINTS, &light_trafo);
 }
 
 void GUI::handle_resize() {
 	glViewport(0, 0, width, height);
-	camera->update_projection_matrix((float)width, (float)height);
+	camera.update_projection_matrix((float)width, (float)height);
 }
 
 void GUI::handle_gamepad_button_press(unsigned int id, int button, bool pressed) {
@@ -357,12 +320,12 @@ void GUI::handle_gamepad_button(unsigned int id, int button) {
 
 	switch(button) {
 		case 9: //L1
-			camera->roll(-dt);
-			camera->update_view_matrix();
+			camera.roll(-dt);
+			camera.update_view_matrix();
 			break;
 		case 10: //R1
-			camera->roll(dt);
-			camera->update_view_matrix();
+			camera.roll(dt);
+			camera.update_view_matrix();
 			break;
 	}
 }
@@ -380,25 +343,25 @@ void GUI::handle_gamepad_axis(unsigned int id, unsigned int axis, int value) {
 	if(abs(value) > 1400) { //deadzone
 		switch(axis) {
 			case 0: //left stick x-axis
-				camera->move_right(0.0001 * value * dt);
+				camera.move_right(0.0001 * value * dt);
 				break;
 			case 1: //left stick y-axis
-				camera->move_forward(-0.0001 * value * dt);
+				camera.move_forward(-0.0001 * value * dt);
 				break;
 			case 2: //right stick x-axis
-				camera->yaw(-0.00001 * value * dt);
+				camera.yaw(-0.00001 * value * dt);
 				break;
 			case 3: //right stick y-axis
-				camera->pitch(-0.00001 * value * dt);
+				camera.pitch(-0.00001 * value * dt);
 				break;
 			case 4: //L2
-				camera->move_up(-0.0001 * value * dt);
+				camera.move_up(-0.0001 * value * dt);
 				break;
 			case 5: //R2
-				camera->move_up(0.0001 * value * dt);
+				camera.move_up(0.0001 * value * dt);
 				break;
 		}
-		camera->update_view_matrix();
+		camera.update_view_matrix();
 	}
 }
 
@@ -413,11 +376,11 @@ void GUI::handle_key_press(std::string key, bool pressed) {
 		}
 	} else if(key == "P") {
 		if(pressed) {
-			material_shader->recompile();
-			textured_shader->recompile();
-			floor_shader->recompile();
-			point_shader->recompile();
-			fps_shader->recompile();
+			material_shader.recompile();
+			textured_shader.recompile();
+			floor_shader.recompile();
+			point_shader.recompile();
+			fps_shader.recompile();
 		}
 	} else if(key == "L") {
 		if(pressed) {
@@ -452,31 +415,31 @@ void GUI::handle_keyboard(std::string key) {
 		dt = 3.0;
 
 	if(key == "D") {
-		camera->move_right(mov_speed * dt);
+		camera.move_right(mov_speed * dt);
 	} else if(key == "A") {
-		camera->move_right(-mov_speed * dt);
+		camera.move_right(-mov_speed * dt);
 	}else if(key == "W") {
-		camera->move_forward(mov_speed * dt);
+		camera.move_forward(mov_speed * dt);
 	} else if(key == "S") {
-		camera->move_forward(-mov_speed * dt);
+		camera.move_forward(-mov_speed * dt);
 	} else if(key == "R") {
-		camera->move_up(mov_speed * dt);
+		camera.move_up(mov_speed * dt);
 	} else if(key == "F") {
 		if(!ctrl)
-			camera->move_up(-mov_speed * dt);
+			camera.move_up(-mov_speed * dt);
 	} else if(key == "E") {
-		camera->roll(rot_speed * dt);
+		camera.roll(rot_speed * dt);
 	} else if(key == "Q") {
-		camera->roll(-rot_speed * dt);
+		camera.roll(-rot_speed * dt);
 	}
-	camera->update_view_matrix();
+	camera.update_view_matrix();
 }
 
 void GUI::handle_mouse_motion(int x, int y) {
 	if(rel_mode) {
-		camera->yaw(-glm::atan((float)x)/500);
-		camera->pitch(-glm::atan((float)y)/500);
-		camera->update_view_matrix();
+		camera.yaw(-glm::atan((float)x)/500);
+		camera.pitch(-glm::atan((float)y)/500);
+		camera.update_view_matrix();
 	}
 }
 
