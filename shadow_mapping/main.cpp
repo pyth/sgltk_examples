@@ -178,8 +178,10 @@ void Win::handle_keyboard(std::string key) {
 	float mov_speed = 0.1f;
 	float rot_speed = 0.05f;
 	float dt = 1000 * (float)delta_time;
-	if (dt < 2.0)
+	if(dt < 2.0)
 		dt = 2.0;
+	if(dt > 5.0)
+		dt = 5.0;
 
 	if(key == "D") {
 		camera.move_right(mov_speed * dt);
@@ -213,9 +215,14 @@ void Win::handle_key_press(std::string key, bool pressed) {
 }
 
 void Win::handle_mouse_motion(int x, int y) {
+	float dt = delta_time;
+	if(dt < 0.01)
+		dt = 0.01;
+	if(dt > 1.0)
+		dt = 1.0;
 	if (rel_mode) {
-		camera.yaw(-glm::atan((float)x) / 500);
-		camera.pitch(-glm::atan((float)y) / 500);
+		camera.yaw(-glm::atan((float)x) * dt);
+		camera.pitch(-glm::atan((float)y) * dt);
 		camera.update_view_matrix();
 	}
 }

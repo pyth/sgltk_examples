@@ -10,7 +10,7 @@ in vec3 norm_tc[];
 
 out vec3 norm_te[];
 out vec3 tc_te[];
-out vec3 pos_ts_te[];
+out vec3 pos_v_te[];
 out vec3 light_ts_te[];
 
 uniform int max_tess_level;
@@ -52,7 +52,7 @@ void main(void){
 
 	tc_te[gl_InvocationID] = tc_tc[gl_InvocationID];
 
-	pos_ts_te[gl_InvocationID] = pos_ts_tc[gl_InvocationID];
+	pos_v_te[gl_InvocationID] = pos_v_tc[gl_InvocationID];
 
 	light_ts_te[gl_InvocationID] = light_ts_tc[gl_InvocationID];
 

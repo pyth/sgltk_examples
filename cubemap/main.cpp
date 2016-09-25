@@ -123,8 +123,9 @@ void Win::handle_resize() {
 
 void Win::handle_mouse_motion(int x, int y) {
 	if(rel_mode) {
-		cam.yaw(-glm::atan((float)x) / 500);
-		cam.pitch(-glm::atan((float)y) / 500);
+		float dt = (float)delta_time;
+		cam.yaw(-glm::atan((float)x) * dt);
+		cam.pitch(-glm::atan((float)y) * dt);
 		cam.pos = -10.f * glm::normalize(cam.dir);
 		cam.update_view_matrix();
 	}

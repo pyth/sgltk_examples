@@ -250,6 +250,7 @@ void GUI::display() {
 		frame_cnt = 0;
 		frame_sum = 0;
 	}
+	set_title("Test "+std::to_string(fps));
 #endif //HAVE_SDL_TTF_H
 
 	glEnable(GL_CULL_FACE);
@@ -437,8 +438,11 @@ void GUI::handle_keyboard(std::string key) {
 
 void GUI::handle_mouse_motion(int x, int y) {
 	if(rel_mode) {
-		camera.yaw(-glm::atan((float)x)/500);
-		camera.pitch(-glm::atan((float)y)/500);
+		float dt = 10 * (float)delta_time;
+		if(dt > 0.1)
+			dt = 0.1;
+		camera.yaw(-glm::atan((float)x) * dt);
+		camera.pitch(-glm::atan((float)y) * dt);
 		camera.update_view_matrix();
 	}
 }

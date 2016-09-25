@@ -2,13 +2,13 @@
 
 layout (quads, equal_spacing, ccw) in;
 
-in vec3 pos_ts_te[];
+in vec3 pos_v_te[];
 in vec3 light_ts_te[];
 in vec3 tc_te[];
 in vec3 norm_te[];
 
 out vec3 tc;
-out vec3 pos_ts;
+out vec3 pos_v;
 out vec3 light_ts;
 
 uniform sampler2D texture_displacement;
@@ -29,9 +29,9 @@ void main(void){
 	vec4 pos = mix(pos0, pos1, gl_TessCoord.y);
 	pos += norm * height * 0.1 - 0.1;
 
-	vec3 pos_v0 = mix(pos_ts_te[0], pos_ts_te[1], gl_TessCoord.x);
-	vec3 pos_v1 = mix(pos_ts_te[2], pos_ts_te[3], gl_TessCoord.x);
-	pos_ts = mix(pos_v0, pos_v1, gl_TessCoord.y);
+	vec3 pos_v0 = mix(pos_v_te[0], pos_v_te[1], gl_TessCoord.x);
+	vec3 pos_v1 = mix(pos_v_te[2], pos_v_te[3], gl_TessCoord.x);
+	pos_v = mix(pos_v0, pos_v1, gl_TessCoord.y);
 
 	vec3 light0 = mix(light_ts_te[0], light_ts_te[1], gl_TessCoord.x);
 	vec3 light1 = mix(light_ts_te[2], light_ts_te[3], gl_TessCoord.x);

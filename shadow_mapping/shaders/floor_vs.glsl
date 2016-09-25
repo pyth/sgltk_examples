@@ -1,7 +1,7 @@
-#version 330
+#version 130
 
-layout(location = 0) in vec4 pos_in;
-layout(location = 1) in vec3 norm_in;
+in vec4 pos_in;
+in vec3 norm_in;
 
 out vec3 cam_vec;
 out vec3 light_vec;

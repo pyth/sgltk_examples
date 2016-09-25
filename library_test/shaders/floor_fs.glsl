@@ -1,6 +1,6 @@
 #version 400
 
-in vec3 pos_ts;
+in vec3 pos_v;
 in vec3 tc;
 in vec3 light_ts;
 
@@ -22,10 +22,10 @@ void main() {
 	vec4 bump = texture(texture_normals, tc.xy);
 	vec4 lm = texture(texture_lightmap, tc.xy);
 
-	vec3 cam = normalize(-pos_ts);
+	vec3 cam = normalize(-pos_v);
 	vec3 norm = normalize(bump.xyz * 2 - vec3(1));
 	vec3 light = normalize(light_ts);
-	vec3 refl = normalize(reflect(light, norm));
+	vec3 refl = -normalize(reflect(light, norm));
 
 	float LN = max(0.0, dot(norm, light));
 	float VR = max(0.0, dot(refl, cam));
@@ -33,7 +33,7 @@ void main() {
 	float light_dist = length(light_ts);
 	float attenuation = 1.0 / (1.0 +
 					0.09 * light_dist +
-					0.0032 * light_dist * light_dist);
+					0.032 * light_dist * light_dist);
 
 	vec4 amb = vec4(0.2 * tex.xyz, 1);
 
@@ -42,4 +42,6 @@ void main() {
 	vec4 spec = sp * pow(VR, 10);
 
 	color = vec4(lm.x * attenuation * (amb + diff + spec).xyz, 1);
+	//color = spec;
+	//color = vec4(vec3(attenuation), 1);
 }
