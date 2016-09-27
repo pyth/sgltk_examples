@@ -85,7 +85,7 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 	std::vector<unsigned short> ind = {0, 1, 2, 2, 1, 3};
 
-	depth_tex = Texture(GL_TEXTURE_2D, 1024, 1024);
+	depth_tex.create_empty(1024, 1024, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT);
 
 	//create a plane
 	int pos_loc_floor = floor_shader.get_attribute_location("pos_in");
@@ -131,15 +131,17 @@ void Win::handle_resize() {
 }
 
 void Win::display() {
-	//clear the screen
-	glClearColor(0, 0, 0, 1);
-	glClearDepth(1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	frame_buf.bind();	
+	frame_buf.bind();
+	glClearDepth(1.0);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	shadow_shader.bind();
+	shadow_shader.set_uniform("light_matrix", false, light_matrix);
+
 	glm::mat4 mat = glm::translate(box_pos);
 	box.setup_shader(&shadow_shader);
 	box.setup_camera(&light_cam.view_matrix, &light_cam.projection_matrix_persp);
@@ -151,6 +153,10 @@ void Win::display() {
 	floor.draw(GL_TRIANGLES, &mat);
 	frame_buf.unbind();
 
+	//clear the screen
+	glClearColor(0, 0, 0, 1);
+	glClearDepth(1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	box_shader.bind();
 	box_shader.set_uniform("light_pos", light_pos);
