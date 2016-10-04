@@ -12,8 +12,10 @@
 
 class Win : public sgltk::Window {
 	sgltk::Mesh mesh;
-	sgltk::Shader shader;
-	sgltk::Camera cam;
+	sgltk::Shader shader1;
+	sgltk::Shader shader2;
+	sgltk::Camera cam1;
+	sgltk::Camera cam2;
 public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
@@ -38,11 +40,18 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	std::vector<unsigned short> ind = {0, 1, 2};
 
 	//compile and link the shaders
-	shader.attach_file("vertex_shader.glsl", GL_VERTEX_SHADER);
-	shader.attach_file("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-	shader.link();
+	shader1.attach_file("vs1.glsl", GL_VERTEX_SHADER);
+	shader1.attach_file("fs1.glsl", GL_FRAGMENT_SHADER);
+	shader1.link();
 
-	cam = sgltk::Camera(glm::vec3(0, 0, 20), glm::vec3(0, 0, -1),
+	shader2.attach_file("vs2.glsl", GL_VERTEX_SHADER);
+	shader2.attach_file("fs2.glsl", GL_FRAGMENT_SHADER);
+	shader2.link();
+
+	cam1 = sgltk::Camera(glm::vec3(0, 0, 20), glm::vec3(0, 0, -1),
+			    glm::vec3(0, 1, 0),
+			    70.0f, (float)width, (float)height, 0.1f, 800.0f);
+	cam2 = sgltk::Camera(glm::vec3(0, 4, 20), glm::vec3(0, 0, -1),
 			    glm::vec3(0, 1, 0),
 			    70.0f, (float)width, (float)height, 0.1f, 800.0f);
 
@@ -50,8 +59,8 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	int pos_loc = mesh.attach_vertex_buffer<glm::vec4>(pos);
 	int color_loc = mesh.attach_vertex_buffer<glm::vec4>(color);
 	mesh.attach_index_buffer(ind);
-	mesh.setup_shader(&shader);
-	mesh.setup_camera(&cam.view_matrix, &cam.projection_matrix_persp);
+	mesh.setup_shader(&shader1);
+	mesh.setup_camera(&cam1);
 	mesh.set_vertex_attribute("pos_in", pos_loc, 4, GL_FLOAT, 0, 0);
 	mesh.set_vertex_attribute("color_in", color_loc, 4, GL_FLOAT, 0, 0);
 }
@@ -61,12 +70,21 @@ Win::~Win() {
 
 void Win::handle_resize() {
 	glViewport(0, 0, width, height);
-	cam.update_projection_matrix((float)width, (float)height);
+	cam1.update_projection_matrix((float)width, (float)height);
+	cam2.update_projection_matrix((float)width, (float)height);
 }
 
 void Win::handle_key_press(std::string key, bool pressed) {
 	if(key == "Escape")
 		stop();
+	if(key == "1")
+		mesh.setup_shader(&shader1);
+	if(key == "2")
+		mesh.setup_shader(&shader2);
+	if(key == "3")
+		mesh.setup_camera(&cam1);
+	if(key == "4")
+		mesh.setup_camera(&cam2);
 }
 
 void Win::display() {
