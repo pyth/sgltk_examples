@@ -23,8 +23,8 @@ void main() {
 	cam_vec = camera_pos - pos.xyz;
 	light_vec = light_pos - pos.xyz;
 	norm = normal_matrix * norm_in;
-	vec4 pos_light_space = light_matrix * pos;
-	pos_ls = (pos_light_space.xyz / pos_light_space.w + 1) / 2;
+	vec4 p_ls = light_matrix * pos;
+	pos_ls = 0.5 * ((p_ls.xyz / p_ls.w) + vec3(1));
 
 	gl_Position = view_proj_matrix * pos;
 }

@@ -4,14 +4,14 @@ in vec3 pos_ls;
 in vec3 cam_vec;
 in vec3 light_vec;
 in vec3 norm;
-in vec2 tc;
 
 out vec4 color;
 
 uniform sampler2D shadow_map;
 
 void main() {
-	float shadow = texture(shadow_map, pos_ls.xy).x;
+	float current_depth = texture(shadow_map, pos_ls.xy).x;
+	float shadow = pos_ls.z > current_depth ? 1.0 : 0.0;
 
 	vec3 cam = normalize(cam_vec);
 	vec3 norm = normalize(norm);
@@ -22,5 +22,5 @@ void main() {
 	float VR = max(0.0, dot(cam, reflection) * sign(LN));
 
 	color = 0.2 * vec4(1) + LN * vec4(1) + 0.7 * vec4(1) * pow(VR, 10);
-	color = 0.2 * vec4(1) + shadow * LN * vec4(1);
+	color = 0.2 * vec4(1) + (1.0 - shadow) * LN * vec4(1);
 }

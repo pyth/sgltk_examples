@@ -8,9 +8,9 @@ out vec3 tc;
 uniform mat4 model_matrix;
 
 void main() {
-	vec4 pos = vec4((model_matrix * pos_in).xy * 0.125, 0, 1);
-	pos.x += 0.9;
-	pos.y += 0.9;
+	vec4 pos = vec4((model_matrix * pos_in).xy * 0.5, 0, 1);
+	pos.x += 0.7;
+	pos.y += 0.7;
 
 	tc = tc_in;
 

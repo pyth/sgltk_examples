@@ -30,6 +30,7 @@ class Win : public sgltk::Window {
 	glm::vec3 box_pos;
 	glm::vec3 light_pos;
 	bool rel_mode;
+	void shadow_pass();
 public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
@@ -85,20 +86,17 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 	std::vector<unsigned short> ind = {0, 1, 2, 2, 1, 3};
 
-	depth_tex.create_empty(1024, 1024, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT);
+	depth_tex.create_empty(1024, 1024, GL_DEPTH_COMPONENT,
+			       GL_FLOAT, GL_DEPTH_COMPONENT);
 
 	//create a plane
 	int pos_loc_floor = floor_shader.get_attribute_location("pos_in");
 	int norm_loc_floor = floor_shader.get_attribute_location("norm_in");
-	int pos_loc_shadow = shadow_shader.get_attribute_location("pos_in");
-	int norm_loc_shadow = shadow_shader.get_attribute_location("norm_in");
 	int pos_buf = floor.attach_vertex_buffer<glm::vec4>(pos);
 	int norm_buf = floor.attach_vertex_buffer<glm::vec3>(norm);
 	floor.attach_index_buffer(ind);
 	floor.set_vertex_attribute(pos_loc_floor, pos_buf, 4, GL_FLOAT, 0, 0);
 	floor.set_vertex_attribute(norm_loc_floor, norm_buf, 3, GL_FLOAT, 0, 0);
-	floor.set_vertex_attribute(pos_loc_shadow, pos_buf, 4, GL_FLOAT, 0, 0);
-	floor.set_vertex_attribute(norm_loc_shadow, norm_buf, 3, GL_FLOAT, 0, 0);
 
 	//create a mini display
 	depth_display.setup_shader(&display_shader);
@@ -107,19 +105,18 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	depth_display.attach_index_buffer(ind);
 	depth_display.set_vertex_attribute("pos_in", pos_buf, 4, GL_FLOAT, 0, 0);
 	depth_display.set_vertex_attribute("tc_in", tc_buf, 2, GL_FLOAT, 0, 0);
-	depth_display.model_matrix = glm::rotate((float)(M_PI / 2), glm::vec3(1, 0, 0));
 	depth_display.textures_diffuse.push_back(&depth_tex);
 
 	//load a model
 	box_pos = glm::vec3(0, 4, 0);
 	box.setup_shader(&box_shader);
-	box.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	box.setup_camera(&camera);
 	box.load("box.obj");
 
-	light_pos = glm::vec3(5, 10, 0);
+	light_pos = glm::vec3(5, 10, -4);
 	light_cam = Camera(light_pos, box_pos - light_pos, glm::vec3(0, 1, 0),
-			   70.0f, 1024, 1024, 0.1f, 800.0f);
-	light_matrix = light_cam.projection_matrix_persp * light_cam.view_matrix;
+			   70.0f, 20, 20, -10, 10, ORTHOGRAPHIC);
+	light_matrix = light_cam.projection_matrix_ortho * light_cam.view_matrix;
 	frame_buf.attach_texture(GL_DEPTH_ATTACHMENT, depth_tex);
 }
 
@@ -130,28 +127,32 @@ void Win::handle_resize() {
 	camera.update_projection_matrix((float)width, (float)height);
 }
 
+void Win::shadow_pass() {
+	frame_buf.bind();
+	glViewport(0, 0, depth_tex.width, depth_tex.height);
+	glClearDepth(1.0);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	glm::mat4 mat = glm::translate(box_pos);
+	box.setup_shader(&shadow_shader);
+	box.setup_camera(&light_cam);
+	box.draw(&mat);
+
+	mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
+	floor.setup_shader(&shadow_shader);
+	floor.setup_camera(&light_cam);
+	floor.draw(GL_TRIANGLES, &mat);
+	frame_buf.unbind();
+}
+
 void Win::display() {
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	frame_buf.bind();
-	glClearDepth(1.0);
-	glClear(GL_DEPTH_BUFFER_BIT);
+	shadow_pass();
 
-	shadow_shader.bind();
-	shadow_shader.set_uniform("light_matrix", false, light_matrix);
-
-	glm::mat4 mat = glm::translate(box_pos);
-	box.setup_shader(&shadow_shader);
-	box.setup_camera(&light_cam.view_matrix, &light_cam.projection_matrix_persp);
-	box.draw(&mat);
-
-	mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
-	floor.setup_shader(&shadow_shader);
-	floor.setup_camera(&light_cam.view_matrix, &light_cam.projection_matrix_persp);
-	floor.draw(GL_TRIANGLES, &mat);
-	frame_buf.unbind();
+	glViewport(0, 0, width, height);
 
 	//clear the screen
 	glClearColor(0, 0, 0, 1);
@@ -167,17 +168,21 @@ void Win::display() {
 	floor_shader.set_uniform("light_pos", light_pos);
 	floor_shader.set_uniform("cam_pos", camera.pos);
 	floor_shader.set_uniform("light_matrix", false, light_matrix);
+	depth_tex.bind();
+	floor_shader.set_uniform_int("shadow_map", 0);
 
-	mat = glm::translate(box_pos);
+	glm::mat4 mat = glm::translate(box_pos);
 	box.setup_shader(&box_shader);
+	box.setup_camera(&camera);
 	box.draw(&mat);
 
 	mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
 	floor.setup_shader(&floor_shader);
-	floor.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	floor.setup_camera(&camera);
 	floor.draw(GL_TRIANGLES, &mat);
 
-	depth_display.draw(GL_TRIANGLES);
+	mat = glm::rotate((float)(-M_PI / 2), glm::vec3(1, 0, 0));
+	depth_display.draw(GL_TRIANGLES, &mat);
 }
 
 void Win::handle_keyboard(std::string key) {
@@ -207,6 +212,7 @@ void Win::handle_keyboard(std::string key) {
 		camera.roll(-rot_speed * dt);
 	}
 	camera.update_view_matrix();
+	light_cam.update_view_matrix();
 }
 
 void Win::handle_key_press(std::string key, bool pressed) {
