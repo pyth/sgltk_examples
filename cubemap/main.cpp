@@ -108,7 +108,9 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	obj.setup_camera(&cam.view_matrix, &cam.projection_matrix_persp_inf);
 	obj.setup_shader(&obj_shader);
 	obj.load("monkey.obj");
-	obj.meshes[0]->textures_ambient = {&cubemap};
+	for(sgltk::Mesh *mesh : obj.meshes) {
+		mesh->textures_ambient = {&cubemap};
+	}
 
 	set_relative_mode(rel_mode);
 }
