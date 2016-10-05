@@ -69,15 +69,15 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 			glm::vec3(0,1,0), 70.0f, (float)width,
 			(float)height, 0.1f, 800.0f);
 
-	std::vector<glm::vec4> pos = {	glm::vec4(-0.5, 0, -0.5, 1),
-					glm::vec4( 0.5, 0, -0.5, 1),
-					glm::vec4(-0.5, 0,  0.5, 1),
-					glm::vec4( 0.5, 0,  0.5, 1)};
+	std::vector<glm::vec4> pos = {		glm::vec4(-0.5, 0, -0.5, 1),
+						glm::vec4( 0.5, 0, -0.5, 1),
+						glm::vec4(-0.5, 0,  0.5, 1),
+						glm::vec4( 0.5, 0,  0.5, 1)};
 
-	std::vector<glm::vec3> norm = {	glm::vec3(0, 1, 0),
-					glm::vec3(0, 1, 0),
-					glm::vec3(0, 1, 0),
-					glm::vec3(0, 1, 0)};
+	std::vector<glm::vec3> norm = {		glm::vec3(0, 1, 0),
+						glm::vec3(0, 1, 0),
+						glm::vec3(0, 1, 0),
+						glm::vec3(0, 1, 0)};
 
 	std::vector<glm::vec2> tex_coord = {	glm::vec2(0, 0),
 						glm::vec2(1, 0),
@@ -86,7 +86,7 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 	std::vector<unsigned short> ind = {0, 1, 2, 2, 1, 3};
 
-	depth_tex.create_empty(4096, 4096, GL_DEPTH_COMPONENT,
+	depth_tex.create_empty(2048, 2048, GL_DEPTH_COMPONENT,
 			       GL_FLOAT, GL_DEPTH_COMPONENT);
 
 	//create a plane
@@ -115,13 +115,14 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 	light_dir = glm::vec3(-5, -10, 4);
 	light_cam = Camera(box_pos - light_dir, light_dir, glm::vec3(0, 1, 0),
-			   70.0f, 20, 20, -10, 200, ORTHOGRAPHIC);
+			   70.0f, 10, 10, -150, 150, ORTHOGRAPHIC);
 	glm::mat4 conv_mat = glm::mat4( glm::vec4(0.5, 0, 0, 0),
 					glm::vec4(0, 0.5, 0, 0),
 					glm::vec4(0, 0, 0.5, 0),
 					glm::vec4(0.5, 0.5, 0.5, 1));
 	light_matrix = conv_mat * light_cam.projection_matrix_ortho * light_cam.view_matrix;
 	frame_buf.attach_texture(GL_DEPTH_ATTACHMENT, depth_tex);
+	frame_buf.finalize();
 }
 
 Win::~Win() {}

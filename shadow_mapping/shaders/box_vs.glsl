@@ -19,7 +19,7 @@ void main() {
 	vec4 pos = model_matrix * pos_in;
 
 	cam_vec = -(view_matrix * pos).xyz;
-	norm = (view_matrix * vec4(normal_matrix * norm_in, 0)).xyz;
+	norm = normal_matrix * norm_in;
 	tc = tex_coord_in0.xy;
 
 	gl_Position = view_proj_matrix * pos;
