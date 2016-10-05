@@ -5,12 +5,15 @@ in vec3 tc_in;
 
 out vec3 tc;
 
+uniform vec2 resolution;
 uniform mat4 model_matrix;
 
 void main() {
-	vec4 pos = vec4((model_matrix * pos_in).xy * 0.5, 0, 1);
-	pos.x += 0.7;
-	pos.y += 0.7;
+	vec4 pos = model_matrix * pos_in;
+	pos.x *= 512 / resolution.x;
+	pos.y *= 512 / resolution.y;
+	pos.x += 0.8;
+	pos.y += 0.8;
 
 	tc = tc_in;
 

@@ -28,7 +28,7 @@ class Win : public sgltk::Window {
 
 	glm::mat4 light_matrix;
 	glm::vec3 box_pos;
-	glm::vec3 light_pos;
+	glm::vec3 light_dir;
 	bool rel_mode;
 	void shadow_pass();
 public:
@@ -86,7 +86,7 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 	std::vector<unsigned short> ind = {0, 1, 2, 2, 1, 3};
 
-	depth_tex.create_empty(1024, 1024, GL_DEPTH_COMPONENT,
+	depth_tex.create_empty(4096, 4096, GL_DEPTH_COMPONENT,
 			       GL_FLOAT, GL_DEPTH_COMPONENT);
 
 	//create a plane
@@ -113,10 +113,14 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	box.setup_camera(&camera);
 	box.load("box.obj");
 
-	light_pos = glm::vec3(5, 10, -4);
-	light_cam = Camera(light_pos, box_pos - light_pos, glm::vec3(0, 1, 0),
-			   70.0f, 20, 20, -10, 10, ORTHOGRAPHIC);
-	light_matrix = light_cam.projection_matrix_ortho * light_cam.view_matrix;
+	light_dir = glm::vec3(-5, -10, 4);
+	light_cam = Camera(box_pos - light_dir, light_dir, glm::vec3(0, 1, 0),
+			   70.0f, 20, 20, -10, 200, ORTHOGRAPHIC);
+	glm::mat4 conv_mat = glm::mat4( glm::vec4(0.5, 0, 0, 0),
+					glm::vec4(0, 0.5, 0, 0),
+					glm::vec4(0, 0, 0.5, 0),
+					glm::vec4(0.5, 0.5, 0.5, 1));
+	light_matrix = conv_mat * light_cam.projection_matrix_ortho * light_cam.view_matrix;
 	frame_buf.attach_texture(GL_DEPTH_ATTACHMENT, depth_tex);
 }
 
@@ -160,15 +164,14 @@ void Win::display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	box_shader.bind();
-	box_shader.set_uniform("light_pos", light_pos);
+	box_shader.set_uniform("light_dir", light_dir);
 	box_shader.set_uniform("cam_pos", camera.pos);
 	box_shader.set_uniform("light_matrix", false, light_matrix);
 
 	floor_shader.bind();
-	floor_shader.set_uniform("light_pos", light_pos);
+	floor_shader.set_uniform("light_dir", light_dir);
 	floor_shader.set_uniform("cam_pos", camera.pos);
 	floor_shader.set_uniform("light_matrix", false, light_matrix);
-	depth_tex.bind();
 	floor_shader.set_uniform_int("shadow_map", 0);
 
 	glm::mat4 mat = glm::translate(box_pos);
@@ -176,11 +179,14 @@ void Win::display() {
 	box.setup_camera(&camera);
 	box.draw(&mat);
 
+	depth_tex.bind();
 	mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
 	floor.setup_shader(&floor_shader);
 	floor.setup_camera(&camera);
 	floor.draw(GL_TRIANGLES, &mat);
 
+	display_shader.bind();
+	display_shader.set_uniform("resolution", glm::vec2(width, height));
 	mat = glm::rotate((float)(-M_PI / 2), glm::vec3(1, 0, 0));
 	depth_display.draw(GL_TRIANGLES, &mat);
 }
