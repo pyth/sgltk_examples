@@ -13,12 +13,12 @@ uniform mat4 view_proj_matrix;
 uniform mat3 normal_matrix;
 uniform mat4 light_matrix;
 
-uniform vec3 camera_pos;
+uniform vec3 cam_pos;
 
 void main() {
 	vec4 pos = model_matrix * pos_in;
 
-	cam_vec = camera_pos - pos.xyz;
+	cam_vec = cam_pos - pos.xyz;
 	norm = normal_matrix * norm_in;
 	vec4 p_ls = light_matrix * pos;
 	pos_ls = p_ls.xyz / p_ls.w;

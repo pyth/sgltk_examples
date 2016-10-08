@@ -65,7 +65,7 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	box_shader.link();
 
 	//create a camera
-	camera = Camera(glm::vec3(0,10,20), glm::vec3(0,-0.125,-0.5),
+	camera = Camera(glm::vec3(3,7,20), glm::vec3(0, 0, -1),
 			glm::vec3(0,1,0), 70.0f, (float)width,
 			(float)height, 0.1f, 800.0f);
 
@@ -166,7 +166,6 @@ void Win::display() {
 
 	box_shader.bind();
 	box_shader.set_uniform("light_dir", light_dir);
-	box_shader.set_uniform("cam_pos", camera.pos);
 	box_shader.set_uniform("light_matrix", false, light_matrix);
 
 	floor_shader.bind();

@@ -13,8 +13,6 @@ uniform mat4 view_matrix;
 uniform mat4 view_proj_matrix;
 uniform mat3 normal_matrix;
 
-uniform vec3 camera_pos;
-
 void main() {
 	vec4 pos = model_matrix * pos_in;
 
