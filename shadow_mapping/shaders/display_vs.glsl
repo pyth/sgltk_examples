@@ -13,7 +13,7 @@ void main() {
 	pos.x *= 512 / resolution.x;
 	pos.y *= 512 / resolution.y;
 	pos.x += 0.8;
-	pos.y += 0.8;
+	pos.y += 0.7;
 
 	tc = tc_in;
 
