@@ -33,23 +33,23 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 
 	floor_diff.load_texture("tile_sandstone_d.png");
 	floor_diff.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	floor_diff.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_diff.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	floor_spec.load_texture("tile_sandstone_s.png");
 	floor_spec.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	floor_spec.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_spec.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	floor_norm.load_texture("tile_sandstone_n.png");
 	floor_norm.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	floor_norm.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_norm.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	floor_displ.load_texture("tile_sandstone_h.png");
 	floor_displ.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	floor_displ.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_displ.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	floor_light.load_texture("tile_sandstone_a.png");
 	floor_light.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	floor_light.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_light.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 #ifdef HAVE_SDL_TTF_H
 	//set up the cameras

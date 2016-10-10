@@ -94,6 +94,8 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	floor_tex.load_texture("tile_sandstone_d.png");
 	floor_tex.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 	floor_tex.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	floor_tex.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	floor_tex.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	//create a plane
 	int pos_loc_floor = floor_shader.get_attribute_location("pos_in");
