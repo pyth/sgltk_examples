@@ -12,17 +12,17 @@ out vec3 light_vec;
 out vec3 norm;
 out vec2 tc;
 
-uniform mat4 view_matrix;
 uniform mat4 view_proj_matrix;
 
 uniform vec3 light_pos;
+uniform vec3 camera_pos;
 
 void main() {
 	vec4 pos = model_matrix * pos_in;
 
-	cam_vec = -(view_matrix * pos).xyz;
-	light_vec = (view_matrix * (vec4(light_pos, 1) - pos)).xyz;
-	norm = (view_matrix * vec4(normal_matrix * norm_in, 0)).xyz;
+	cam_vec = camera_pos - pos.xyz;
+	light_vec = light_pos - pos.xyz;
+	norm = normal_matrix * norm_in;
 	tc = tex_coord_in0.xy;
 
 	gl_Position = view_proj_matrix * pos;

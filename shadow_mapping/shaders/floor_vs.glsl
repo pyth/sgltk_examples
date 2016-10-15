@@ -10,7 +10,6 @@ out vec3 pos_ls;
 out vec2 tc;
 
 uniform mat4 model_matrix;
-uniform mat4 view_matrix;
 uniform mat4 view_proj_matrix;
 uniform mat3 normal_matrix;
 uniform mat4 light_matrix;

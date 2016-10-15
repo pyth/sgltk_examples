@@ -29,7 +29,7 @@ void main() {
 
 	vec4 diff = LN * tex;
 
-	vec4 spec = vec4(1) * pow(VR, 10);
+	vec4 spec = 0.3 * vec4(1) * pow(VR, 10);
 
 	color = amb + vec4(attenuation * (diff.xyz + spec.xyz), 1);
 }

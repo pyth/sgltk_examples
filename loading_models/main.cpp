@@ -66,10 +66,12 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	spikey.setup_shader(&spikey_shader);
 	spikey.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
 	spikey.load("Spikey.dae");
+	spikey.set_texture_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
 	box.setup_shader(&box_shader);
 	box.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
 	box.load("box.obj");
+	box.set_texture_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
 	//start the timer
 	timer.start();

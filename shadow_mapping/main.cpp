@@ -4,6 +4,7 @@
 #include <sgltk/framebuffer.h>
 #include <sgltk/window.h>
 #include <glm/gtx/projection.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #ifdef __linux__
 	#include <unistd.h>
@@ -71,10 +72,10 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 			glm::vec3(0,1,0), 70.0f, (float)width,
 			(float)height, 0.1f, 800.0f);
 
-	std::vector<glm::vec4> pos = {		glm::vec4(-0.5, 0, -0.5, 1),
-						glm::vec4( 0.5, 0, -0.5, 1),
-						glm::vec4(-0.5, 0,  0.5, 1),
-						glm::vec4( 0.5, 0,  0.5, 1)};
+	std::vector<glm::vec4> pos = {		glm::vec4(-0.5, 0,  0.5, 1),
+						glm::vec4( 0.5, 0,  0.5, 1),
+						glm::vec4(-0.5, 0, -0.5, 1),
+						glm::vec4( 0.5, 0, -0.5, 1)};
 
 	std::vector<glm::vec3> norm = {		glm::vec3(0, 1, 0),
 						glm::vec3(0, 1, 0),
@@ -97,7 +98,7 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	floor_tex.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	floor_tex.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	//create a plane
+	//create a floor plane
 	int pos_loc_floor = floor_shader.get_attribute_location("pos_in");
 	int norm_loc_floor = floor_shader.get_attribute_location("norm_in");
 	int tc_loc_floor = floor_shader.get_attribute_location("tc_in");
@@ -108,6 +109,8 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	floor.set_vertex_attribute(pos_loc_floor, pos_buf, 4, GL_FLOAT, 0, 0);
 	floor.set_vertex_attribute(norm_loc_floor, norm_buf, 3, GL_FLOAT, 0, 0);
 	floor.set_vertex_attribute(tc_loc_floor, tc_buf, 2, GL_FLOAT, 0, 0);
+	floor.textures_diffuse.push_back(&floor_tex);
+	floor.textures_misc.push_back(std::make_pair("shadow_map", &depth_tex));
 
 	//create a mini display
 	depth_display.setup_shader(&display_shader);
@@ -123,18 +126,18 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	box.setup_shader(&box_shader);
 	box.setup_camera(&camera);
 	box.load("box.obj");
+	box.attach_texture("shadow_map", &depth_tex);
+	box.set_texture_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	box.set_texture_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	light_dir = glm::vec3(-5, -10, 4);
 	/*std::vector<glm::vec3> frustum(8);
 	camera.calculate_frustum_points(&frustum[0], &frustum[1],
 					&frustum[2], &frustum[3],
 					&frustum[4], &frustum[5],
-					&frustum[6], &frustum[7]);
-	for(unsigned int i = 0; i < frustum.size(); i++) {
-		frustum[i] = glm::proj(frustum[i], light_dir);
-	}*/
+					&frustum[6], &frustum[7]);*/
 	light_cam = Camera(box_pos - light_dir, light_dir, glm::vec3(0, 1, 0),
-			   70.0f, 10, 10, -150, 150, ORTHOGRAPHIC);
+			   90.0f, 10, 10, 1.0, 50, ORTHOGRAPHIC);
 	glm::mat4 conv_mat = glm::mat4( glm::vec4(0.5, 0, 0, 0),
 					glm::vec4(0, 0.5, 0, 0),
 					glm::vec4(0, 0, 0.5, 0),
@@ -185,30 +188,32 @@ void Win::display() {
 
 	box_shader.bind();
 	box_shader.set_uniform("light_dir", light_dir);
+	box_shader.set_uniform("cam_pos", camera.pos);
 	box_shader.set_uniform("light_matrix", false, light_matrix);
+	box_shader.set_uniform_int("soft_shadow", 5);
 
 	floor_shader.bind();
 	floor_shader.set_uniform("light_dir", light_dir);
 	floor_shader.set_uniform("cam_pos", camera.pos);
 	floor_shader.set_uniform("light_matrix", false, light_matrix);
-	floor_shader.set_uniform_int("shadow_map", 0);
-	floor_shader.set_uniform_int("floor_tex", 1);
+	floor_shader.set_uniform_int("soft_shadow", 5);
 
 	glm::mat4 mat = glm::translate(box_pos);
 	box.setup_shader(&box_shader);
 	box.setup_camera(&camera);
 	box.draw(&mat);
 
-	depth_tex.bind(0);
-	floor_tex.bind(1);
 	mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
 	floor.setup_shader(&floor_shader);
 	floor.setup_camera(&camera);
 	floor.draw(GL_TRIANGLES, &mat);
 
 	display_shader.bind();
+	display_shader.set_uniform_int("perspective", 0);
+	display_shader.set_uniform_float("near", light_cam.near_plane);
+	display_shader.set_uniform_float("far", light_cam.far_plane);
 	display_shader.set_uniform("resolution", glm::vec2(width, height));
-	mat = glm::rotate((float)(-M_PI / 2), glm::vec3(1, 0, 0));
+	mat = glm::rotate((float)(M_PI / 2), glm::vec3(1, 0, 0));
 	depth_display.draw(GL_TRIANGLES, &mat);
 }
 
@@ -239,7 +244,7 @@ void Win::handle_keyboard(std::string key) {
 		camera.roll(-rot_speed * dt);
 	}
 	camera.update_view_matrix();
-	light_cam.update_view_matrix();
+	//light_cam.update_view_matrix();
 }
 
 void Win::handle_key_press(std::string key, bool pressed) {

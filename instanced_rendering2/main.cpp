@@ -42,16 +42,20 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 			    glm::vec3(0, 1, 0),
 			    70.0f, (float)width, (float)height, 0.1f, 800.0f);
 
-	std::vector<glm::mat4> model_matrix(25);
-	for(unsigned int i = 0; i < model_matrix.size(); i++) {
-		model_matrix[i] = glm::scale(glm::vec3(4));
-		model_matrix[i] *= glm::translate(glm::vec3(i / 5 * 4, i % 5 * 4, 0));
+	std::vector<glm::mat4> model_matrix(125);
+	for(unsigned int i = 0; i < 25; i++) {
+		for(unsigned int j = 0; j < 5; j++) {
+			model_matrix[j + i * 5] = glm::scale(glm::vec3(4));
+			model_matrix[j + i * 5] *= glm::translate(glm::vec3(i / 5 * 4, i % 5 * 4, j * 4));
+		}
 	}
 
 	//load a model
 	box.setup_shader(&shader);
 	box.setup_camera(&cam.view_matrix, &cam.projection_matrix_persp);
 	box.load("box.obj");
+	box.set_texture_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	box.set_texture_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	box.setup_instanced_matrix(model_matrix);
 }
 
@@ -86,8 +90,8 @@ void Win::handle_key_press(std::string key, bool pressed) {
 }
 
 void Win::handle_keyboard(std::string key) {
-	float mov_speed = 0.1f;
-	float rot_speed = 0.001f;
+	float mov_speed = 1;
+	float rot_speed = 0.05f;
 	float dt = 1000 * (float)delta_time;
 	if (dt < 1.0)
 		dt = 1.0;
@@ -124,7 +128,7 @@ void Win::display() {
 	shader.set_uniform_float("light_pos", 25, 25, 20);
 	shader.set_uniform("cam_pos", cam.pos);
 
-	box.draw_instanced(25);
+	box.draw_instanced(125);
 }
 
 int main(int argc, char **argv) {
