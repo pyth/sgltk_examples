@@ -69,7 +69,7 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 	//create a camera
 	camera = Camera(glm::vec3(3,7,20), glm::vec3(0, 0, -1),
-			glm::vec3(0,1,0), 70.0f, (float)width,
+			glm::vec3(0,1,0), glm::radians(70.0f), (float)width,
 			(float)height, 0.1f, 800.0f);
 
 	std::vector<glm::vec4> pos = {		glm::vec4(-0.5, 0,  0.5, 1),
@@ -89,7 +89,7 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 	std::vector<unsigned short> ind = {0, 1, 2, 2, 1, 3};
 
-	depth_tex.create_empty(2048, 2048, GL_DEPTH_COMPONENT,
+	depth_tex.create_empty(1024, 1024, GL_DEPTH_COMPONENT,
 			       GL_FLOAT, GL_DEPTH_COMPONENT);
 
 	floor_tex.load_texture("tile_sandstone_d.png");
@@ -137,12 +137,8 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 					&frustum[4], &frustum[5],
 					&frustum[6], &frustum[7]);*/
 	light_cam = Camera(box_pos - light_dir, light_dir, glm::vec3(0, 1, 0),
-			   90.0f, 10, 10, 1.0, 50, ORTHOGRAPHIC);
-	glm::mat4 conv_mat = glm::mat4( glm::vec4(0.5, 0, 0, 0),
-					glm::vec4(0, 0.5, 0, 0),
-					glm::vec4(0, 0, 0.5, 0),
-					glm::vec4(0.5, 0.5, 0.5, 1));
-	light_matrix = conv_mat * light_cam.projection_matrix_ortho * light_cam.view_matrix;
+			   glm::radians(90.0f), 10, 10, 1, 50, ORTHOGRAPHIC);
+	light_matrix = light_cam.projection_matrix_ortho * light_cam.view_matrix;
 	frame_buf.attach_texture(GL_DEPTH_ATTACHMENT, depth_tex);
 	frame_buf.finalize();
 }
@@ -160,14 +156,16 @@ void Win::shadow_pass() {
 	glClearDepth(1.0);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
+	glCullFace(GL_FRONT);
 	glm::mat4 mat = glm::translate(box_pos);
 	box.setup_shader(&shadow_shader);
-	box.setup_camera(&light_cam);
+	box.setup_camera(&light_cam, ORTHOGRAPHIC);
 	box.draw(&mat);
+	glCullFace(GL_BACK);
 
 	mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
 	floor.setup_shader(&shadow_shader);
-	floor.setup_camera(&light_cam);
+	floor.setup_camera(&light_cam, ORTHOGRAPHIC);
 	floor.draw(GL_TRIANGLES, &mat);
 	frame_buf.unbind();
 }
@@ -176,6 +174,8 @@ void Win::display() {
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
 
 	shadow_pass();
 

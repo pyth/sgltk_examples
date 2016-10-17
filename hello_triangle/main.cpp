@@ -49,11 +49,11 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	shader2.link();
 
 	cam1 = sgltk::Camera(glm::vec3(0, 0, 20), glm::vec3(0, 0, -1),
-			    glm::vec3(0, 1, 0),
-			    70.0f, (float)width, (float)height, 0.1f, 800.0f);
+			    glm::vec3(0, 1, 0), glm::radians(70.0f),
+			    (float)width, (float)height, 0.1f, 800.0f);
 	cam2 = sgltk::Camera(glm::vec3(0, 4, 20), glm::vec3(0, 0, -1),
-			    glm::vec3(0, 1, 0),
-			    70.0f, (float)width, (float)height, 0.1f, 800.0f);
+			    glm::vec3(0, 1, 0), glm::radians(70.0f),
+			    (float)width, (float)height, 0.1f, 800.0f);
 
 	//create the triangle mesh
 	int pos_loc = mesh.attach_vertex_buffer<glm::vec4>(pos);

@@ -24,6 +24,7 @@ void main() {
 	norm = normal_matrix * norm_in;
 	vec4 p_ls = light_matrix * pos;
 	pos_ls = p_ls.xyz / p_ls.w;
+	pos_ls = pos_ls * 0.5 + vec3(0.5);
 
 	gl_Position = view_proj_matrix * pos;
 }

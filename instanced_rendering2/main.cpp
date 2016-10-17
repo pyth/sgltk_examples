@@ -39,8 +39,8 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	shader.link();
 
 	cam = sgltk::Camera(glm::vec3(35, 35, 100), glm::vec3(0, 0, -1),
-			    glm::vec3(0, 1, 0),
-			    70.0f, (float)width, (float)height, 0.1f, 800.0f);
+			    glm::vec3(0, 1, 0), glm::radians(70.0f),
+			    (float)width, (float)height, 0.1f, 800.0f);
 
 	std::vector<glm::mat4> model_matrix(125);
 	for(unsigned int i = 0; i < 25; i++) {

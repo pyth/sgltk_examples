@@ -54,8 +54,8 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 #ifdef HAVE_SDL_TTF_H
 	//set up the cameras
 	camera = Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
-			glm::vec3(0,1,0), 70.0f, (float)res_x,
-			(float)res_y, 0.1f, 800.0f);
+			glm::vec3(0,1,0), glm::radians(70.0f),
+			(float)res_x, (float)res_y, 0.1f, 800.0f);
 #endif //HAVE_SDL_TTF_H
 
 	//load the shaders

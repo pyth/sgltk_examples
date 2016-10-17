@@ -55,8 +55,8 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 	//create a camera
 	camera = Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
-			glm::vec3(0,1,0), 70.0f, (float)width,
-			(float)height, 0.1f, 800.0f);
+			glm::vec3(0,1,0), glm::radians(70.0f),
+			(float)width, (float)height, 0.1f, 800.0f);
 
 	//load the models and prepare them for rendering
 	bob.setup_shader(&bob_shader);

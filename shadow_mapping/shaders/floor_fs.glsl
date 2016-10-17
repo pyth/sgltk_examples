@@ -17,11 +17,12 @@ void main() {
 	vec2 texel_size = 1.0 / textureSize(shadow_map, 0);
 	for(int x = -soft_shadow; x <= soft_shadow; x++) {
 		for(int y = -soft_shadow; y <= soft_shadow; y++) {
-			float saved_depth = texture(shadow_map, pos_ls.xy + vec2(x, y) * texel_size).r;
-			if(pos_ls.x > 1.0 || pos_ls.y > 1.0)
-				shadow += 0.0;
-			else
-				shadow += pos_ls.z - 0.001 > saved_depth ? 1.0 : 0.0;
+			float saved_depth = texture(shadow_map, pos_ls.xy +
+						    vec2(x, y) * texel_size).r;
+			if(pos_ls.x >= 0.0 && pos_ls.x <= 1.0 &&
+					pos_ls.y >= 0.0 && pos_ls.y <= 1.0)
+				shadow += pos_ls.z - 0.005 >
+					  saved_depth ? 1.0 : 0.0;
 		}
 	}
 	shadow /= pow(soft_shadow * 2 + 1, 2);

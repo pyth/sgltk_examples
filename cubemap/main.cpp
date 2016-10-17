@@ -90,8 +90,10 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	cubemap.set_target(GL_TEXTURE_CUBE_MAP);
 	cubemap.load_cubemap(pos_x, neg_x, pos_y, neg_y, pos_z, neg_z);
 
-	cam = sgltk::Camera(glm::vec3(0, 0, 10), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0),
-				70.f, (float)width, (float)height, 0.1f, 800.0f, sgltk::INF_PERSPECTIVE);
+	cam = sgltk::Camera(glm::vec3(0, 0, 10), glm::vec3(0, 0, -1),
+			    glm::vec3(0, 1, 0), glm::radians(70.f),
+			    (float)width, (float)height, 0.1f, 800.0f,
+			    sgltk::INF_PERSPECTIVE);
 
 	//create the triangle mesh
 	skybox_mat = glm::scale(glm::vec3(200));
