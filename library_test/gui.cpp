@@ -51,12 +51,10 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	floor_light.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	floor_light.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-#ifdef HAVE_SDL_TTF_H
 	//set up the cameras
 	camera = Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
 			glm::vec3(0,1,0), glm::radians(70.0f),
 			(float)res_x, (float)res_y, 0.1f, 800.0f);
-#endif //HAVE_SDL_TTF_H
 
 	//load the shaders
 	material_shader.attach_file("material_vs.glsl", GL_VERTEX_SHADER);

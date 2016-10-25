@@ -1,15 +1,10 @@
 set(BIN_SOURCE main.cpp)
 set(BIN_HEADERS)
 
-set(TARGET instanced_rendering2)
+set(TARGET particle_system)
 
 link_directories(${PROJECT_SOURCE_DIR}/sgltk/lib)
 include_directories(${PROJECT_SOURCE_DIR}/sgltk/include)
-
-find_library(SGLTK_FOUND sgltk)
-if(${SGLTK_FOUND})
-	message(STATUS "FOUND sgltk")
-endif()
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 

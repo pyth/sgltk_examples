@@ -26,7 +26,7 @@ class Win : public sgltk::Window {
 	sgltk::Camera cam;
 	sgltk::Scene obj;
 public:
-	Win(const char *title, int res_x, int res_y, int offset_x,
+	Win(const std::string& title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
 	~Win();
 	void handle_resize();
@@ -36,7 +36,7 @@ public:
 	void display();
 };
 
-Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
+Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
 		sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
 
 	rel_mode = true;
@@ -108,9 +108,7 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	obj.setup_camera(&cam.view_matrix, &cam.projection_matrix_persp_inf);
 	obj.setup_shader(&obj_shader);
 	obj.load("monkey.obj");
-	for(sgltk::Mesh *mesh : obj.meshes) {
-		mesh->textures_ambient = {&cubemap};
-	}
+	obj.attach_texture("cubemap", &cubemap);
 
 	set_relative_mode(rel_mode);
 }
@@ -211,8 +209,6 @@ int main(int argc, char **argv) {
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
 	Win window("Cubemap", w, h, x, y, 3, 0, 0);
-
-
 
 	window.run(100);
 

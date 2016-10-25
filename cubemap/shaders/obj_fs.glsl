@@ -5,7 +5,7 @@ in vec3 norm;
 
 out vec4 color;
 
-uniform samplerCube texture_ambient;
+uniform samplerCube cubemap;
 
 void main() {
 	vec3 n = normalize(norm);
@@ -14,8 +14,8 @@ void main() {
 	vec3 tc_refr = normalize(refract(cam_vec, n, 0.8));
 	vec3 tc_refl = -normalize(reflect(cam_vec, n));
 
-	vec4 refr = texture(texture_ambient, tc_refr);
-	vec4 refl = texture(texture_ambient, tc_refl);
+	vec4 refr = texture(cubemap, tc_refr);
+	vec4 refl = texture(cubemap, tc_refl);
 
 	color = mix(refl, refr, CR);
 }
