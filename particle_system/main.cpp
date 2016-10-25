@@ -15,6 +15,9 @@
 
 class Win : public sgltk::Window {
 	bool rel_mode;
+	unsigned int fps;
+	unsigned int frame_cnt;
+	unsigned int frame_sum;
 	sgltk::Camera cam;
 	sgltk::Shader shader;
 	unsigned int num_particles;
@@ -36,6 +39,9 @@ Win::Win(const std::string& title,
 		 		offset_y, gl_maj, gl_min, flags) {
 
 	rel_mode = true;
+	fps = 0.0;
+	frame_sum = 0;
+	frame_cnt = 0;
 	srand(time(NULL));
 
 	num_particles = 1000;
@@ -113,6 +119,14 @@ void Win::display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	particle_system.draw();
+	frame_cnt++;
+	frame_sum += 1.0 / delta_time;
+	if(frame_cnt > 100) {
+		fps = (unsigned int)(frame_sum / frame_cnt);
+		frame_cnt = 0;
+		frame_sum = 0;
+	}
+	set_title("Test "+std::to_string(fps));
 }
 
 int main(int argc, char **argv) {
@@ -137,7 +151,7 @@ int main(int argc, char **argv) {
 
 	Win window("Particle system", w, h, x, y, 3, 0, 0);
 
-	window.run(100);
+	window.run();
 
 	return 0;
 }
