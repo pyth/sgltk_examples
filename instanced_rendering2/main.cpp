@@ -70,7 +70,7 @@ void Win::handle_resize() {
 void Win::handle_mouse_motion(int x, int y) {
 	float dt = (float)delta_time;
 	if (dt < 0.01)
-		dt = 0.01;
+		dt = 0.01f;
 	if (rel_mode) {
 		cam.yaw(-glm::atan((float)x) * dt);
 		cam.pitch(-glm::atan((float)y) * dt);

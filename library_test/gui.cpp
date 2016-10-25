@@ -311,11 +311,11 @@ void GUI::handle_gamepad_button(unsigned int id, int button) {
 	if(id != 0)
 		return;
 
-	float dt = delta_time * 50;
+	float dt = (float)delta_time * 50;
 	if(dt < 0.01)
-		dt = 0.01;
+		dt = 0.01f;
 	if(dt > 0.03)
-		dt = 0.03;
+		dt = 0.03f;
 
 	switch(button) {
 		case 9: //L1
@@ -335,29 +335,29 @@ void GUI::handle_gamepad_axis(unsigned int id, unsigned int axis, int value) {
 
 	float dt = (float)delta_time * 50;
 	if(dt < 0.1)
-		dt = 0.1;
+		dt = 0.1f;
 	if(dt > 0.3)
-		dt = 0.3;
+		dt = 0.3f;
 
 	if(abs(value) > 1400) { //deadzone
 		switch(axis) {
 			case 0: //left stick x-axis
-				camera.move_right(0.0001 * value * dt);
+				camera.move_right(0.0001f * value * dt);
 				break;
 			case 1: //left stick y-axis
-				camera.move_forward(-0.0001 * value * dt);
+				camera.move_forward(-0.0001f * value * dt);
 				break;
 			case 2: //right stick x-axis
-				camera.yaw(-0.00001 * value * dt);
+				camera.yaw(-0.00001f * value * dt);
 				break;
 			case 3: //right stick y-axis
-				camera.pitch(-0.00001 * value * dt);
+				camera.pitch(-0.00001f * value * dt);
 				break;
 			case 4: //L2
-				camera.move_up(-0.0001 * value * dt);
+				camera.move_up(-0.0001f * value * dt);
 				break;
 			case 5: //R2
-				camera.move_up(0.0001 * value * dt);
+				camera.move_up(0.0001f * value * dt);
 				break;
 		}
 		camera.update_view_matrix();
@@ -438,7 +438,7 @@ void GUI::handle_mouse_motion(int x, int y) {
 	if(rel_mode) {
 		float dt = 10 * (float)delta_time;
 		if(dt > 0.1)
-			dt = 0.1;
+			dt = 0.1f;
 		camera.yaw(-glm::atan((float)x) * dt);
 		camera.pitch(-glm::atan((float)y) * dt);
 		camera.update_view_matrix();

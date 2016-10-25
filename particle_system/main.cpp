@@ -39,15 +39,14 @@ Win::Win(const std::string& title,
 		 		offset_y, gl_maj, gl_min, flags) {
 
 	rel_mode = true;
-	fps = 0.0;
+	fps = 0;
 	frame_sum = 0;
 	frame_cnt = 0;
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 
 	num_particles = 1000;
 
 	shader.attach_file("particle_vs.glsl", GL_VERTEX_SHADER);
-	//shader.attach_file("particle_gs.glsl", GL_GEOMETRY_SHADER);
 	shader.attach_file("particle_fs.glsl", GL_FRAGMENT_SHADER);
 	shader.link();
 
@@ -114,19 +113,19 @@ void Win::display() {
 	}
 	particle_system.update();
 
-	glClearColor(0.1, 0.1, 0.1, 1);
+	glClearColor(0.1f, 0.1f, 0.1f, 1);
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	particle_system.draw();
 	frame_cnt++;
-	frame_sum += 1.0 / delta_time;
+	frame_sum += (unsigned int)(1.0 / delta_time);
 	if(frame_cnt > 100) {
 		fps = (unsigned int)(frame_sum / frame_cnt);
 		frame_cnt = 0;
 		frame_sum = 0;
 	}
-	set_title("Test "+std::to_string(fps));
+	set_title("Particle system "+std::to_string(fps));
 }
 
 int main(int argc, char **argv) {
@@ -140,7 +139,6 @@ int main(int argc, char **argv) {
 
 	sgltk::App::init();
 	sgltk::Shader::add_path("../particle_system/shaders");
-	sgltk::Image::add_path("../data/textures");
 
 	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
 	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);
