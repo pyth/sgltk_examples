@@ -64,11 +64,13 @@ Win::Win(const std::string& title,
 	for(unsigned int i = 0; i < num_particles; i++) {
 		pos = glm::vec3(0);
 		vel = glm::vec3(2 * (float)rand() / RAND_MAX - 1, 2 * (float)rand() / RAND_MAX - 1, 2 * (float)rand() / RAND_MAX - 1);
+		vel = (3 * (float)rand() / RAND_MAX + 0.5f) * glm::normalize(vel);
 		lt = (float)(rand() % 30 + 5);
 		particle_system.add_particle(pos, vel, lt);
 	}
 	particle_system.update();
 	glEnable(GL_PROGRAM_POINT_SIZE);
+	glEnable(GL_DEPTH_TEST);
 	set_relative_mode(rel_mode);
 }
 
@@ -108,6 +110,7 @@ void Win::display() {
 	for(unsigned int i = 0; i < num_particles; i++) {
 		pos = glm::vec3(0);
 		vel = glm::vec3(2 * (float)rand() / RAND_MAX - 1, 2 * (float)rand() / RAND_MAX - 1, 2 * (float)rand() / RAND_MAX - 1);
+		vel = (3 * (float)rand() / RAND_MAX + 0.5f) * glm::normalize(vel);
 		lt = (float)(rand() % 30 + 5);
 		particle_system.add_particle(pos, vel, lt);
 	}
