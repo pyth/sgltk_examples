@@ -52,9 +52,9 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	floor_light.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	//set up the cameras
-	camera = Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
-			glm::vec3(0,1,0), glm::radians(70.0f),
-			(float)res_x, (float)res_y, 0.1f, 800.0f);
+	camera = P_Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
+			  glm::vec3(0,1,0), glm::radians(70.0f),
+			  (float)res_x, (float)res_y, 0.1f, 800.0f);
 
 	//load the shaders
 	material_shader.attach_file("material_vs.glsl", GL_VERTEX_SHADER);
@@ -115,8 +115,7 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	floor.attach_vertex_buffer(vert);
 	floor.attach_index_buffer(floor_ind);
 	floor.setup_shader(&floor_shader);
-	floor.setup_camera(&camera.view_matrix,
-			   &camera.projection_matrix_persp);
+	floor.setup_camera(&camera);
 	floor.set_vertex_attribute("pos_in", 0, 4, GL_FLOAT, sizeof(sgltk::Vertex),
 				   (void*)offsetof(sgltk::Vertex, position));
 	floor.set_vertex_attribute("norm_in", 0, 3, GL_FLOAT, sizeof(sgltk::Vertex),
@@ -165,12 +164,12 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	floor.textures_displacement.push_back(&floor_displ);
 
 	material_model.setup_shader(&material_shader);
-	material_model.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	material_model.setup_camera(&camera);
 	material_model.load("Spikey.dae");
 	material_model.set_animation_speed(1.0);
 
 	textured_model.setup_shader(&textured_shader);
-	textured_model.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	textured_model.setup_camera(&camera);
 	textured_model.load("bob_lamp.md5mesh");
 	textured_model.set_animation_speed(1.0);
 
@@ -188,7 +187,7 @@ GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
 	light.attach_vertex_buffer(light_verts);
 	light.attach_index_buffer(light_index);
 	light.setup_shader(&point_shader);
-	light.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	light.setup_camera(&camera);
 	light.set_vertex_attribute("pos_in", 0, 3, GL_FLOAT, sizeof(sgltk::Vertex),
 					(void *)offsetof(sgltk::Vertex, position));
 	light.set_vertex_attribute("color_in", 0, 4, GL_FLOAT, sizeof(sgltk::Vertex),

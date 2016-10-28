@@ -23,8 +23,8 @@ class Win : public sgltk::Window {
 	Shader box_shader;
 	Shader floor_shader;
 	Shader shadow_shader;
-	Camera camera;
-	Camera light_cam;
+	P_Camera camera;
+	O_Camera light_cam;
 	Texture depth_tex;
 	Texture floor_tex;
 	Framebuffer frame_buf;
@@ -68,9 +68,9 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	box_shader.link();
 
 	//create a camera
-	camera = Camera(glm::vec3(3,7,20), glm::vec3(0, 0, -1),
-			glm::vec3(0,1,0), glm::radians(70.0f), (float)width,
-			(float)height, 0.1f, 800.0f);
+	camera = P_Camera(glm::vec3(3,7,20), glm::vec3(0, 0, -1),
+			  glm::vec3(0,1,0), glm::radians(70.0f), (float)width,
+			  (float)height, 0.1f, 800.0f);
 
 	std::vector<glm::vec4> pos = {		glm::vec4(-0.5, 0,  0.5, 1),
 						glm::vec4( 0.5, 0,  0.5, 1),
@@ -136,9 +136,9 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 					&frustum[2], &frustum[3],
 					&frustum[4], &frustum[5],
 					&frustum[6], &frustum[7]);*/
-	light_cam = Camera(box_pos - light_dir, light_dir, glm::vec3(0, 1, 0),
-			   glm::radians(90.0f), 10, 10, 1, 50, ORTHOGRAPHIC);
-	light_matrix = light_cam.projection_matrix_ortho * light_cam.view_matrix;
+	light_cam = O_Camera(box_pos - light_dir, light_dir, glm::vec3(0, 1, 0),
+			     10, 10, 1, 50);
+	light_matrix = light_cam.projection_matrix * light_cam.view_matrix;
 	frame_buf.attach_texture(GL_DEPTH_ATTACHMENT, depth_tex);
 	frame_buf.finalize();
 }
@@ -159,13 +159,13 @@ void Win::shadow_pass() {
 	glCullFace(GL_FRONT);
 	glm::mat4 mat = glm::translate(box_pos);
 	box.setup_shader(&shadow_shader);
-	box.setup_camera(&light_cam, ORTHOGRAPHIC);
+	box.setup_camera(&light_cam);
 	box.draw(&mat);
 	glCullFace(GL_BACK);
 
 	mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
 	floor.setup_shader(&shadow_shader);
-	floor.setup_camera(&light_cam, ORTHOGRAPHIC);
+	floor.setup_camera(&light_cam);
 	floor.draw(GL_TRIANGLES, &mat);
 	frame_buf.unbind();
 }

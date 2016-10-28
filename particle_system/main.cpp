@@ -18,7 +18,7 @@ class Win : public sgltk::Window {
 	unsigned int fps;
 	unsigned int frame_cnt;
 	unsigned int frame_sum;
-	sgltk::Camera cam;
+	sgltk::P_Camera cam;
 	sgltk::Shader shader;
 	unsigned int num_particles;
 	sgltk::Particles particle_system;
@@ -50,12 +50,12 @@ Win::Win(const std::string& title,
 	shader.attach_file("particle_fs.glsl", GL_FRAGMENT_SHADER);
 	shader.link();
 
-	cam = sgltk::Camera(glm::vec3(0, 0, 10), glm::vec3(0, 0, -1),
-			    glm::vec3(0, 1, 0), glm::radians(70.f),
-			    (float)width, (float)height, 0.1f, 800.0f);
+	cam = sgltk::P_Camera(glm::vec3(0, 0, 10), glm::vec3(0, 0, -1),
+			      glm::vec3(0, 1, 0), glm::radians(70.f),
+			      (float)width, (float)height, 0.1f, 800.0f);
 
 	particle_system.resize(num_particles);
-	particle_system.setup_camera(&cam.view_matrix, &cam.projection_matrix_persp);
+	particle_system.setup_camera(&cam.view_matrix, &cam.projection_matrix);
 	particle_system.setup_shader(&shader);
 	
 	glm::vec3 pos;

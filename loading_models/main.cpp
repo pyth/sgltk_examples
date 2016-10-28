@@ -21,7 +21,7 @@ class Win : public sgltk::Window {
 	Shader box_shader;
 	Shader bob_shader;
 	Shader spikey_shader;
-	Camera camera;
+	P_Camera camera;
 
 	bool rel_mode;
 public:
@@ -54,22 +54,22 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	box_shader.link();
 
 	//create a camera
-	camera = Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
-			glm::vec3(0,1,0), glm::radians(70.0f),
-			(float)width, (float)height, 0.1f, 800.0f);
+	camera = P_Camera(glm::vec3(0,5,20), glm::vec3(0,0,-1),
+			  glm::vec3(0,1,0), glm::radians(70.0f),
+			  (float)width, (float)height, 0.1f, 800.0f);
 
 	//load the models and prepare them for rendering
 	bob.setup_shader(&bob_shader);
-	bob.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	bob.setup_camera(&camera.view_matrix, &camera.projection_matrix);
 	bob.load("bob_lamp.md5mesh");
 
 	spikey.setup_shader(&spikey_shader);
-	spikey.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	spikey.setup_camera(&camera.view_matrix, &camera.projection_matrix);
 	spikey.load("Spikey.dae");
 	spikey.set_texture_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
 	box.setup_shader(&box_shader);
-	box.setup_camera(&camera.view_matrix, &camera.projection_matrix_persp);
+	box.setup_camera(&camera.view_matrix, &camera.projection_matrix);
 	box.load("box.obj");
 	box.set_texture_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 

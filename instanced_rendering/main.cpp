@@ -13,7 +13,7 @@
 class Win : public sgltk::Window {
 	sgltk::Mesh mesh;
 	sgltk::Shader shader;
-	sgltk::Camera cam;
+	sgltk::P_Camera cam;
 public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
@@ -42,9 +42,9 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	shader.attach_file("fragment_shader.glsl", GL_FRAGMENT_SHADER);
 	shader.link();
 
-	cam = sgltk::Camera(glm::vec3(30, 30, 100), glm::vec3(0, 0, -1),
-			    glm::vec3(0, 1, 0), glm::radians(70.0f),
-			    (float)width, (float)height, 0.1f, 800.0f);
+	cam = sgltk::P_Camera(glm::vec3(30, 30, 100), glm::vec3(0, 0, -1),
+			      glm::vec3(0, 1, 0), glm::radians(70.0f),
+			      (float)width, (float)height, 0.1f, 800.0f);
 
 	std::vector<glm::mat4> model_matrix(25);
 	for(unsigned int i = 0; i < model_matrix.size(); i++) {
@@ -57,7 +57,7 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	int mat_buf = mesh.attach_vertex_buffer<glm::mat4>(model_matrix);
 	mesh.attach_index_buffer(ind);
 	mesh.setup_shader(&shader);
-	mesh.setup_camera(&cam.view_matrix, &cam.projection_matrix_persp);
+	mesh.setup_camera(&cam.view_matrix, &cam.projection_matrix);
 	mesh.set_vertex_attribute("pos_in", pos_buf, 4, GL_FLOAT, 0, 0);
 	mesh.set_vertex_attribute("color_in", color_buf, 4, GL_FLOAT, 0, 0);
 

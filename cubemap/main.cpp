@@ -23,7 +23,7 @@ class Win : public sgltk::Window {
 	sgltk::Mesh skybox;
 	sgltk::Shader skybox_shader;
 	sgltk::Shader obj_shader;
-	sgltk::Camera cam;
+	sgltk::IP_Camera cam;
 	sgltk::Scene obj;
 public:
 	Win(const std::string& title, int res_x, int res_y, int offset_x,
@@ -90,22 +90,21 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	cubemap.set_target(GL_TEXTURE_CUBE_MAP);
 	cubemap.load_cubemap(pos_x, neg_x, pos_y, neg_y, pos_z, neg_z);
 
-	cam = sgltk::Camera(glm::vec3(0, 0, 10), glm::vec3(0, 0, -1),
-			    glm::vec3(0, 1, 0), glm::radians(70.f),
-			    (float)width, (float)height, 0.1f, 800.0f,
-			    sgltk::INF_PERSPECTIVE);
+	cam = sgltk::IP_Camera(glm::vec3(0, 0, 10), glm::vec3(0, 0, -1),
+			       glm::vec3(0, 1, 0), glm::radians(70.f),
+			       (float)width, (float)height, 0.1f);
 
 	//create the triangle mesh
 	skybox_mat = glm::scale(glm::vec3(200));
 	int pos_buf = skybox.attach_vertex_buffer<glm::vec4>(pos);
 	skybox.attach_index_buffer(ind);
 	skybox.setup_shader(&skybox_shader);
-	skybox.setup_camera(&cam.view_matrix, &cam.projection_matrix_persp_inf);
+	skybox.setup_camera(&cam.view_matrix, &cam.projection_matrix);
 	skybox.set_vertex_attribute("pos_in", pos_buf, 4, GL_FLOAT, 0, 0);
 	skybox.textures_ambient = {&cubemap};
 
 	obj_mat = glm::scale(glm::vec3(2));
-	obj.setup_camera(&cam.view_matrix, &cam.projection_matrix_persp_inf);
+	obj.setup_camera(&cam.view_matrix, &cam.projection_matrix);
 	obj.setup_shader(&obj_shader);
 	obj.load("monkey.obj");
 	obj.attach_texture("cubemap", &cubemap);

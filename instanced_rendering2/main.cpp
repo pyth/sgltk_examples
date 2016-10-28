@@ -15,7 +15,7 @@ class Win : public sgltk::Window {
 
 	sgltk::Scene box;
 	sgltk::Shader shader;
-	sgltk::Camera cam;
+	sgltk::P_Camera cam;
 public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
@@ -38,9 +38,9 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	shader.attach_file("box_fs.glsl", GL_FRAGMENT_SHADER);
 	shader.link();
 
-	cam = sgltk::Camera(glm::vec3(35, 35, 100), glm::vec3(0, 0, -1),
-			    glm::vec3(0, 1, 0), glm::radians(70.0f),
-			    (float)width, (float)height, 0.1f, 800.0f);
+	cam = sgltk::P_Camera(glm::vec3(35, 35, 100), glm::vec3(0, 0, -1),
+			      glm::vec3(0, 1, 0), glm::radians(70.0f),
+			      (float)width, (float)height, 0.1f, 800.0f);
 
 	std::vector<glm::mat4> model_matrix(125);
 	for(unsigned int i = 0; i < 25; i++) {
@@ -52,7 +52,7 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 
 	//load a model
 	box.setup_shader(&shader);
-	box.setup_camera(&cam.view_matrix, &cam.projection_matrix_persp);
+	box.setup_camera(&cam.view_matrix, &cam.projection_matrix);
 	box.load("box.obj");
 	box.set_texture_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	box.set_texture_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);

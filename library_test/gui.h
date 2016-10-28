@@ -49,7 +49,7 @@ class GUI : public Window {
 	Scene material_model;
 	Scene textured_model;
 
-	Camera camera;
+	P_Camera camera;
 
 	sgltk::Timer time;
 
