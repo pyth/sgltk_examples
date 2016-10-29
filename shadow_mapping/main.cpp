@@ -24,15 +24,17 @@ class Win : public sgltk::Window {
 	Shader floor_shader;
 	Shader shadow_shader;
 	P_Camera camera;
-	O_Camera light_cam;
+	O_Camera light_cam_o;
+	P_Camera light_cam_p;
+	Camera *curr_light_cam;
 	Texture depth_tex;
 	Texture floor_tex;
 	Framebuffer frame_buf;
 
-	glm::mat4 light_matrix;
 	glm::vec3 box_pos;
 	glm::vec3 light_dir;
 	bool rel_mode;
+	bool perspective;
 	void shadow_pass();
 public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
@@ -136,9 +138,12 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 					&frustum[2], &frustum[3],
 					&frustum[4], &frustum[5],
 					&frustum[6], &frustum[7]);*/
-	light_cam = O_Camera(box_pos - light_dir, light_dir, glm::vec3(0, 1, 0),
+	light_cam_o = O_Camera(box_pos - light_dir, light_dir, glm::vec3(0, 1, 0),
 			     10, 10, 1, 50);
-	light_matrix = light_cam.projection_matrix * light_cam.view_matrix;
+	light_cam_p = P_Camera(box_pos - light_dir, light_dir, glm::vec3(0, 1, 0),
+			     glm::radians(90.f), 1024, 1024, 1, 50);
+	curr_light_cam = &light_cam_p;
+	perspective = true;
 	frame_buf.attach_texture(GL_DEPTH_ATTACHMENT, depth_tex);
 	frame_buf.finalize();
 }
@@ -159,13 +164,13 @@ void Win::shadow_pass() {
 	glCullFace(GL_FRONT);
 	glm::mat4 mat = glm::translate(box_pos);
 	box.setup_shader(&shadow_shader);
-	box.setup_camera(&light_cam);
+	box.setup_camera(curr_light_cam);
 	box.draw(&mat);
 	glCullFace(GL_BACK);
 
 	mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
 	floor.setup_shader(&shadow_shader);
-	floor.setup_camera(&light_cam);
+	floor.setup_camera(curr_light_cam);
 	floor.draw(GL_TRIANGLES, &mat);
 	frame_buf.unbind();
 }
@@ -185,6 +190,8 @@ void Win::display() {
 	glClearColor(0, 0, 0, 1);
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glm::mat4 light_matrix = curr_light_cam->projection_matrix * curr_light_cam->view_matrix;
 
 	box_shader.bind();
 	box_shader.set_uniform("light_dir", light_dir);
@@ -209,9 +216,13 @@ void Win::display() {
 	floor.draw(GL_TRIANGLES, &mat);
 
 	display_shader.bind();
-	display_shader.set_uniform_int("perspective", 0);
-	display_shader.set_uniform_float("near", light_cam.near_plane);
-	display_shader.set_uniform_float("far", light_cam.far_plane);
+	if(perspective) {
+		display_shader.set_uniform_int("perspective", 1);
+	} else {
+		display_shader.set_uniform_int("perspective", 0);
+	}
+	display_shader.set_uniform_float("near", curr_light_cam->near_plane);
+	display_shader.set_uniform_float("far", curr_light_cam->far_plane);
 	display_shader.set_uniform("resolution", glm::vec2(width, height));
 	mat = glm::rotate((float)(M_PI / 2), glm::vec3(1, 0, 0));
 	depth_display.draw(GL_TRIANGLES, &mat);
@@ -242,9 +253,14 @@ void Win::handle_keyboard(std::string key) {
 		camera.roll(rot_speed * dt);
 	} else if(key == "Q") {
 		camera.roll(-rot_speed * dt);
+	} else if(key == "1") {
+		curr_light_cam = &light_cam_o;
+		perspective = false;
+	} else if(key == "2") {
+		curr_light_cam = &light_cam_p;
+		perspective = true;
 	}
 	camera.update_view_matrix();
-	//light_cam.update_view_matrix();
 }
 
 void Win::handle_key_press(std::string key, bool pressed) {

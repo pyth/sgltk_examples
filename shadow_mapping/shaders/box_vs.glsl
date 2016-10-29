@@ -7,7 +7,7 @@ in vec3 tex_coord_in0;
 out vec3 cam_vec;
 out vec3 norm;
 out vec2 tc;
-out vec3 pos_ls;
+out vec4 pos_ls;
 
 uniform vec3 cam_pos;
 uniform mat4 model_matrix;
@@ -21,8 +21,7 @@ void main() {
 	cam_vec = cam_pos - pos.xyz;
 	norm = normal_matrix * norm_in;
 	tc = tex_coord_in0.xy;
-	vec4 p_ls = light_matrix * pos;
-	pos_ls = p_ls.xyz / p_ls.w;
+	pos_ls = light_matrix * pos;
 
 	gl_Position = view_proj_matrix * pos;
 }

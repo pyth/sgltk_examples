@@ -1,6 +1,6 @@
 #version 130
 
-in vec3 pos_ls;
+in vec4 pos_ls;
 in vec3 cam_vec;
 in vec3 norm;
 in vec2 tc;
@@ -14,14 +14,16 @@ uniform sampler2D shadow_map;
 
 void main() {
 	float shadow = 0.0;
+	vec3 pos = pos_ls.xyz / pos_ls.w * 0.5 + 0.5;
+	//pos = pos * 0.5 + 0.5;
 	vec2 texel_size = 1.0 / textureSize(shadow_map, 0);
 	for(int x = -soft_shadow; x <= soft_shadow; x++) {
 		for(int y = -soft_shadow; y <= soft_shadow; y++) {
-			float saved_depth = texture(shadow_map, pos_ls.xy +
+			float saved_depth = texture(shadow_map, pos.xy +
 						    vec2(x, y) * texel_size).r;
-			if(pos_ls.x >= 0.0 && pos_ls.x <= 1.0 &&
-					pos_ls.y >= 0.0 && pos_ls.y <= 1.0)
-				shadow += pos_ls.z - 0.005 >
+			if(pos.x >= 0.0 && pos.x <= 1.0 &&
+					pos.y >= 0.0 && pos.y <= 1.0)
+				shadow += pos.z - 0.005 >
 					  saved_depth ? 1.0 : 0.0;
 		}
 	}
