@@ -10,8 +10,8 @@ out vec2 tc;
 out vec4 pos_ls;
 
 uniform vec3 cam_pos;
-uniform mat4 model_matrix;
 uniform mat4 light_matrix;
+uniform mat4 model_matrix;
 uniform mat4 view_proj_matrix;
 uniform mat3 normal_matrix;
 

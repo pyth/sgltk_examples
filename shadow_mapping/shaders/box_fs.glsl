@@ -32,7 +32,7 @@ void main() {
 	vec3 cam = normalize(cam_vec);
 	vec3 norm = normalize(norm);
 	vec3 light = -normalize(light_dir);
-	vec3 reflection = normalize(reflect(light, norm));
+	vec3 reflection = -normalize(reflect(light, norm));
 
 	float LN = max(0.0, dot(norm, light));
 	float VR = max(0.0, dot(cam, reflection) * sign(LN));
@@ -41,7 +41,7 @@ void main() {
 
 	vec4 diff = LN * tex;
 
-	vec4 spec = 0.7 * vec4(1) * pow(VR, 10);
+	vec4 spec = 0.3 * vec4(1) * pow(VR, 10);
 
 	color = amb + (1.0 - shadow) * (diff + spec);
 }

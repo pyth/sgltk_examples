@@ -31,10 +31,10 @@ class Win : public sgltk::Window {
 	Texture floor_tex;
 	Framebuffer frame_buf;
 
-	glm::vec3 box_pos;
 	glm::vec3 light_dir;
 	bool rel_mode;
 	bool perspective;
+	std::vector<glm::mat4> model_matrix;
 	void shadow_pass();
 public:
 	Win(const char *title, int res_x, int res_y, int offset_x,
@@ -123,8 +123,19 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 	depth_display.set_vertex_attribute("tc_in", tc_buf, 2, GL_FLOAT, 0, 0);
 	depth_display.textures_diffuse.push_back(&depth_tex);
 
+	model_matrix.resize(5);
+	model_matrix[0] = glm::rotate(glm::radians(0.0f), glm::vec3(0, 1, 0));
+	model_matrix[0] = glm::translate(glm::vec3(0, 4, 0)) * model_matrix[0];
+	model_matrix[1] = glm::rotate(glm::radians(14.0f), glm::vec3(0, 1, 1));
+	model_matrix[1] = glm::translate(glm::vec3(2, 7, -2)) * model_matrix[1];
+	model_matrix[2] = glm::rotate(glm::radians(24.0f), glm::vec3(0, 1, 0));
+	model_matrix[2] = glm::translate(glm::vec3(-4, 4, -2)) * model_matrix[2];
+	model_matrix[3] = glm::rotate(glm::radians(56.0f), glm::vec3(0, 0, 1));
+	model_matrix[3] = glm::translate(glm::vec3(-6, 4, 2)) * model_matrix[3];
+	model_matrix[4] = glm::rotate(glm::radians(78.0f), glm::vec3(1, 0, 0));
+	model_matrix[4] = glm::translate(glm::vec3(4, 4, 1)) * model_matrix[4];
+
 	//load a model
-	box_pos = glm::vec3(0, 4, 0);
 	box.setup_shader(&box_shader);
 	box.setup_camera(&camera);
 	box.load("box.obj");
@@ -138,10 +149,10 @@ Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, in
 					&frustum[2], &frustum[3],
 					&frustum[4], &frustum[5],
 					&frustum[6], &frustum[7]);*/
-	light_cam_o = O_Camera(box_pos - light_dir, light_dir, glm::vec3(0, 1, 0),
-			     10, 10, 1, 50);
-	light_cam_p = P_Camera(box_pos - light_dir, light_dir, glm::vec3(0, 1, 0),
-			     glm::radians(90.f), 1024, 1024, 1, 50);
+	light_cam_o = O_Camera(glm::vec3(5, 14, -4), light_dir, glm::vec3(0, 1, 0),
+			       20, 20, 1, 100);
+	light_cam_p = P_Camera(glm::vec3(5, 14, -4), light_dir, glm::vec3(0, 1, 0),
+			       glm::radians(90.f), 1024, 1024, 1, 100);
 	curr_light_cam = &light_cam_p;
 	perspective = true;
 	frame_buf.attach_texture(GL_DEPTH_ATTACHMENT, depth_tex);
@@ -162,13 +173,14 @@ void Win::shadow_pass() {
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	glCullFace(GL_FRONT);
-	glm::mat4 mat = glm::translate(box_pos);
 	box.setup_shader(&shadow_shader);
 	box.setup_camera(curr_light_cam);
-	box.draw(&mat);
+	for(glm::mat4 mat : model_matrix) {
+		box.draw(&mat);
+	}
 	glCullFace(GL_BACK);
 
-	mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
+	glm::mat4 mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
 	floor.setup_shader(&shadow_shader);
 	floor.setup_camera(curr_light_cam);
 	floor.draw(GL_TRIANGLES, &mat);
@@ -205,12 +217,13 @@ void Win::display() {
 	floor_shader.set_uniform("light_matrix", false, light_matrix);
 	floor_shader.set_uniform_int("soft_shadow", 5);
 
-	glm::mat4 mat = glm::translate(box_pos);
 	box.setup_shader(&box_shader);
 	box.setup_camera(&camera);
-	box.draw(&mat);
+	for(glm::mat4 mat : model_matrix) {
+		box.draw(&mat);
+	}
 
-	mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
+	glm::mat4 mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
 	floor.setup_shader(&floor_shader);
 	floor.setup_camera(&camera);
 	floor.draw(GL_TRIANGLES, &mat);
