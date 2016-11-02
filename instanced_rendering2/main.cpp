@@ -17,17 +17,17 @@ class Win : public sgltk::Window {
 	sgltk::Shader shader;
 	sgltk::P_Camera cam;
 public:
-	Win(const char *title, int res_x, int res_y, int offset_x,
+	Win(const std::string& title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
 	~Win();
 	void handle_resize();
 	void handle_mouse_motion(int x, int y);
-	void handle_key_press(std::string key, bool pressed);
-	void handle_keyboard(std::string key);
+	void handle_key_press(const std::string& key, bool pressed);
+	void handle_keyboard(const std::string& key);
 	void display();
 };
 
-Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
+Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
 	sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
 
 	rel_mode = true;
@@ -78,7 +78,7 @@ void Win::handle_mouse_motion(int x, int y) {
 	}
 }
 
-void Win::handle_key_press(std::string key, bool pressed) {
+void Win::handle_key_press(const std::string& key, bool pressed) {
 	if(key == "Escape") {
 		stop();
 	} else if(key == "M") {
@@ -89,7 +89,7 @@ void Win::handle_key_press(std::string key, bool pressed) {
 	}
 }
 
-void Win::handle_keyboard(std::string key) {
+void Win::handle_keyboard(const std::string& key) {
 	float mov_speed = 1;
 	float rot_speed = 0.05f;
 	float dt = 1000 * (float)delta_time;

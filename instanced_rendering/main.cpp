@@ -15,15 +15,15 @@ class Win : public sgltk::Window {
 	sgltk::Shader shader;
 	sgltk::P_Camera cam;
 public:
-	Win(const char *title, int res_x, int res_y, int offset_x,
+	Win(const std::string& title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
 	~Win();
 	void handle_resize();
-	void handle_key_press(std::string key, bool pressed);
+	void handle_key_press(const std::string& key, bool pressed);
 	void display();
 };
 
-Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
+Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
 	sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
 
 	//triangle vertex positions
@@ -78,7 +78,7 @@ void Win::handle_resize() {
 	cam.update_projection_matrix((float)width, (float)height);
 }
 
-void Win::handle_key_press(std::string key, bool pressed) {
+void Win::handle_key_press(const std::string& key, bool pressed) {
 	if(key == "Escape")
 		stop();
 }

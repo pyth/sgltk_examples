@@ -30,8 +30,8 @@ public:
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
 	~Win();
 	void handle_resize();
-	void handle_keyboard(std::string key);
-	void handle_key_press(std::string key, bool pressed);
+	void handle_keyboard(const std::string& key);
+	void handle_key_press(const std::string& key, bool pressed);
 	void handle_mouse_motion(int x, int y);
 	void display();
 };
@@ -130,7 +130,7 @@ void Win::handle_mouse_motion(int x, int y) {
 	}
 }
 
-void Win::handle_key_press(std::string key, bool pressed) {
+void Win::handle_key_press(const std::string& key, bool pressed) {
 	if(key == "Escape") {
 		stop();
 	} else if(key == "M") {
@@ -145,7 +145,7 @@ void Win::handle_key_press(std::string key, bool pressed) {
 	}
 }
 
-void Win::handle_keyboard(std::string key) {
+void Win::handle_keyboard(const std::string& key) {
 	float rot_speed = 0.005f;
 	float dt = 1000 * (float)delta_time;
 	if (dt < 2.0)

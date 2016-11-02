@@ -2,7 +2,7 @@
 
 #define NUM_TILES 400
 
-GUI::GUI(const char *title, int res_x, int res_y, int offset_x,
+GUI::GUI(const std::string& title, int res_x, int res_y, int offset_x,
 	 int offset_y, int gl_maj, int gl_min, unsigned int flags)
 	 :Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
 
@@ -363,7 +363,7 @@ void GUI::handle_gamepad_axis(unsigned int id, unsigned int axis, int value) {
 	}
 }
 
-void GUI::handle_key_press(std::string key, bool pressed) {
+void GUI::handle_key_press(const std::string& key, bool pressed) {
 	SDL_DisplayMode mode;
 	if(key == "Escape") {
 		stop();
@@ -403,7 +403,7 @@ void GUI::handle_key_press(std::string key, bool pressed) {
 	}
 }
 
-void GUI::handle_keyboard(std::string key) {
+void GUI::handle_keyboard(const std::string& key) {
 	float mov_speed = 0.1f;
 	float rot_speed = 0.01f;
 	float dt = 1000 * (float)delta_time;

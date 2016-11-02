@@ -1,10 +1,7 @@
 #include <sgltk/scene.h>
 #include <sgltk/camera.h>
-#include <sgltk/timer.h>
 #include <sgltk/framebuffer.h>
 #include <sgltk/window.h>
-#include <glm/gtx/projection.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 #ifdef __linux__
 	#include <unistd.h>
@@ -37,17 +34,17 @@ class Win : public sgltk::Window {
 	std::vector<glm::mat4> model_matrix;
 	void shadow_pass();
 public:
-	Win(const char *title, int res_x, int res_y, int offset_x,
+	Win(const std::string& title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
 	~Win();
 	void handle_resize();
-	void handle_keyboard(std::string key);
-	void handle_key_press(std::string key, bool pressed);
+	void handle_keyboard(const std::string& key);
+	void handle_key_press(const std::string& key, bool pressed);
 	void handle_mouse_motion(int x, int y);
 	void display();
 };
 
-Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
+Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
 	sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
 
 	rel_mode = true;
@@ -241,7 +238,7 @@ void Win::display() {
 	depth_display.draw(GL_TRIANGLES, &mat);
 }
 
-void Win::handle_keyboard(std::string key) {
+void Win::handle_keyboard(const std::string& key) {
 	float mov_speed = 0.1f;
 	float rot_speed = 0.05f;
 	float dt = 1000 * (float)delta_time;
@@ -276,7 +273,7 @@ void Win::handle_keyboard(std::string key) {
 	camera.update_view_matrix();
 }
 
-void Win::handle_key_press(std::string key, bool pressed) {
+void Win::handle_key_press(const std::string& key, bool pressed) {
 	if(key == "Escape") {
 		stop();
 	} else if(key == "M") {
@@ -317,13 +314,6 @@ int main(int argc, char **argv) {
 	Scene::add_path("../data/models");
 	Image::add_path("../data/textures");
 	Shader::add_path("../shadow_mapping/shaders");
-
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
 	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);

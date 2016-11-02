@@ -28,7 +28,7 @@ public:
 	~Win();
 	void handle_resize();
 	void handle_mouse_motion(int x, int y);
-	void handle_key_press(std::string key, bool pressed);
+	void handle_key_press(const std::string& key, bool pressed);
 	void display();
 };
 
@@ -92,7 +92,7 @@ void Win::handle_mouse_motion(int x, int y) {
 	}
 }
 
-void Win::handle_key_press(std::string key, bool pressed) {
+void Win::handle_key_press(const std::string& key, bool pressed) {
 	if(key == "Escape") {
 		stop();
 	} else if(key == "M") {

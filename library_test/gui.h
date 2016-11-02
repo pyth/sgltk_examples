@@ -64,7 +64,7 @@ class GUI : public Window {
 
 	Mesh *create_sphere(unsigned int slices, unsigned int stacks);
 public:
-	GUI(const char *title, int res_x, int res_y, int offset_x,
+	GUI(const std::string& title, int res_x, int res_y, int offset_x,
 	    int offset_y, int gl_maj, int gl_min, unsigned int flags);
 
 	~GUI();
@@ -73,8 +73,8 @@ public:
 	void handle_gamepad_button_press(unsigned int id, int button, bool pressed);
 	void handle_gamepad_button(unsigned int id, int button);
 	void handle_gamepad_axis(unsigned int id, unsigned int axis, int value);
-	void handle_keyboard(std::string key);
-	void handle_key_press(std::string key, bool pressed);
+	void handle_keyboard(const std::string& key);
+	void handle_key_press(const std::string& key, bool pressed);
 	void handle_mouse_motion(int x, int y);
 	void handle_mouse_wheel(int x, int y);
 	void handle_mouse_button(int x, int y, int button, bool state, int clicks);
