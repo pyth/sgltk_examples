@@ -5,7 +5,6 @@ in vec3 tc;
 
 out vec4 color;
 
-uniform int perspective;
 uniform float near;
 uniform float far;
 uniform sampler2D textures_diffuse;
@@ -16,8 +15,6 @@ float linearize_depth(float depth) {
 }
 
 void main() {
-	float depth = texture(textures_diffuse, tc.xy).r;
-	if(perspective == 1)
-		depth = linearize_depth(depth);
+	float depth = linearize_depth(texture(textures_diffuse, tc.xy).r);
 	color = vec4(vec3(depth), 1);
 }

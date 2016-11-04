@@ -4,10 +4,10 @@ in vec4 pos_ls;
 in vec3 cam_vec;
 in vec3 norm;
 in vec2 tc;
+in vec3 light;
 
 out vec4 color;
 
-uniform vec3 light_dir;
 uniform int soft_shadow;
 uniform sampler2D texture_diffuse;
 uniform sampler2D shadow_map;
@@ -33,10 +33,10 @@ void main() {
 
 	vec3 cam = normalize(cam_vec);
 	vec3 norm = normalize(norm);
-	vec3 light = -normalize(light_dir);
-	vec3 reflection = normalize(reflect(light, norm));
+	vec3 l = normalize(light);
+	vec3 reflection = normalize(reflect(l, norm));
 
-	float LN = max(0.0, dot(norm, light));
+	float LN = max(0.0, dot(norm, l));
 	float VR = max(0.0, dot(cam, reflection) * sign(LN));
 
 	vec4 amb = 0.2 * tex;
