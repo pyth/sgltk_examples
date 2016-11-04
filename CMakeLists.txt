@@ -6,6 +6,7 @@ set(TARGETS system_info
 	cubemap
 	particle_system
 	shadow_mapping
+	shadow_mapping2
 	loading_models
 	instanced_rendering
 	instanced_rendering2

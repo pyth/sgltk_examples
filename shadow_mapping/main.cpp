@@ -20,6 +20,7 @@ class Win : public sgltk::Window {
 	Shader box_shader;
 	Shader floor_shader;
 	Shader shadow_shader;
+	Shader instanced_shadow_shader;
 	P_Camera camera;
 	O_Camera light_cam_o;
 	P_Camera light_cam_p;
@@ -57,6 +58,10 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	shadow_shader.attach_file("shadow_vs.glsl", GL_VERTEX_SHADER);
 	shadow_shader.attach_file("shadow_fs.glsl", GL_FRAGMENT_SHADER);
 	shadow_shader.link();
+
+	instanced_shadow_shader.attach_file("instanced_shadow_vs.glsl", GL_VERTEX_SHADER);
+	instanced_shadow_shader.attach_file("instanced_shadow_fs.glsl", GL_FRAGMENT_SHADER);
+	instanced_shadow_shader.link();
 
 	floor_shader.attach_file("floor_vs.glsl", GL_VERTEX_SHADER);
 	floor_shader.attach_file("floor_fs.glsl", GL_FRAGMENT_SHADER);
@@ -171,7 +176,7 @@ void Win::shadow_pass() {
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	glCullFace(GL_FRONT);
-	box.setup_shader(&box_shader);
+	box.setup_shader(&instanced_shadow_shader);
 	box.setup_camera(curr_light_cam);
 	box.draw_instanced(5);
 	glCullFace(GL_BACK);

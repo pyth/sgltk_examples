@@ -22,14 +22,15 @@ class Win : public sgltk::Window {
 	sgltk::Shader shader;
 	unsigned int num_particles;
 	sgltk::Particles particle_system;
-public:
-	Win(const std::string& title, int res_x, int res_y, int offset_x,
-		int offset_y, int gl_maj, int gl_min, unsigned int flags);
-	~Win();
+
 	void handle_resize();
 	void handle_mouse_motion(int x, int y);
 	void handle_key_press(const std::string& key, bool pressed);
 	void display();
+public:
+	Win(const std::string& title, int res_x, int res_y, int offset_x,
+		int offset_y, int gl_maj, int gl_min, unsigned int flags);
+	~Win();
 };
 
 Win::Win(const std::string& title,

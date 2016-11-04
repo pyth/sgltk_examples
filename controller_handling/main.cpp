@@ -4,16 +4,16 @@
 using namespace std;
 
 class Win : public sgltk::Window {
-public:
-	Win(const char *title, int res_x, int res_y, int offset_x,
-		int offset_y, int gl_maj, int gl_min, unsigned int flags);
-	~Win();
 	void handle_gamepad_added(unsigned int gamepad_id);
 	void handle_gamepad_removed(unsigned int gamepad_id);
 	void handle_gamepad_button(unsigned int gamepad_id, int button);
 	void handle_gamepad_button_press(unsigned int gamepad_id, int button, bool pressed);
 	void handle_gamepad_axis_change(unsigned int gamepad_id, unsigned int axis, int value);
 	void handle_key_press(std::string key, bool pressed);
+public:
+	Win(const char *title, int res_x, int res_y, int offset_x,
+		int offset_y, int gl_maj, int gl_min, unsigned int flags);
+	~Win();
 };
 
 Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :

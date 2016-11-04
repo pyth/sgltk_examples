@@ -63,11 +63,6 @@ class GUI : public Window {
 #endif //HAVE_SDL_TTF_H
 
 	Mesh *create_sphere(unsigned int slices, unsigned int stacks);
-public:
-	GUI(const std::string& title, int res_x, int res_y, int offset_x,
-	    int offset_y, int gl_maj, int gl_min, unsigned int flags);
-
-	~GUI();
 
 	void handle_resize();
 	void handle_gamepad_button_press(unsigned int id, int button, bool pressed);
@@ -79,6 +74,11 @@ public:
 	void handle_mouse_wheel(int x, int y);
 	void handle_mouse_button(int x, int y, int button, bool state, int clicks);
 	void display();
+public:
+	GUI(const std::string& title, int res_x, int res_y, int offset_x,
+	    int offset_y, int gl_maj, int gl_min, unsigned int flags);
+
+	~GUI();
 };
 
 #endif

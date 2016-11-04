@@ -30,11 +30,11 @@ void main() {
 	vec4 tex = texture(texture_diffuse, tc);
 
 	vec3 cam = normalize(cam_vec);
-	vec3 norm = normalize(norm);
+	vec3 n = normalize(norm);
 	vec3 light = -normalize(light_dir);
-	vec3 reflection = -normalize(reflect(light, norm));
+	vec3 reflection = -normalize(reflect(light, n));
 
-	float LN = max(0.0, dot(norm, light));
+	float LN = max(0.0, dot(n, light));
 	float VR = max(0.0, dot(cam, reflection) * sign(LN));
 
 	vec4 amb = 0.2 * tex;

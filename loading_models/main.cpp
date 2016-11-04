@@ -14,6 +14,8 @@
 using namespace sgltk;
 
 class Win : public sgltk::Window {
+	bool rel_mode;
+
 	Timer timer;
 	Scene box;
 	Scene bob;
@@ -23,16 +25,15 @@ class Win : public sgltk::Window {
 	Shader spikey_shader;
 	P_Camera camera;
 
-	bool rel_mode;
-public:
-	Win(const std::string& title, int res_x, int res_y, int offset_x,
-		int offset_y, int gl_maj, int gl_min, unsigned int flags);
-	~Win();
 	void handle_resize();
 	void handle_keyboard(const std::string& key);
 	void handle_key_press(const std::string& key, bool pressed);
 	void handle_mouse_motion(int x, int y);
 	void display();
+public:
+	Win(const std::string& title, int res_x, int res_y, int offset_x,
+		int offset_y, int gl_maj, int gl_min, unsigned int flags);
+	~Win();
 };
 
 Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :

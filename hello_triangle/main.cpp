@@ -16,13 +16,14 @@ class Win : public sgltk::Window {
 	sgltk::Shader shader2;
 	sgltk::P_Camera cam1;
 	sgltk::P_Camera cam2;
+
+	void handle_resize();
+	void handle_key_press(const std::string& key, bool pressed);
+	void display();
 public:
 	Win(const std::string& title, int res_x, int res_y, int offset_x,
 		int offset_y, int gl_maj, int gl_min, unsigned int flags);
 	~Win();
-	void handle_resize();
-	void handle_key_press(const std::string& key, bool pressed);
-	void display();
 };
 
 Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
