@@ -44,4 +44,5 @@ void main() {
 	vec4 spec = 0.3 * vec4(1) * pow(VR, 10);
 
 	color = amb + (1.0 - shadow) * (diff + spec);
+	color = vec4(norm, 1);
 }

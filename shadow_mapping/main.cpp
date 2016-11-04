@@ -33,15 +33,15 @@ class Win : public sgltk::Window {
 	bool perspective;
 	std::vector<glm::mat4> model_matrix;
 	void shadow_pass();
-public:
-	Win(const std::string& title, int res_x, int res_y, int offset_x,
-		int offset_y, int gl_maj, int gl_min, unsigned int flags);
-	~Win();
 	void handle_resize();
 	void handle_keyboard(const std::string& key);
 	void handle_key_press(const std::string& key, bool pressed);
 	void handle_mouse_motion(int x, int y);
 	void display();
+public:
+	Win(const std::string& title, int res_x, int res_y, int offset_x,
+		int offset_y, int gl_maj, int gl_min, unsigned int flags);
+	~Win();
 };
 
 Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
@@ -67,7 +67,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	box_shader.link();
 
 	//create a camera
-	camera = P_Camera(glm::vec3(3,7,20), glm::vec3(0, 0, -1),
+	camera = P_Camera(glm::vec3(10,10,10), glm::vec3(-10, -8, -10),
 			  glm::vec3(0,1,0), glm::radians(70.0f), (float)width,
 			  (float)height, 0.1f, 800.0f);
 
@@ -88,7 +88,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	std::vector<unsigned short> ind = {0, 1, 2, 2, 1, 3};
 
-	depth_tex.create_empty(1024, 1024, GL_DEPTH_COMPONENT,
+	depth_tex.create_empty_2D(1024, 1024, GL_DEPTH_COMPONENT,
 			       GL_FLOAT, GL_DEPTH_COMPONENT);
 
 	floor_tex.load_texture("tile_sandstone_d.png");
@@ -130,7 +130,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	model_matrix[3] = glm::rotate(glm::radians(56.0f), glm::vec3(0, 0, 1));
 	model_matrix[3] = glm::translate(glm::vec3(-6, 4, 2)) * model_matrix[3];
 	model_matrix[4] = glm::rotate(glm::radians(78.0f), glm::vec3(1, 0, 0));
-	model_matrix[4] = glm::translate(glm::vec3(4, 4, 1)) * model_matrix[4];
+	model_matrix[4] = glm::translate(glm::vec3(0, 2, -6)) * model_matrix[4];
 
 	//load a model
 	box.setup_shader(&box_shader);
@@ -139,16 +139,17 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	box.attach_texture("shadow_map", &depth_tex);
 	box.set_texture_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	box.set_texture_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	box.setup_instanced_matrix(model_matrix);
 
-	light_dir = glm::vec3(-5, -10, 4);
+	light_dir = glm::vec3(-5, -14, 4);
 	/*std::vector<glm::vec3> frustum(8);
 	camera.calculate_frustum_points(&frustum[0], &frustum[1],
 					&frustum[2], &frustum[3],
 					&frustum[4], &frustum[5],
 					&frustum[6], &frustum[7]);*/
-	light_cam_o = O_Camera(glm::vec3(5, 14, -4), light_dir, glm::vec3(0, 1, 0),
+	light_cam_o = O_Camera(-light_dir, light_dir, glm::vec3(0, 1, 0),
 			       20, 20, 1, 100);
-	light_cam_p = P_Camera(glm::vec3(5, 14, -4), light_dir, glm::vec3(0, 1, 0),
+	light_cam_p = P_Camera(-light_dir, light_dir, glm::vec3(0, 1, 0),
 			       glm::radians(90.f), 1024, 1024, 1, 100);
 	curr_light_cam = &light_cam_p;
 	perspective = true;
@@ -170,11 +171,9 @@ void Win::shadow_pass() {
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	glCullFace(GL_FRONT);
-	box.setup_shader(&shadow_shader);
+	box.setup_shader(&box_shader);
 	box.setup_camera(curr_light_cam);
-	for(glm::mat4 mat : model_matrix) {
-		box.draw(&mat);
-	}
+	box.draw_instanced(5);
 	glCullFace(GL_BACK);
 
 	glm::mat4 mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
@@ -206,19 +205,17 @@ void Win::display() {
 	box_shader.set_uniform("light_dir", light_dir);
 	box_shader.set_uniform("cam_pos", camera.pos);
 	box_shader.set_uniform("light_matrix", false, light_matrix);
-	box_shader.set_uniform_int("soft_shadow", 5);
+	box_shader.set_uniform_int("soft_shadow", 2);
 
 	floor_shader.bind();
 	floor_shader.set_uniform("light_dir", light_dir);
 	floor_shader.set_uniform("cam_pos", camera.pos);
 	floor_shader.set_uniform("light_matrix", false, light_matrix);
-	floor_shader.set_uniform_int("soft_shadow", 5);
+	floor_shader.set_uniform_int("soft_shadow", 2);
 
 	box.setup_shader(&box_shader);
 	box.setup_camera(&camera);
-	for(glm::mat4 mat : model_matrix) {
-		box.draw(&mat);
-	}
+	box.draw_instanced(5);
 
 	glm::mat4 mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
 	floor.setup_shader(&floor_shader);

@@ -1,5 +1,8 @@
 #version 130
 
+in mat4 model_matrix;
+in mat3 normal_matrix;
+
 in vec4 pos_in;
 in vec3 norm_in;
 in vec3 tex_coord_in0;
@@ -11,9 +14,7 @@ out vec4 pos_ls;
 
 uniform vec3 cam_pos;
 uniform mat4 light_matrix;
-uniform mat4 model_matrix;
 uniform mat4 view_proj_matrix;
-uniform mat3 normal_matrix;
 
 void main() {
 	vec4 pos = model_matrix * pos_in;
