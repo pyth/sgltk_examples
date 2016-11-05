@@ -15,7 +15,6 @@ uniform sampler2D shadow_map;
 void main() {
 	float shadow = 0.0;
 	vec3 pos = pos_ls.xyz / pos_ls.w * 0.5 + 0.5;
-	//pos = pos * 0.5 + 0.5;
 	vec2 texel_size = 1.0 / textureSize(shadow_map, 0);
 	for(int x = -soft_shadow; x <= soft_shadow; x++) {
 		for(int y = -soft_shadow; y <= soft_shadow; y++) {
@@ -32,9 +31,9 @@ void main() {
 	vec4 tex = texture(texture_diffuse, tc);
 
 	vec3 cam = normalize(cam_vec);
-	vec3 norm = normalize(norm);
+	vec3 n = normalize(norm);
 	vec3 l = normalize(light);
-	vec3 reflection = normalize(reflect(l, norm));
+	vec3 reflection = normalize(reflect(l, n));
 
 	float LN = max(0.0, dot(norm, l));
 	float VR = max(0.0, dot(cam, reflection) * sign(LN));

@@ -1,5 +1,6 @@
 #include <sgltk/scene.h>
 #include <sgltk/camera.h>
+#include <sgltk/timer.h>
 #include <sgltk/framebuffer.h>
 #include <sgltk/window.h>
 
@@ -13,13 +14,23 @@
 using namespace sgltk;
 
 class Win : public sgltk::Window {
+	bool rel_mode;
+	std::vector<glm::mat4> model_matrix;
+
+	glm::vec3 light_pos;
+	glm::mat4 light_trafo;
+	glm::mat4 light_matrix;
+
 	Mesh floor;
+	Mesh light;
 	Mesh depth_display;
 	Scene box;
 	Shader display_shader;
 	Shader box_shader;
+	Shader light_shader;
 	Shader floor_shader;
 	Shader shadow_shader;
+	Timer light_timer;
 	P_Camera camera;
 	P_Camera light_cam;
 	Camera *curr_light_cam;
@@ -27,11 +38,8 @@ class Win : public sgltk::Window {
 	Texture floor_tex;
 	Framebuffer frame_buf;
 
-	glm::vec3 light_pos;
-	glm::mat4 light_matrix;
-	bool rel_mode;
-	std::vector<glm::mat4> model_matrix;
 	void shadow_pass();
+	void normal_pass();
 	void handle_resize();
 	void handle_keyboard(const std::string& key);
 	void handle_key_press(const std::string& key, bool pressed);
@@ -47,11 +55,23 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
 
 	rel_mode = true;
+	glEnable(GL_PROGRAM_POINT_SIZE);
 
 	//create shaders
 	display_shader.attach_file("display_vs.glsl", GL_VERTEX_SHADER);
 	display_shader.attach_file("display_fs.glsl", GL_FRAGMENT_SHADER);
 	display_shader.link();
+
+	light_shader.attach_string("#version 130\n"
+				   "in vec4 pos_in;\n"
+				   "uniform mat4 model_view_proj_matrix;"
+				   "void main() {\n"
+				   "gl_Position = model_view_proj_matrix * pos_in;\n"
+				   "gl_PointSize = 10;"
+				   "gl_FrontColor = vec4(1);}", GL_VERTEX_SHADER);
+	//light_shader.attach_file("point_shader_vs.glsl", GL_VERTEX_SHADER);
+	//light_shader.attach_file("point_shader_fs.glsl", GL_FRAGMENT_SHADER);
+	light_shader.link();
 
 	shadow_shader.attach_file("shadow_vs.glsl", GL_VERTEX_SHADER);
 	shadow_shader.attach_file("shadow_fs.glsl", GL_FRAGMENT_SHADER);
@@ -66,8 +86,8 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	box_shader.link();
 
 	//create a camera
-	camera = P_Camera(glm::vec3(10,10,10), glm::vec3(-10, -8, -10),
-			  glm::vec3(0,1,0), glm::radians(70.0f), (float)width,
+	camera = P_Camera(glm::vec3(10, 10, 10), glm::vec3(-10, -8, -10),
+			  glm::vec3(0, 1, 0), glm::radians(70.0f), (float)width,
 			  (float)height, 0.1f, 800.0f);
 
 	std::vector<glm::vec4> pos = {		glm::vec4(-0.5, 0,  0.5, 1),
@@ -85,7 +105,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 						glm::vec2(0, 1),
 						glm::vec2(1, 1)};
 
-	std::vector<unsigned short> ind = {0, 1, 2, 2, 1, 3};
+	std::vector<unsigned short> ind = {0, 1, 2, 3};
 
 	depth_tex.create_empty_2D(1024, 1024, GL_DEPTH_COMPONENT,
 			       GL_FLOAT, GL_DEPTH_COMPONENT);
@@ -109,6 +129,14 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	floor.set_vertex_attribute(tc_loc_floor, tc_buf, 2, GL_FLOAT, 0, 0);
 	floor.textures_diffuse.push_back(&floor_tex);
 	floor.textures_misc.push_back(std::make_pair("shadow_map", &depth_tex));
+
+	std::vector<glm::vec4> light_point = {glm::vec4(0, 0, 0, 1)};
+	std::vector<unsigned short> light_ind = {0};
+	light.attach_vertex_buffer<glm::vec4>(light_point);
+	floor.set_vertex_attribute("pos_in", 0, 4, GL_FLOAT, 0, 0);
+	light.attach_index_buffer(light_ind);
+	light.setup_camera(&camera);
+	light.setup_shader(&light_shader);
 
 	//create a mini display
 	depth_display.setup_shader(&display_shader);
@@ -140,18 +168,23 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	box.set_texture_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	box.setup_instanced_matrix(model_matrix);
 
-	light_pos = glm::vec3(5, 14, -4);
+	light.model_matrix = glm::translate(glm::vec3(5, 14, -4)) *
+			     glm::rotate((float)M_PI * 0.0f, glm::vec3(1, 0, 0)) *
+			     glm::translate(glm::vec3(0, 1, 0));
+	light_pos = light.model_matrix * glm::vec4(0, 0, 0, 1);
 	/*std::vector<glm::vec3> frustum(8);
 	camera.calculate_frustum_points(&frustum[0], &frustum[1],
 					&frustum[2], &frustum[3],
 					&frustum[4], &frustum[5],
 					&frustum[6], &frustum[7]);*/
 	light_cam = P_Camera(light_pos, -light_pos, glm::vec3(0, 1, 0),
-			     glm::radians(90.f), 1024, 1024, 1, 100);
+			     glm::radians(90.f), depth_tex.width, depth_tex.height, 2, 100);
 
 	light_matrix = light_cam.projection_matrix * light_cam.view_matrix;
 	frame_buf.attach_texture(GL_DEPTH_ATTACHMENT, depth_tex);
 	frame_buf.finalize();
+
+	light_timer.start();
 }
 
 Win::~Win() {}
@@ -176,8 +209,39 @@ void Win::shadow_pass() {
 	glm::mat4 mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
 	floor.setup_shader(&floor_shader);
 	floor.setup_camera(&light_cam);
-	floor.draw(GL_TRIANGLES, &mat);
+	floor.draw(GL_TRIANGLE_STRIP, &mat);
 	frame_buf.unbind();
+}
+
+void Win::normal_pass() {
+	glViewport(0, 0, width, height);
+
+	glClearColor(0, 0, 0, 1);
+	glClearDepth(1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	box_shader.bind();
+	box_shader.set_uniform("light_pos", light_pos);
+	box_shader.set_uniform("cam_pos", camera.pos);
+	box_shader.set_uniform("light_matrix", false, light_matrix);
+	box_shader.set_uniform_int("soft_shadow", 4);
+
+	floor_shader.bind();
+	floor_shader.set_uniform("light_pos", light_pos);
+	floor_shader.set_uniform("cam_pos", camera.pos);
+	floor_shader.set_uniform("light_matrix", false, light_matrix);
+	floor_shader.set_uniform_int("soft_shadow", 4);
+
+	box.setup_shader(&box_shader);
+	box.setup_camera(&camera);
+	box.draw_instanced(5);
+
+	glm::mat4 mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
+	floor.setup_shader(&floor_shader);
+	floor.setup_camera(&camera);
+	floor.draw(GL_TRIANGLE_STRIP, &mat);
+
+	light.draw(GL_POINTS);
 }
 
 void Win::display() {
@@ -187,42 +251,25 @@ void Win::display() {
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 
+	light.model_matrix = glm::translate(glm::vec3(5, 14, -4)) *
+			     glm::rotate((float)(M_PI * light_timer.get_time()), glm::vec3(1, 0, 0)) *
+			     glm::translate(glm::vec3(0, 1, 0));
+	light_pos = light.model_matrix * glm::vec4(0, 0, 0, 1);
+	light_cam.pos = light_pos;
+	light_cam.dir = -glm::normalize(light_pos);
+	light_cam.update_view_matrix();
+	light_matrix = light_cam.projection_matrix * light_cam.view_matrix;
+
 	shadow_pass();
 
-	glViewport(0, 0, width, height);
-
-	//clear the screen
-	glClearColor(0, 0, 0, 1);
-	glClearDepth(1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	box_shader.bind();
-	box_shader.set_uniform("light_pos", light_pos);
-	box_shader.set_uniform("cam_pos", camera.pos);
-	box_shader.set_uniform("light_matrix", false, light_matrix);
-	box_shader.set_uniform_int("soft_shadow", 2);
-
-	floor_shader.bind();
-	floor_shader.set_uniform("light_pos", light_pos);
-	floor_shader.set_uniform("cam_pos", camera.pos);
-	floor_shader.set_uniform("light_matrix", false, light_matrix);
-	floor_shader.set_uniform_int("soft_shadow", 2);
-
-	box.setup_shader(&box_shader);
-	box.setup_camera(&camera);
-	box.draw_instanced(5);
-
-	glm::mat4 mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
-	floor.setup_shader(&floor_shader);
-	floor.setup_camera(&camera);
-	floor.draw(GL_TRIANGLES, &mat);
+	normal_pass();
 
 	display_shader.bind();
 	display_shader.set_uniform_float("near", light_cam.near_plane);
 	display_shader.set_uniform_float("far", light_cam.far_plane);
 	display_shader.set_uniform("resolution", glm::vec2(width, height));
-	mat = glm::rotate((float)(M_PI / 2), glm::vec3(1, 0, 0));
-	depth_display.draw(GL_TRIANGLES, &mat);
+	glm::mat4 mat = glm::rotate((float)(M_PI / 2), glm::vec3(1, 0, 0));
+	depth_display.draw(GL_TRIANGLE_STRIP, &mat);
 }
 
 void Win::handle_keyboard(const std::string& key) {
