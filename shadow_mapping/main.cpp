@@ -56,6 +56,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	rel_mode = true;
 	glEnable(GL_PROGRAM_POINT_SIZE);
+	glEnable(GL_DEPTH_TEST);
 
 	//create shaders
 	display_shader.attach_file("display_vs.glsl", GL_VERTEX_SHADER);
@@ -64,18 +65,12 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	light_shader.attach_string("#version 130\n"
 				   "in vec4 pos_in;\n"
-				   "uniform mat4 model_view_proj_matrix;"
+				   "uniform mat4 model_view_proj_matrix;\n"
 				   "void main() {\n"
 				   "gl_Position = model_view_proj_matrix * pos_in;\n"
-				   "gl_PointSize = 10;"
+				   "gl_PointSize = 10;\n"
 				   "gl_FrontColor = vec4(1);}", GL_VERTEX_SHADER);
-	//light_shader.attach_file("point_shader_vs.glsl", GL_VERTEX_SHADER);
-	//light_shader.attach_file("point_shader_fs.glsl", GL_FRAGMENT_SHADER);
 	light_shader.link();
-
-	shadow_shader.attach_file("shadow_vs.glsl", GL_VERTEX_SHADER);
-	shadow_shader.attach_file("shadow_fs.glsl", GL_FRAGMENT_SHADER);
-	shadow_shader.link();
 
 	floor_shader.attach_file("floor_vs.glsl", GL_VERTEX_SHADER);
 	floor_shader.attach_file("floor_fs.glsl", GL_FRAGMENT_SHADER);
@@ -133,7 +128,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	std::vector<glm::vec4> light_point = {glm::vec4(0, 0, 0, 1)};
 	std::vector<unsigned short> light_ind = {0};
 	light.attach_vertex_buffer<glm::vec4>(light_point);
-	floor.set_vertex_attribute("pos_in", 0, 4, GL_FLOAT, 0, 0);
+	light.set_vertex_attribute("pos_in", 0, 4, GL_FLOAT, 0, 0);
 	light.attach_index_buffer(light_ind);
 	light.setup_camera(&camera);
 	light.setup_shader(&light_shader);
@@ -172,13 +167,8 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 			     glm::rotate((float)M_PI * 0.0f, glm::vec3(1, 0, 0)) *
 			     glm::translate(glm::vec3(0, 1, 0));
 	light_pos = glm::vec3(light.model_matrix * glm::vec4(0, 0, 0, 1));
-	/*std::vector<glm::vec3> frustum(8);
-	camera.calculate_frustum_points(&frustum[0], &frustum[1],
-					&frustum[2], &frustum[3],
-					&frustum[4], &frustum[5],
-					&frustum[6], &frustum[7]);*/
 	light_cam = P_Camera(light_pos, -light_pos, glm::vec3(0, 1, 0),
-			     glm::radians(90.f), depth_tex.width, depth_tex.height, 2, 100);
+			     glm::radians(90.f), (float)depth_tex.width, (float)depth_tex.height, 2.f, 100.f);
 
 	light_matrix = light_cam.projection_matrix * light_cam.view_matrix;
 	frame_buf.attach_texture(GL_DEPTH_ATTACHMENT, depth_tex);
@@ -261,7 +251,7 @@ void Win::display() {
 	light_matrix = light_cam.projection_matrix * light_cam.view_matrix;
 
 	shadow_pass();
-
+	glDisable(GL_CULL_FACE);
 	normal_pass();
 
 	display_shader.bind();
@@ -274,12 +264,12 @@ void Win::display() {
 
 void Win::handle_keyboard(const std::string& key) {
 	float mov_speed = 0.1f;
-	float rot_speed = 0.05f;
+	float rot_speed = 0.01f;
 	float dt = 1000 * (float)delta_time;
 	if(dt < 2.0)
 		dt = 2.0;
-	if(dt > 5.0)
-		dt = 5.0;
+	if(dt > 3.0)
+		dt = 3.0;
 
 	if(key == "D") {
 		camera.move_right(mov_speed * dt);
@@ -351,10 +341,10 @@ int main(int argc, char **argv) {
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
 	//open a window
-	Win window("Shadow mapping", w, h, x, y, 3, 0, 0);
+	Win window("Shadow mapping", w, h, x, y, 3, 2, 0);
 	window.set_relative_mode(true);
 
 	//start the mainloop
-	window.run();
+	window.run(100);
 	return 0;
 }
