@@ -171,7 +171,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	light.model_matrix = glm::translate(glm::vec3(5, 14, -4)) *
 			     glm::rotate((float)M_PI * 0.0f, glm::vec3(1, 0, 0)) *
 			     glm::translate(glm::vec3(0, 1, 0));
-	light_pos = light.model_matrix * glm::vec4(0, 0, 0, 1);
+	light_pos = glm::vec3(light.model_matrix * glm::vec4(0, 0, 0, 1));
 	/*std::vector<glm::vec3> frustum(8);
 	camera.calculate_frustum_points(&frustum[0], &frustum[1],
 					&frustum[2], &frustum[3],
@@ -254,7 +254,7 @@ void Win::display() {
 	light.model_matrix = glm::translate(glm::vec3(5, 14, -4)) *
 			     glm::rotate((float)(M_PI * light_timer.get_time()), glm::vec3(1, 0, 0)) *
 			     glm::translate(glm::vec3(0, 1, 0));
-	light_pos = light.model_matrix * glm::vec4(0, 0, 0, 1);
+	light_pos = glm::vec3(light.model_matrix * glm::vec4(0, 0, 0, 1));
 	light_cam.pos = light_pos;
 	light_cam.dir = -glm::normalize(light_pos);
 	light_cam.update_view_matrix();
