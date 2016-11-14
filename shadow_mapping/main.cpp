@@ -30,6 +30,7 @@ class Win : public sgltk::Window {
 	Shader light_shader;
 	Shader floor_shader;
 	Shader shadow_shader;
+	Shader shadow_inst_shader;
 	Timer light_timer;
 	P_Camera camera;
 	P_Camera light_cam;
@@ -72,6 +73,14 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 				   "gl_FrontColor = vec4(1);}", GL_VERTEX_SHADER);
 	light_shader.link();
 
+	shadow_shader.attach_file("shadow_vs.glsl", GL_VERTEX_SHADER);
+	shadow_shader.attach_file("shadow_fs.glsl", GL_FRAGMENT_SHADER);
+	shadow_shader.link();
+
+	shadow_inst_shader.attach_file("shadow_inst_vs.glsl", GL_VERTEX_SHADER);
+	shadow_inst_shader.attach_file("shadow_inst_fs.glsl", GL_FRAGMENT_SHADER);
+	shadow_inst_shader.link();
+
 	floor_shader.attach_file("floor_vs.glsl", GL_VERTEX_SHADER);
 	floor_shader.attach_file("floor_fs.glsl", GL_FRAGMENT_SHADER);
 	floor_shader.link();
@@ -81,7 +90,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	box_shader.link();
 
 	//create a camera
-	camera = P_Camera(glm::vec3(10, 10, 10), glm::vec3(-10, -8, -10),
+	camera = P_Camera(glm::vec3(14, 14, 14), glm::vec3(-10, -8, -10),
 			  glm::vec3(0, 1, 0), glm::radians(70.0f), (float)width,
 			  (float)height, 0.1f, 800.0f);
 
@@ -191,13 +200,14 @@ void Win::shadow_pass() {
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	glCullFace(GL_FRONT);
-	box.setup_shader(&box_shader);
+	box.setup_shader(&shadow_inst_shader);
+	box.set_instanced_matrix_attributes();
 	box.setup_camera(&light_cam);
 	box.draw_instanced(5);
 	glCullFace(GL_BACK);
 
 	glm::mat4 mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
-	floor.setup_shader(&floor_shader);
+	floor.setup_shader(&shadow_shader);
 	floor.setup_camera(&light_cam);
 	floor.draw(GL_TRIANGLE_STRIP, &mat);
 	frame_buf.unbind();
@@ -223,6 +233,7 @@ void Win::normal_pass() {
 	floor_shader.set_uniform_int("soft_shadow", 4);
 
 	box.setup_shader(&box_shader);
+	box.set_instanced_matrix_attributes();
 	box.setup_camera(&camera);
 	box.draw_instanced(5);
 
