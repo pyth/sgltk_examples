@@ -65,7 +65,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 		//left
 		4, 0, 6, 6, 0, 2,
 		//right
-		1, 5, 7, 1, 7, 2,
+		1, 5, 7, 1, 7, 3,
 		//bottom
 		0, 1, 4, 1, 4, 5,
 		//top
@@ -88,7 +88,6 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	sgltk::Image neg_y("pond_d.jpg");
 	sgltk::Image pos_z("pond_b.jpg");
 	sgltk::Image neg_z("pond_f.jpg");
-	cubemap.set_target(GL_TEXTURE_CUBE_MAP);
 	cubemap.load_cubemap(pos_x, neg_x, pos_y, neg_y, pos_z, neg_z);
 
 	cam = sgltk::IP_Camera(glm::vec3(0, 0, 10), glm::vec3(0, 0, -1),
