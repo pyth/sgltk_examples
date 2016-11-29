@@ -9,7 +9,6 @@
 #else
 	#include <direct.h>
 #endif //__linux__
-#include <string.h>
 
 using namespace sgltk;
 
@@ -21,12 +20,12 @@ class Win : public sgltk::Window {
 	glm::mat4 light_trafo;
 	std::vector<glm::mat4> light_matrix;
 
-	Mesh floor;
+	Mesh walls;
 	Mesh light;
 	Scene box;
 	Shader box_shader;
 	Shader light_shader;
-	Shader floor_shader;
+	Shader wall_shader;
 	Shader shadow_shader;
 	Shader shadow_inst_shader;
 	Timer light_timer;
@@ -34,7 +33,7 @@ class Win : public sgltk::Window {
 	P_Camera light_cam;
 	Camera *curr_light_cam;
 	Texture depth_tex;
-	Texture floor_tex;
+	Texture wall_tex;
 	Framebuffer frame_buf;
 
 	void shadow_pass();
@@ -70,6 +69,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	light_shader.link();
 
 	shadow_shader.attach_file("shadow_vs.glsl", GL_VERTEX_SHADER);
+	shadow_shader.attach_file("shadow_gs.glsl", GL_GEOMETRY_SHADER);
 	shadow_shader.attach_file("shadow_fs.glsl", GL_FRAGMENT_SHADER);
 	shadow_shader.link();
 
@@ -78,58 +78,59 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	shadow_inst_shader.attach_file("shadow_inst_fs.glsl", GL_FRAGMENT_SHADER);
 	shadow_inst_shader.link();
 
-	floor_shader.attach_file("floor_vs.glsl", GL_VERTEX_SHADER);
-	floor_shader.attach_file("floor_fs.glsl", GL_FRAGMENT_SHADER);
-	floor_shader.link();
+	wall_shader.attach_file("walls_vs.glsl", GL_VERTEX_SHADER);
+	wall_shader.attach_file("walls_fs.glsl", GL_FRAGMENT_SHADER);
+	wall_shader.link();
 
 	box_shader.attach_file("box_vs.glsl", GL_VERTEX_SHADER);
 	box_shader.attach_file("box_fs.glsl", GL_FRAGMENT_SHADER);
 	box_shader.link();
 
 	//create a camera
-	camera = P_Camera(glm::vec3(14, 14, 14), glm::vec3(-10, -8, -10),
+	camera = P_Camera(glm::vec3(-6, 8, 4), glm::vec3(0.7, -0.25, -0.6),
 			  glm::vec3(0, 1, 0), glm::radians(70.0f), (float)width,
 			  (float)height, 0.1f, 800.0f);
 
-	std::vector<glm::vec4> pos = {		glm::vec4(-0.5, 0,  0.5, 1),
-						glm::vec4( 0.5, 0,  0.5, 1),
-						glm::vec4(-0.5, 0, -0.5, 1),
-						glm::vec4( 0.5, 0, -0.5, 1)};
+	std::vector<glm::vec4> pos = {
+		glm::vec4(-1, -1, -1, 1),
+		glm::vec4( 1, -1, -1, 1),
+		glm::vec4(-1,  1, -1, 1),
+		glm::vec4( 1,  1, -1, 1),
 
-	std::vector<glm::vec3> norm = {		glm::vec3(0, 1, 0),
-						glm::vec3(0, 1, 0),
-						glm::vec3(0, 1, 0),
-						glm::vec3(0, 1, 0)};
+		glm::vec4(-1, -1,  1, 1),
+		glm::vec4( 1, -1,  1, 1),
+		glm::vec4(-1,  1,  1, 1),
+		glm::vec4( 1,  1,  1, 1)
+	};
 
-	std::vector<glm::vec2> tex_coord = {	glm::vec2(0, 0),
-						glm::vec2(1, 0),
-						glm::vec2(0, 1),
-						glm::vec2(1, 1)};
-
-	std::vector<unsigned short> ind = {0, 1, 2, 3};
+	std::vector<unsigned short> ind = {
+		//front
+		0, 1, 2, 2, 1, 3,
+		//back
+		4, 5, 6, 6, 5, 7,
+		//left
+		4, 0, 6, 6, 0, 2,
+		//right
+		1, 5, 7, 1, 7, 3,
+		//bottom
+		0, 1, 4, 1, 4, 5,
+		//top
+		2, 3, 6, 3, 6, 7
+	};
 
 	depth_tex.create_empty_cubemap(1024, 1024, GL_DEPTH_COMPONENT,
 				       GL_FLOAT, GL_DEPTH_COMPONENT);
 
-	floor_tex.load_texture("tile_sandstone_d.png");
-	floor_tex.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	floor_tex.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	floor_tex.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	floor_tex.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	Image img("tile_sandstone_d.png");
+	wall_tex.load_cubemap(img, img, img, img, img, img);
 
-	//create a floor plane
-	int pos_loc_floor = floor_shader.get_attribute_location("pos_in");
-	int norm_loc_floor = floor_shader.get_attribute_location("norm_in");
-	int tc_loc_floor = floor_shader.get_attribute_location("tc_in");
-	int pos_buf = floor.attach_vertex_buffer<glm::vec4>(pos);
-	int norm_buf = floor.attach_vertex_buffer<glm::vec3>(norm);
-	int tc_buf = floor.attach_vertex_buffer<glm::vec2>(tex_coord);
-	floor.attach_index_buffer(ind);
-	floor.set_vertex_attribute(pos_loc_floor, pos_buf, 4, GL_FLOAT, 0, 0);
-	floor.set_vertex_attribute(norm_loc_floor, norm_buf, 3, GL_FLOAT, 0, 0);
-	floor.set_vertex_attribute(tc_loc_floor, tc_buf, 2, GL_FLOAT, 0, 0);
-	floor.textures_diffuse.push_back(&floor_tex);
-	floor.textures_misc.push_back(std::make_pair("shadow_map", &depth_tex));
+	int pos_loc = wall_shader.get_attribute_location("pos_in");
+	int pos_buf = walls.attach_vertex_buffer<glm::vec4>(pos);
+	walls.attach_index_buffer(ind);
+	walls.set_vertex_attribute(pos_loc, pos_buf, 4, GL_FLOAT, 0, 0);
+	walls.model_matrix = glm::scale(glm::vec3(20.f, 20.f, 20.f));
+	walls.textures_diffuse.push_back(&wall_tex);
+	walls.textures_misc.push_back(std::make_pair("shadow_map", &depth_tex));
 
 	std::vector<glm::vec4> light_point = {glm::vec4(0, 0, 0, 1)};
 	std::vector<unsigned short> light_ind = {0};
@@ -139,7 +140,6 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	light.setup_camera(&camera);
 	light.setup_shader(&light_shader);
 
-	//create a mini display
 	model_matrix.resize(5);
 	model_matrix[0] = glm::rotate(glm::radians(0.0f), glm::vec3(0, 1, 0));
 	model_matrix[0] = glm::translate(glm::vec3(0, 4, 0)) * model_matrix[0];
@@ -165,24 +165,30 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 			     glm::translate(glm::vec3(0, 1 * cos(0), 0));
 	light_pos = glm::vec3(light.model_matrix * glm::vec4(0, 0, 0, 1));
 	light_cam = P_Camera(light_pos, glm::vec3(1, 0, 0), glm::vec3(0, 1, 0),
-			     glm::radians(90.f), (float)depth_tex.width, (float)depth_tex.height, 2.f, 100.f);
+			     glm::radians(90.f), (float)depth_tex.width, (float)depth_tex.height, 1.f, 150.f);
 
 	light_cam.dir = glm::vec3(1, 0, 0);
+	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[0] = light_cam.projection_matrix * light_cam.view_matrix;
 	light_cam.dir = glm::vec3(-1, 0, 0);
+	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[1] = light_cam.projection_matrix * light_cam.view_matrix;
 	light_cam.dir = glm::vec3(0, 1, 0);
+	light_cam.up = glm::vec3(0, 0, 1);
 	light_cam.update_view_matrix();
 	light_matrix[2] = light_cam.projection_matrix * light_cam.view_matrix;
 	light_cam.dir = glm::vec3(0, -1, 0);
+	light_cam.up = glm::vec3(0, 0, -1);
 	light_cam.update_view_matrix();
 	light_matrix[3] = light_cam.projection_matrix * light_cam.view_matrix;
 	light_cam.dir = glm::vec3(0, 0, 1);
+	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[4] = light_cam.projection_matrix * light_cam.view_matrix;
 	light_cam.dir = glm::vec3(0, 0, -1);
+	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[5] = light_cam.projection_matrix * light_cam.view_matrix;
 
@@ -223,10 +229,9 @@ void Win::shadow_pass() {
 	box.draw_instanced(5);
 	glCullFace(GL_BACK);
 
-	glm::mat4 mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
-	floor.setup_shader(&shadow_shader);
-	floor.setup_camera(&light_cam);
-	floor.draw(GL_TRIANGLE_STRIP, &mat);
+	walls.setup_shader(&shadow_shader);
+	walls.setup_camera(&light_cam);
+	walls.draw(GL_TRIANGLES);
 	frame_buf.unbind();
 }
 
@@ -238,27 +243,27 @@ void Win::normal_pass() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	box_shader.bind();
+	box_shader.set_uniform_float("far_plane", light_cam.far_plane);
 	box_shader.set_uniform("light_pos", light_pos);
 	box_shader.set_uniform("cam_pos", camera.pos);
 	box_shader.set_uniform("light_matrix", false, light_matrix);
-	box_shader.set_uniform_int("soft_shadow", 4);
+	box_shader.set_uniform_int("soft_shadow", 2);
 
-	floor_shader.bind();
-	floor_shader.set_uniform_float("far_plane", light_cam.far_plane);
-	floor_shader.set_uniform("light_pos", light_pos);
-	floor_shader.set_uniform("cam_pos", camera.pos);
-	floor_shader.set_uniform("light_matrix", false, light_matrix);
-	floor_shader.set_uniform_int("soft_shadow", 4);
+	wall_shader.bind();
+	wall_shader.set_uniform_float("far_plane", light_cam.far_plane);
+	wall_shader.set_uniform("light_pos", light_pos);
+	wall_shader.set_uniform("cam_pos", camera.pos);
+	wall_shader.set_uniform("light_matrix", false, light_matrix);
+	wall_shader.set_uniform_int("soft_shadow", 2);
 
 	box.setup_shader(&box_shader);
 	box.set_instanced_matrix_attributes();
 	box.setup_camera(&camera);
 	box.draw_instanced(5);
 
-	glm::mat4 mat = glm::scale(glm::vec3(100.f, 1.f, 100.f));
-	floor.setup_shader(&floor_shader);
-	floor.setup_camera(&camera);
-	floor.draw(GL_TRIANGLE_STRIP, &mat);
+	walls.setup_shader(&wall_shader);
+	walls.setup_camera(&camera);
+	walls.draw(GL_TRIANGLES);
 
 	light.draw(GL_POINTS);
 }
@@ -271,26 +276,32 @@ void Win::display() {
 	glFrontFace(GL_CCW);
 
 	light.model_matrix = glm::translate(glm::vec3(-2, 7, 0)) *
-			     glm::translate(glm::vec3(0, 1 * cos(M_PI * light_timer.get_time()), 0));
+			     glm::translate(glm::vec3(0, 2 * cos(M_PI * light_timer.get_time()), 0));
 	light_pos = glm::vec3(light.model_matrix * glm::vec4(0, 0, 0, 1));
 	light_cam.pos = light_pos;
 
 	light_cam.dir = glm::vec3(1, 0, 0);
+	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[0] = light_cam.projection_matrix * light_cam.view_matrix;
 	light_cam.dir = glm::vec3(-1, 0, 0);
+	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[1] = light_cam.projection_matrix * light_cam.view_matrix;
 	light_cam.dir = glm::vec3(0, 1, 0);
+	light_cam.up = glm::vec3(0, 0, 1);
 	light_cam.update_view_matrix();
 	light_matrix[2] = light_cam.projection_matrix * light_cam.view_matrix;
 	light_cam.dir = glm::vec3(0, -1, 0);
+	light_cam.up = glm::vec3(0, 0, -1);
 	light_cam.update_view_matrix();
 	light_matrix[3] = light_cam.projection_matrix * light_cam.view_matrix;
 	light_cam.dir = glm::vec3(0, 0, 1);
+	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[4] = light_cam.projection_matrix * light_cam.view_matrix;
 	light_cam.dir = glm::vec3(0, 0, -1);
+	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[5] = light_cam.projection_matrix * light_cam.view_matrix;
 
@@ -378,7 +389,7 @@ int main(int argc, char **argv) {
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
 	//open a window
-	Win window("Shadow mapping", w, h, x, y, 3, 2, 0);
+	Win window("Shadow mapping 2", w, h, x, y, 3, 2, 0);
 	window.set_relative_mode(true);
 
 	//start the mainloop
