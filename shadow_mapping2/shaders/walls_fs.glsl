@@ -18,7 +18,7 @@ void main() {
 			for(float z = 0.0; z <= 2 * offset * soft_shadow; z += offset) {
 				float saved_depth = texture(shadow_map, -light + vec3(x, y, z) - vec3(offset * soft_shadow)).r * far_plane;
 				float current_depth = length(light);
-				shadow += current_depth - 0.05 > saved_depth ? 1.0 : 0.0;
+				shadow += current_depth - 0.01 > saved_depth ? 1.0 : 0.0;
 			}
 		}
 	}

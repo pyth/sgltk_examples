@@ -161,11 +161,11 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	box.set_texture_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	box.setup_instanced_matrix(model_matrix);
 
-	light.model_matrix = glm::translate(glm::vec3(-2, 7, 0)) *
+	light.model_matrix = glm::translate(glm::vec3(-2, 5, 0)) *
 			     glm::translate(glm::vec3(0, 1 * cos(0), 0));
 	light_pos = glm::vec3(light.model_matrix * glm::vec4(0, 0, 0, 1));
 	light_cam = P_Camera(light_pos, glm::vec3(1, 0, 0), glm::vec3(0, 1, 0),
-			     glm::radians(90.f), (float)depth_tex.width, (float)depth_tex.height, 1.f, 150.f);
+			     glm::radians(90.f), (float)depth_tex.width, (float)depth_tex.height, 1.0f, 50.f);
 
 	light_cam.dir = glm::vec3(1, 0, 0);
 	light_cam.up = glm::vec3(0, -1, 0);
@@ -218,20 +218,22 @@ void Win::shadow_pass() {
 	shadow_inst_shader.set_uniform("light_matrix", false, light_matrix);
 	shadow_inst_shader.set_uniform_float("far_plane", light_cam.far_plane);
 
-	shadow_shader.bind();
-	shadow_shader.set_uniform("light_pos", light_pos);
-	shadow_shader.set_uniform("light_matrix", false, light_matrix);
-	shadow_shader.set_uniform_float("far_plane", light_cam.far_plane);
-
 	box.setup_shader(&shadow_inst_shader);
 	box.set_instanced_matrix_attributes();
 	box.setup_camera(&light_cam);
 	box.draw_instanced(5);
 	glCullFace(GL_BACK);
 
+	/*The walls are not being drawn as an easy way of avoiding shadow acne.*/
+
+	/*shadow_shader.bind();
+	shadow_shader.set_uniform("light_pos", light_pos);
+	shadow_shader.set_uniform("light_matrix", false, light_matrix);
+	shadow_shader.set_uniform_float("far_plane", light_cam.far_plane);
+
 	walls.setup_shader(&shadow_shader);
 	walls.setup_camera(&light_cam);
-	walls.draw(GL_TRIANGLES);
+	walls.draw(GL_TRIANGLES);*/
 	frame_buf.unbind();
 }
 
@@ -247,14 +249,14 @@ void Win::normal_pass() {
 	box_shader.set_uniform("light_pos", light_pos);
 	box_shader.set_uniform("cam_pos", camera.pos);
 	box_shader.set_uniform("light_matrix", false, light_matrix);
-	box_shader.set_uniform_int("soft_shadow", 2);
+	box_shader.set_uniform_int("soft_shadow", 1);
 
 	wall_shader.bind();
 	wall_shader.set_uniform_float("far_plane", light_cam.far_plane);
 	wall_shader.set_uniform("light_pos", light_pos);
 	wall_shader.set_uniform("cam_pos", camera.pos);
 	wall_shader.set_uniform("light_matrix", false, light_matrix);
-	wall_shader.set_uniform_int("soft_shadow", 2);
+	wall_shader.set_uniform_int("soft_shadow", 1);
 
 	box.setup_shader(&box_shader);
 	box.set_instanced_matrix_attributes();
@@ -275,7 +277,7 @@ void Win::display() {
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 
-	light.model_matrix = glm::translate(glm::vec3(-2, 7, 0)) *
+	light.model_matrix = glm::translate(glm::vec3(-2, 5, 0)) *
 			     glm::translate(glm::vec3(0, 2 * cos(M_PI * light_timer.get_time()), 0));
 	light_pos = glm::vec3(light.model_matrix * glm::vec4(0, 0, 0, 1));
 	light_cam.pos = light_pos;
