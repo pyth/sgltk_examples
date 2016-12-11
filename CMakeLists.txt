@@ -15,6 +15,11 @@ set(TARGETS system_info
 
 set(TYPE DYNAMIC)
 
+set(CMAKE_PREFIX_PATH "" CACHE PATH "3rd party libraries and headers")
+
+include_directories(${CMAKE_PREFIX_PATH})
+link_directories(${CMAKE_PREFIX_PATH})
+
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wno-int-to-pointer-cast")
 endif()
