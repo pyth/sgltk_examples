@@ -75,8 +75,8 @@ class GUI : public Window {
 	void handle_mouse_button(int x, int y, int button, bool state, int clicks);
 	void display();
 public:
-	GUI(const std::string& title, int res_x, int res_y, int offset_x,
-	    int offset_y, int gl_maj, int gl_min, unsigned int flags);
+	GUI(const std::string& title, int res_x, int res_y, int offset_x, int offset_y,
+		int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags);
 
 	~GUI();
 };

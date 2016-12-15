@@ -32,8 +32,8 @@ void main() {
 
 	float light_dist = length(light_ts);
 	float attenuation = 1.0 / (1.0 +
-					0.09 * light_dist +
-					0.032 * light_dist * light_dist);
+					0.05 * light_dist +
+					0.0032 * light_dist * light_dist);
 
 	vec4 amb = vec4(0.2 * tex.xyz, 1);
 

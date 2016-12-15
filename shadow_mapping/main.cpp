@@ -47,13 +47,14 @@ class Win : public sgltk::Window {
 	void handle_mouse_motion(int x, int y);
 	void display();
 public:
-	Win(const std::string& title, int res_x, int res_y, int offset_x,
-		int offset_y, int gl_maj, int gl_min, unsigned int flags);
+	Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y,
+		int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags);
 	~Win();
 };
 
-Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
-	sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
+Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y,
+	 int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags) :
+	sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, depth_bits, stencil_bits, flags) {
 
 	rel_mode = true;
 	glEnable(GL_PROGRAM_POINT_SIZE);
@@ -352,7 +353,7 @@ int main(int argc, char **argv) {
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
 	//open a window
-	Win window("Shadow mapping", w, h, x, y, 3, 2, 0);
+	Win window("Shadow mapping", w, h, x, y, 3, 2, 24, 8, 0);
 	window.set_relative_mode(true);
 
 	//start the mainloop

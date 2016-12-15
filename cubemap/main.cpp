@@ -32,13 +32,14 @@ class Win : public sgltk::Window {
 	void handle_mouse_motion(int x, int y);
 	void display();
 public:
-	Win(const std::string& title, int res_x, int res_y, int offset_x,
-		int offset_y, int gl_maj, int gl_min, unsigned int flags);
+	Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y,
+		int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags);
 	~Win();
 };
 
-Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y, int gl_maj, int gl_min, unsigned int flags) :
-		sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, flags) {
+Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y,
+	 int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags) :
+		sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, depth_bits, stencil_bits, flags) {
 
 	rel_mode = true;
 	wireframe = false;
@@ -207,7 +208,7 @@ int main(int argc, char **argv) {
 	int y = sgltk::App::sys_info.display_bounds[0].y +
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
-	Win window("Cubemap", w, h, x, y, 3, 0, 0);
+	Win window("Cubemap", w, h, x, y, 3, 0, 24, 8, 0);
 
 	window.run(100);
 

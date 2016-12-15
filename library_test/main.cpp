@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 	int y = sgltk::App::sys_info.display_bounds[0].y +
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
-	window = new GUI("Test", w, h, x, y, 4, 0, 0);
+	window = new GUI("Test", w, h, x, y, 4, 0, 24, 8, 0);
 
 	window->run();
 	return 0;
