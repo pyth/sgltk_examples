@@ -2,9 +2,8 @@
 
 #define NUM_TILES 400
 
-GUI::GUI(const std::string& title, int res_x, int res_y, int offset_x, int offset_y,
-	 int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags)
-	 :Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, depth_bits, stencil_bits, flags) {
+GUI::GUI(const std::string& title, int res_x, int res_y, int offset_x, int offset_y)
+	 :Window(title, res_x, res_y, offset_x, offset_y) {
 
 	sgltk::App::enable_vsync(true);
 

@@ -31,17 +31,15 @@ class Win : public sgltk::Window {
 	void handle_mouse_motion(int x, int y);
 	void display();
 public:
-	Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y,
-		int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags);
+	Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y);
 	~Win();
 };
 
-Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y,
-	 int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags) :
-	 sgltk::Window(title, res_x, res_y, offset_x, offset_y,
-		gl_maj, gl_min, depth_bits, stencil_bits, flags) {
+Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y) :
+	 sgltk::Window(title, res_x, res_y, offset_x, offset_y) {
 
 	rel_mode = true;
+	set_relative_mode(rel_mode);
 
 	//create shaders
 	bob_shader.attach_file("bob_vs.glsl", GL_VERTEX_SHADER);
@@ -126,10 +124,12 @@ void Win::display() {
 
 void Win::handle_keyboard(const std::string& key) {
 	float mov_speed = 0.1f;
-	float rot_speed = 0.05f;
+	float rot_speed = 0.01f;
 	float dt = 1000 * (float)delta_time;
-	if (dt < 2.0)
-		dt = 2.0;
+	if (dt < 0.001)
+		dt = 0.001f;
+	if(dt > 1.0)
+		dt = 1.0f;
 
 	if(key == "D") {
 		camera.move_right(mov_speed * dt);
@@ -164,6 +164,11 @@ void Win::handle_key_press(const std::string& key, bool pressed) {
 
 void Win::handle_mouse_motion(int x, int y) {
 	if (rel_mode) {
+		float dt = (float)delta_time;
+		if(dt < 0.01)
+			dt = 0.01f;
+		if(dt > 2.0)
+			dt = 2.0;
 		camera.yaw(-glm::atan((float)x) / 500);
 		camera.pitch(-glm::atan((float)y) / 500);
 		camera.update_view_matrix();
@@ -203,8 +208,7 @@ int main(int argc, char **argv) {
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
 	//open a window
-	Win window("Loading models", w, h, x, y, 3, 0, 24, 8, 0);
-	window.set_relative_mode(true);
+	Win window("Loading models", w, h, x, y);
 
 	//start the mainloop
 	window.run();

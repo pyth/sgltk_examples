@@ -28,14 +28,12 @@ class Win : public sgltk::Window {
 	void handle_key_press(const std::string& key, bool pressed);
 	void display();
 public:
-	Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y,
-		int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags);
+	Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y);
 	~Win();
 };
 
-Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y,
-	 int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags) :
-	 sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, depth_bits, stencil_bits, flags) {
+Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y) :
+	 sgltk::Window(title, res_x, res_y, offset_x, offset_y) {
 
 	rel_mode = true;
 	fps = 0;
@@ -85,9 +83,9 @@ void Win::handle_mouse_motion(int x, int y) {
 	if(rel_mode) {
 		float dt = (float)delta_time;
 		if (dt < 0.01)
-			dt = 0.01;
+			dt = 0.01f;
 		if (dt > 3.0)
-			dt = 3.0;
+			dt = 3.0f;
 		cam.yaw(-glm::atan((float)x) * dt);
 		cam.pitch(-glm::atan((float)y) * dt);
 		cam.pos = -10.f * glm::normalize(cam.dir);
@@ -153,7 +151,7 @@ int main(int argc, char **argv) {
 	int y = sgltk::App::sys_info.display_bounds[0].y +
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
-	Win window("Particle system", w, h, x, y, 3, 0, 24, 8, 0);
+	Win window("Particle system", w, h, x, y);
 
 	window.run();
 

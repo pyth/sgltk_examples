@@ -9,16 +9,14 @@ class Win : public sgltk::Window {
 	void handle_gamepad_button(unsigned int gamepad_id, int button);
 	void handle_gamepad_button_press(unsigned int gamepad_id, int button, bool pressed);
 	void handle_gamepad_axis_change(unsigned int gamepad_id, unsigned int axis, int value);
-	void handle_key_press(std::string key, bool pressed);
+	void handle_key_press(const std::string& key, bool pressed);
 public:
-	Win(const char *title, int res_x, int res_y, int offset_x, int offset_y,
-		int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags);
+	Win(const char *title, int res_x, int res_y, int offset_x, int offset_y);
 	~Win();
 };
 
-Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y,
-	int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags) :
-	sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, depth_bits, stencil_bits, flags) {
+Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y) :
+	sgltk::Window(title, res_x, res_y, offset_x, offset_y) {
 }
 
 Win::~Win() {}
@@ -45,7 +43,7 @@ void Win::handle_gamepad_axis_change(unsigned int gamepad_id, unsigned int axis,
 	std::cout<<"player "<<gamepad_id<<": "<<"axis "<<axis<<" "<<value<<std::endl;
 }
 
-void Win::handle_key_press(std::string key, bool pressed) {
+void Win::handle_key_press(const std::string& key, bool pressed) {
 	if(key == "Escape")
 		stop();
 }
@@ -60,7 +58,7 @@ int main(int argc, char **argv) {
 	int y = sgltk::App::sys_info.display_bounds[0].y +
 		(int)(0.375 * sgltk::App::sys_info.display_bounds[0].h);
 
-	Win window("Controller test", w, h, x, y, 3, 0, 24, 8, 0);
+	Win window("Controller test", w, h, x, y);
 	window.run();
 	return 0;
 }

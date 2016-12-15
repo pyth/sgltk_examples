@@ -23,14 +23,12 @@ class Win : public sgltk::Window {
 	void handle_keyboard(const std::string& key);
 	void display();
 public:
-	Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y,
-		int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags);
+	Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y);
 	~Win();
 };
 
-Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y,
-	 int gl_maj, int gl_min, int depth_bits, int stencil_bits, unsigned int flags) :
-	sgltk::Window(title, res_x, res_y, offset_x, offset_y, gl_maj, gl_min, depth_bits, stencil_bits, flags) {
+Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y) :
+	sgltk::Window(title, res_x, res_y, offset_x, offset_y) {
 
 	rel_mode = true;
 	set_relative_mode(true);
@@ -148,6 +146,7 @@ int main(int argc, char **argv) {
 	//this should be done prior to using any of the classes and
 	//functions provided by sgltk
 	sgltk::App::init();
+	sgltk::App::set_gl_version(3, 3);
 
 	//setup the shader files location
 	sgltk::Shader::add_path("../instanced_rendering2/shaders");
@@ -161,7 +160,7 @@ int main(int argc, char **argv) {
 	int y = sgltk::App::sys_info.display_bounds[0].y +
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
-	Win window("Instanced rendering 2", w, h, x, y, 3, 3, 24, 8, 0);
+	Win window("Instanced rendering 2", w, h, x, y);
 
 	window.run();
 

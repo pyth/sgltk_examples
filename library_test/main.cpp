@@ -17,7 +17,6 @@ using namespace sgltk;
 static GUI *window;
 
 int main(int argc, char** argv) {
-	App::init();
 	//change the current working directory to the one containing the executable
 	std::string path(argv[0]);
 	path = path.substr(0, path.find_last_of("\\/"));
@@ -26,6 +25,9 @@ int main(int argc, char** argv) {
 #else
 	_chdir(path.c_str());
 #endif //__linux__
+
+	App::init();
+	App::set_gl_version(4, 0);
 
 	//set the paths to the resources
 	Scene::add_path("../data/models");
@@ -40,7 +42,7 @@ int main(int argc, char** argv) {
 	int y = sgltk::App::sys_info.display_bounds[0].y +
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
-	window = new GUI("Test", w, h, x, y, 4, 0, 24, 8, 0);
+	window = new GUI("Test", w, h, x, y);
 
 	window->run();
 	return 0;
