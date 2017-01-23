@@ -1,3 +1,7 @@
+if(NOT assimp_FOUND)
+	return()
+endif()
+
 set(BIN_SOURCE main.cpp)
 set(BIN_HEADERS)
 
