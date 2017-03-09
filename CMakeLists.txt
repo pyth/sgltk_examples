@@ -14,6 +14,7 @@ set(TARGETS system_info
 	library_test)
 
 set(TYPE DYNAMIC)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_PREFIX_PATH "" CACHE PATH "3rd party libraries and headers")
 
