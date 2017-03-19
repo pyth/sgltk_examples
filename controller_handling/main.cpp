@@ -4,49 +4,85 @@
 using namespace std;
 
 class Win : public sgltk::Window {
-	void handle_gamepad_added(unsigned int gamepad_id);
-	void handle_gamepad_removed(unsigned int gamepad_id);
-	void handle_gamepad_button(unsigned int gamepad_id, int button);
-	void handle_gamepad_button_press(unsigned int gamepad_id, int button, bool pressed);
-	void handle_gamepad_axis_change(unsigned int gamepad_id, unsigned int axis, int value);
-	void handle_key_press(const std::string& key, bool pressed);
+	void handle_gamepad_added(unsigned int gamepad_id) {
+		std::cout << "Gamepad #" << gamepad_id << ": connected" << std::endl;
+	}
+
+	void handle_gamepad_removed(unsigned int gamepad_id) {
+		std::cout << "Gamepad #" << gamepad_id << ": removed" << std::endl;
+	}
+
+	void handle_gamepad_button(unsigned int gamepad_id, int button) {
+		std::cout << "Gamepad #" << gamepad_id << ": button #" << button << " is being held down" << std::endl;
+		sgltk::Gamepad *gamepad = sgltk::Gamepad::id_map[gamepad_id];
+		gamepad->play_rumble(1, 200);
+	}
+
+	void handle_gamepad_button_press(unsigned int gamepad_id, int button, bool pressed) {
+		sgltk::Gamepad *gamepad = sgltk::Gamepad::id_map[gamepad_id];
+		if(pressed) {
+			std::cout << "Gamepad #" << gamepad_id << ": button #" << button << " was pressed" << std::endl;
+		} else {
+			std::cout << "Gamepad #" << gamepad_id << ": button #" << button << " was released" << std::endl;
+			gamepad->stop_rumble();
+		}
+	}
+
+	void handle_gamepad_axis_change(unsigned int gamepad_id, unsigned int axis, int value) {
+		std::cout << "Gamepad #" << gamepad_id << ": axis #" << axis << " was moved to " << value << std::endl;
+	}
+
+	void handle_joystick_added(unsigned int joystick_id) {
+		std::cout << "Joystick #" << joystick_id << ": connected" << std::endl;
+		sgltk::Joystick *joystick = sgltk::Joystick::id_map[joystick_id];
+		joystick->set_deadzone(200);
+	}
+
+	void handle_joystick_removed(unsigned int joystick_id) {
+		std::cout << "Joystick #" << joystick_id << ": removed" << std::endl;
+	}
+
+	void handle_joystick_button(unsigned int joystick_id, int button) {
+		/* My Saitek X52 reports that the button 23 was pressed when the joystick is connected.
+		 * As far as I can tell the X52 doesn't have a button 23 on it. I'll look into this.
+		 */
+		if(button == 23)
+			return;
+		std::cout << "Joystick #" << joystick_id << ": button #" << button << " is being held down" << std::endl;
+	}
+
+	void handle_joystick_button_press(unsigned int joystick_id, int button, bool pressed) {
+		/* My Saitek X52 reports that the button 23 was pressed when the joystick is connected.
+		 * As far as I can tell the X52 doesn't have a button 23 on it. I'll look into this.
+		 */
+		if(button == 23)
+			return;
+		if(pressed) {
+			std::cout << "Joystick #" << joystick_id << ": button #" << button << " was pressed" << std::endl;
+		} else {
+			std::cout << "Joystick #" << joystick_id << ": button #" << button << " was released" << std::endl;
+		}
+	}
+
+	void handle_joystick_axis_change(unsigned int joystick_id, unsigned int axis, int value) {
+		std::cout << "Joystick #" << joystick_id << ": axis #" << axis << " was moved to " << value << std::endl;
+	}
+
+	void handle_joystick_hat_change(unsigned int joystick_id, unsigned int hat, unsigned int value) {
+		std::cout << "Joystick #" << joystick_id << ": hat #" << hat << " was moved to " << value << std::endl;
+	}
+
+	void handle_key_press(const std::string& key, bool pressed) {
+		if(key == "Escape")
+			stop();
+	}
+
 public:
-	Win(const char *title, int res_x, int res_y, int offset_x, int offset_y);
-	~Win();
+	Win(const char *title, int res_x, int res_y, int offset_x, int offset_y) :
+		sgltk::Window(title, res_x, res_y, offset_x, offset_y) {
+	}
+	~Win() {}
 };
-
-Win::Win(const char *title, int res_x, int res_y, int offset_x, int offset_y) :
-	sgltk::Window(title, res_x, res_y, offset_x, offset_y) {
-}
-
-Win::~Win() {}
-
-void Win::handle_gamepad_added(unsigned int gamepad_id) {
-}
-
-void Win::handle_gamepad_removed(unsigned int gamepad_id) {
-}
-
-void Win::handle_gamepad_button(unsigned int gamepad_id, int button) {
-	std::cout<<"player "<<gamepad_id<<": "<<"button "<<button<<std::endl;
-	sgltk::Gamepad *gamepad = sgltk::Gamepad::id_map[gamepad_id];
-	gamepad->play_rumble(1, 200);
-}
-
-void Win::handle_gamepad_button_press(unsigned int gamepad_id, int button, bool pressed) {
-	sgltk::Gamepad *gamepad = sgltk::Gamepad::id_map[gamepad_id];
-	if(!pressed)
-		gamepad->stop_rumble();
-}
-
-void Win::handle_gamepad_axis_change(unsigned int gamepad_id, unsigned int axis, int value) {
-	std::cout<<"player "<<gamepad_id<<": "<<"axis "<<axis<<" "<<value<<std::endl;
-}
-
-void Win::handle_key_press(const std::string& key, bool pressed) {
-	if(key == "Escape")
-		stop();
-}
 
 int main(int argc, char **argv) {
 	sgltk::App::init();
@@ -59,6 +95,6 @@ int main(int argc, char **argv) {
 		(int)(0.375 * sgltk::App::sys_info.display_bounds[0].h);
 
 	Win window("Controller test", w, h, x, y);
-	window.run();
+	window.run(30);
 	return 0;
 }
