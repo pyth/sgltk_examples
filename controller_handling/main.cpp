@@ -36,6 +36,13 @@ class Win : public sgltk::Window {
 		std::cout << "Joystick #" << joystick_id << ": connected" << std::endl;
 		sgltk::Joystick *joystick = sgltk::Joystick::id_map[joystick_id];
 		joystick->set_deadzone(200);
+		//On the X52 buttons 23 through 25 correspond to the three mode switch posissions
+		size_t found = joystick->name.find("Saitek X52");
+		if(found != std::string::npos) {
+			joystick->mark_switch(23);
+			joystick->mark_switch(24);
+			joystick->mark_switch(25);
+		}
 	}
 
 	void handle_joystick_removed(unsigned int joystick_id) {
@@ -43,20 +50,10 @@ class Win : public sgltk::Window {
 	}
 
 	void handle_joystick_button(unsigned int joystick_id, int button) {
-		/* My Saitek X52 reports that the button 23 was pressed when the joystick is connected.
-		 * As far as I can tell the X52 doesn't have a button 23 on it. I'll look into this.
-		 */
-		if(button == 23)
-			return;
 		std::cout << "Joystick #" << joystick_id << ": button #" << button << " is being held down" << std::endl;
 	}
 
 	void handle_joystick_button_press(unsigned int joystick_id, int button, bool pressed) {
-		/* My Saitek X52 reports that the button 23 was pressed when the joystick is connected.
-		 * As far as I can tell the X52 doesn't have a button 23 on it. I'll look into this.
-		 */
-		if(button == 23)
-			return;
 		if(pressed) {
 			std::cout << "Joystick #" << joystick_id << ": button #" << button << " was pressed" << std::endl;
 		} else {
