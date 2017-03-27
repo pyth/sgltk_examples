@@ -27,26 +27,26 @@ GUI::GUI(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	Image fps_text;
 	fps_text.create_text("FPS: " + std::to_string(0),
 			     font, 255, 0, 0, 255);
-	fps_tex.load_texture(fps_text);
+	fps_tex.load(fps_text);
 #endif //HAVE_SDL_TTF_H
 
-	floor_diff.load_texture("tile_sandstone_d.png");
+	floor_diff.load("tile_sandstone_d.png");
 	floor_diff.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	floor_diff.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	floor_spec.load_texture("tile_sandstone_s.png");
+	floor_spec.load("tile_sandstone_s.png");
 	floor_spec.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	floor_spec.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	floor_norm.load_texture("tile_sandstone_n.png");
+	floor_norm.load("tile_sandstone_n.png");
 	floor_norm.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	floor_norm.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	floor_displ.load_texture("tile_sandstone_h.png");
+	floor_displ.load("tile_sandstone_h.png");
 	floor_displ.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	floor_displ.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	floor_light.load_texture("tile_sandstone_a.png");
+	floor_light.load("tile_sandstone_a.png");
 	floor_light.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	floor_light.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -242,7 +242,7 @@ void GUI::display() {
 		Image fps_text;
 		fps_text.create_text("FPS: " + std::to_string(fps),
 				     font, 255, 0, 0, 255);
-		fps_tex.load_texture(fps_text);
+		fps_tex.load(fps_text);
 		frame_cnt = 0;
 		frame_sum = 0;
 	}

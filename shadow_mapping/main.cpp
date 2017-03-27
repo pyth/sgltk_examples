@@ -35,8 +35,8 @@ class Win : public sgltk::Window {
 	P_Camera camera;
 	P_Camera light_cam;
 	Camera *curr_light_cam;
-	Texture depth_tex;
-	Texture floor_tex;
+	Texture_2d depth_tex;
+	Texture_2d floor_tex;
 	Framebuffer frame_buf;
 
 	void shadow_pass();
@@ -111,10 +111,10 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	std::vector<unsigned short> ind = {0, 1, 2, 3};
 
-	depth_tex.create_empty_2D(1024, 1024, GL_DEPTH_COMPONENT,
+	depth_tex.create_empty(1024, 1024, GL_DEPTH_COMPONENT,
 			       GL_FLOAT, GL_DEPTH_COMPONENT);
 
-	floor_tex.load_texture("tile_sandstone_d.png");
+	floor_tex.load("tile_sandstone_d.png");
 	floor_tex.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 	floor_tex.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 	floor_tex.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

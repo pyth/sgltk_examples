@@ -35,12 +35,12 @@ class GUI : public Window {
 	Shader fps_shader;
 	Shader point_shader;
 
-	Texture fps_tex;
-	Texture floor_diff;
-	Texture floor_spec;
-	Texture floor_norm;
-	Texture floor_displ;
-	Texture floor_light;
+	Texture_2d fps_tex;
+	Texture_2d floor_diff;
+	Texture_2d floor_spec;
+	Texture_2d floor_norm;
+	Texture_2d floor_displ;
+	Texture_2d floor_light;
 
 	Mesh fps_display;
 	Mesh floor;

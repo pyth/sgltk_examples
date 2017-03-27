@@ -19,7 +19,7 @@ class Win : public sgltk::Window {
 
 	glm::mat4 skybox_mat;
 	glm::mat4 obj_mat;
-	sgltk::Texture cubemap;
+	sgltk::Cubemap cubemap;
 	sgltk::Mesh skybox;
 	sgltk::Shader skybox_shader;
 	sgltk::Shader obj_shader;
@@ -87,7 +87,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	sgltk::Image neg_y("pond_d.jpg");
 	sgltk::Image pos_z("pond_b.jpg");
 	sgltk::Image neg_z("pond_f.jpg");
-	cubemap.load_cubemap(pos_x, neg_x, pos_y, neg_y, pos_z, neg_z);
+	cubemap.load(pos_x, neg_x, pos_y, neg_y, pos_z, neg_z);
 
 	cam = sgltk::IP_Camera(glm::vec3(0, 0, 10), glm::vec3(0, 0, -1),
 			       glm::vec3(0, 1, 0), glm::radians(70.f),

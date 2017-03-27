@@ -41,7 +41,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	frame_cnt = 0;
 	srand((unsigned int)time(NULL));
 
-	num_particles = 1000;
+	num_particles = 200;
 
 	shader.attach_file("particle_vs.glsl", GL_VERTEX_SHADER);
 	shader.attach_file("particle_fs.glsl", GL_FRAGMENT_SHADER);

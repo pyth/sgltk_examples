@@ -32,8 +32,8 @@ class Win : public sgltk::Window {
 	P_Camera camera;
 	P_Camera light_cam;
 	Camera *curr_light_cam;
-	Texture depth_tex;
-	Texture wall_tex;
+	Cubemap depth_tex;
+	Cubemap wall_tex;
 	Framebuffer frame_buf;
 
 	void shadow_pass();
@@ -118,11 +118,11 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 		2, 3, 6, 3, 6, 7
 	};
 
-	depth_tex.create_empty_cubemap(1024, 1024, GL_DEPTH_COMPONENT,
+	depth_tex.create_empty(1024, 1024, GL_DEPTH_COMPONENT,
 				       GL_FLOAT, GL_DEPTH_COMPONENT);
 
 	Image img("tile_sandstone_d.png");
-	wall_tex.load_cubemap(img, img, img, img, img, img);
+	wall_tex.load(img, img, img, img, img, img);
 
 	int pos_loc = wall_shader.get_attribute_location("pos_in");
 	int pos_buf = walls.attach_vertex_buffer<glm::vec4>(pos);
