@@ -19,19 +19,19 @@ float get_tess_level(float dist0, float dist1) {
 	float dist = (dist0 + dist1) / 2.0;
 
 	if(dist <= 20.0)
-		return max_tess_level;
+		return float(max_tess_level);
 
 	else if(dist <= 60.0)
-		return max_tess_level / 2;
+		return float(max_tess_level / 2);
 
 	else if(dist <= 100.0)
-		return max_tess_level / 4;
+		return float(max_tess_level / 4);
 
 	else if(dist <= 180.0)
-		return max_tess_level / 8;
+		return float(max_tess_level / 8);
 
 	else
-		return max_tess_level / 16;
+		return float(max_tess_level / 16);
 }
 
 void main(void){

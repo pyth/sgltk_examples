@@ -1,7 +1,7 @@
 #include <sgltk/app.h>
 #include <sgltk/window.h>
 #include <sgltk/mesh.h>
-#include <sgltk/scene.h>
+#include <sgltk/model.h>
 #include <sgltk/camera.h>
 #include <sgltk/shader.h>
 
@@ -24,7 +24,7 @@ class Win : public sgltk::Window {
 	sgltk::Shader skybox_shader;
 	sgltk::Shader obj_shader;
 	sgltk::IP_Camera cam;
-	sgltk::Scene obj;
+	sgltk::Model obj;
 
 	void handle_resize();
 	void handle_keyboard(const std::string& key);
@@ -197,7 +197,7 @@ int main(int argc, char **argv) {
 	//setup asset locations
 	sgltk::Shader::add_path("../cubemap/shaders");
 	sgltk::Image::add_path("../data/textures");
-	sgltk::Scene::add_path("../data/models");
+	sgltk::Model::add_path("../data/models");
 
 	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
 	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);

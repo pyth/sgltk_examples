@@ -1,6 +1,6 @@
 #include <sgltk/app.h>
 #include <sgltk/window.h>
-#include <sgltk/scene.h>
+#include <sgltk/model.h>
 #include <sgltk/camera.h>
 #include <sgltk/shader.h>
 
@@ -13,7 +13,7 @@
 class Win : public sgltk::Window {
 	bool rel_mode;
 
-	sgltk::Scene box;
+	sgltk::Model box;
 	sgltk::Shader shader;
 	sgltk::P_Camera cam;
 
@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
 
 	//setup the shader files location
 	sgltk::Shader::add_path("../instanced_rendering2/shaders");
-	sgltk::Scene::add_path("../data/models");
+	sgltk::Model::add_path("../data/models");
 	sgltk::Image::add_path("../data/textures");
 
 	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);

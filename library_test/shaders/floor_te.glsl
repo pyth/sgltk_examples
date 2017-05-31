@@ -14,7 +14,7 @@ out vec3 light_ts;
 uniform sampler2D texture_displacement;
 uniform mat4 view_proj_matrix;
 
-void main(void){
+void main() {
 	vec3 tc0 = mix(tc_te[0], tc_te[1], gl_TessCoord.x);
 	vec3 tc1 = mix(tc_te[2], tc_te[3], gl_TessCoord.x);
 	tc = mix(tc0, tc1, gl_TessCoord.y);

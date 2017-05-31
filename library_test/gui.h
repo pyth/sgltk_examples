@@ -3,7 +3,7 @@
 
 #include <sgltk/window.h>
 #include <sgltk/mesh.h>
-#include <sgltk/scene.h>
+#include <sgltk/model.h>
 #include <sgltk/camera.h>
 #include <sgltk/texture.h>
 #include <sgltk/timer.h>
@@ -46,8 +46,8 @@ class GUI : public Window {
 	Mesh floor;
 	Mesh light;
 
-	Scene material_model;
-	Scene textured_model;
+	Model material_model;
+	Model textured_model;
 
 	P_Camera camera;
 
@@ -81,4 +81,3 @@ public:
 };
 
 #endif
-

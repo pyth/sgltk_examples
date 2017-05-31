@@ -41,7 +41,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	frame_cnt = 0;
 	srand((unsigned int)time(NULL));
 
-	num_particles = 200;
+	num_particles = 300000;
 
 	shader.attach_file("particle_vs.glsl", GL_VERTEX_SHADER);
 	shader.attach_file("particle_fs.glsl", GL_FRAGMENT_SHADER);
@@ -54,18 +54,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	particle_system.resize(num_particles);
 	particle_system.setup_camera(&cam.view_matrix, &cam.projection_matrix);
 	particle_system.setup_shader(&shader);
-	
-	glm::vec3 pos;
-	glm::vec3 vel;
-	float lt;
-	for(unsigned int i = 0; i < num_particles; i++) {
-		pos = glm::vec3(0);
-		vel = glm::vec3(2 * (float)rand() / RAND_MAX - 1, 2 * (float)rand() / RAND_MAX - 1, 2 * (float)rand() / RAND_MAX - 1);
-		vel = (3 * (float)rand() / RAND_MAX + 0.5f) * glm::normalize(vel);
-		lt = (float)(rand() % 30 + 5);
-		particle_system.add_particle(pos, vel, lt);
-	}
-	particle_system.update();
+
 	glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_DEPTH_TEST);
 	set_relative_mode(rel_mode);
@@ -108,13 +97,13 @@ void Win::display() {
 	glm::vec3 pos;
 	glm::vec3 vel;
 	float lt;
-	for(unsigned int i = 0; i < num_particles; i++) {
-		pos = glm::vec3(0);
-		vel = glm::vec3(2 * (float)rand() / RAND_MAX - 1, 2 * (float)rand() / RAND_MAX - 1, 2 * (float)rand() / RAND_MAX - 1);
-		vel = (3 * (float)rand() / RAND_MAX + 0.5f) * glm::normalize(vel);
-		lt = (float)(rand() % 30 + 5);
-		particle_system.add_particle(pos, vel, lt);
-	}
+
+
+	pos = glm::vec3(0);
+	vel = glm::vec3(2 * (float)rand() / RAND_MAX - 1, 2 * (float)rand() / RAND_MAX - 1, 2 * (float)rand() / RAND_MAX - 1);
+	vel = (3 * (float)rand() / RAND_MAX + 0.5f) * glm::normalize(vel);
+	lt = (float)(rand() % 30 + 5);
+	particle_system.add_particle(pos, vel, lt);
 	particle_system.update();
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1);

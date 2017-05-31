@@ -1,4 +1,4 @@
-#include <sgltk/scene.h>
+#include <sgltk/model.h>
 #include <sgltk/camera.h>
 #include <sgltk/timer.h>
 #include <sgltk/framebuffer.h>
@@ -22,7 +22,7 @@ class Win : public sgltk::Window {
 
 	Mesh walls;
 	Mesh light;
-	Scene box;
+	Model box;
 	Shader box_shader;
 	Shader light_shader;
 	Shader wall_shader;
@@ -380,7 +380,7 @@ int main(int argc, char **argv) {
 	App::set_gl_version(3, 2);
 
 	//set the pathes to search for assets and shaders
-	Scene::add_path("../data/models");
+	Model::add_path("../data/models");
 	Image::add_path("../data/textures");
 	Shader::add_path("../shadow_mapping2/shaders");
 

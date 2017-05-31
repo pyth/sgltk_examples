@@ -1,7 +1,4 @@
 #include <sgltk/app.h>
-#include <sgltk/window.h>
-#include <sgltk/scene.h>
-#include <sgltk/camera.h>
 #include <sgltk/texture.h>
 #ifdef __linux__
 	#include <unistd.h>
@@ -13,8 +10,6 @@
 #include "gui.h"
 
 using namespace sgltk;
-
-static GUI *window;
 
 int main(int argc, char** argv) {
 	//change the current working directory to the one containing the executable
@@ -30,7 +25,7 @@ int main(int argc, char** argv) {
 	App::set_gl_version(4, 0);
 
 	//set the paths to the resources
-	Scene::add_path("../data/models");
+	Model::add_path("../data/models");
 	Image::add_path("../data/textures");
 	Image::add_path("../data/fonts");
 	Shader::add_path("../library_test/shaders");
@@ -42,8 +37,8 @@ int main(int argc, char** argv) {
 	int y = sgltk::App::sys_info.display_bounds[0].y +
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
-	window = new GUI("Test", w, h, x, y);
+	GUI window("Test", w, h, x, y);
 
-	window->run();
+	window.run();
 	return 0;
 }

@@ -1,5 +1,5 @@
 #include <sgltk/app.h>
-#include <sgltk/scene.h>
+#include <sgltk/model.h>
 #include <sgltk/camera.h>
 #include <sgltk/timer.h>
 #include <sgltk/window.h>
@@ -17,9 +17,9 @@ class Win : public sgltk::Window {
 	bool rel_mode;
 
 	Timer timer;
-	Scene box;
-	Scene bob;
-	Scene spikey;
+	Model box;
+	Model bob;
+	Model spikey;
 	Shader box_shader;
 	Shader bob_shader;
 	Shader spikey_shader;
@@ -189,7 +189,7 @@ int main(int argc, char **argv) {
 	App::init();
 
 	//set the pathes to search for assets and shaders
-	Scene::add_path("../data/models");
+	Model::add_path("../data/models");
 	Image::add_path("../data/textures");
 	Shader::add_path("../loading_models/shaders");
 
