@@ -9,11 +9,11 @@ This is a collection of examples intended to show how to use [sgltk](http://www.
 * **Windows**
 
     1. Generate the makefiles or project files using `cmake`:
-    
+
         `cmake -G` to get the list of available generators
 
         `cmake -G "generator_name" -DCMAKE_PREFIX_PATH="path/to/include;path/to/lib" .`
-    
+
     2. Use `make` or open the project file in the appropriate IDE to build the project
 
 * **Linux**
@@ -33,3 +33,16 @@ This is a collection of examples intended to show how to use [sgltk](http://www.
         `make` or `make -j number-of-threads`
 
         Every example has a separate build target identically titled to the name of the folder containing that example.
+
+## Controls
+
+* **Esc** - quit the example
+* **M** - toggle mouse capture
+* **W**/**A**/**S**/**D** - move the camera forward/left/backward/right
+* **R**/**F** - move the camera up/down
+* **Q**/**E** - roll the camera
+* **Ctrl+F** - toggle fullscreen
+* **L** - toggle wireframe models
+* **P** - recompile shaders
+
+Depending on the example some of these controls might not be available.
