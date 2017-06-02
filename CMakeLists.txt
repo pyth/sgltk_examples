@@ -4,7 +4,6 @@ project(sgltk_example)
 set(TARGETS system_info
 	hello_triangle
 	cubemap
-	island
 	sphere
 	particle_system
 	shadow_mapping
