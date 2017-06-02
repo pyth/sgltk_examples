@@ -10,4 +10,5 @@ void main() {
 	vec4 amb = 0.2 * vec4(1);
 	vec4 diff = 0.7 * max(0, dot(n, l)) * vec4(1);
 	color = amb + diff;
+	color = diff;
 }

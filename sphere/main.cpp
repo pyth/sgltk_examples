@@ -13,11 +13,14 @@
 class Win : public sgltk::Window {
 	bool rel_mode;
 	bool wireframe;
+	bool normals;
 
+	glm::mat4 model_mat[2];
 	int tess_level;
 	glm::vec3 light_pos;
 
-	sgltk::Shader shader;
+	sgltk::Shader normal_shader;
+	sgltk::Shader sphere_shader;
 	sgltk::Shader light_shader;
 	sgltk::P_Camera cam;
 	sgltk::Mesh light;
@@ -39,17 +42,30 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	rel_mode = false;
 	wireframe = false;
+	normals = true;
 	set_relative_mode(rel_mode);
 
+	glPatchParameteri(GL_PATCH_VERTICES, 3);
+
+	model_mat[0] = glm::translate(glm::vec3(2, 0, 0));
+	model_mat[1] = glm::translate(glm::vec3(-2, 0, 0));
+
 	tess_level = 10;
-	light_pos = glm::vec3(2, 2, 0);
+	light_pos = glm::vec3(0, 2, 0);
 
 	//compile and link the shaders
-	shader.attach_file("vs.glsl", GL_VERTEX_SHADER);
-	shader.attach_file("tc.glsl", GL_TESS_CONTROL_SHADER);
-	shader.attach_file("te.glsl", GL_TESS_EVALUATION_SHADER);
-	shader.attach_file("fs.glsl", GL_FRAGMENT_SHADER);
-	shader.link();
+	sphere_shader.attach_file("sphere_vs.glsl", GL_VERTEX_SHADER);
+	sphere_shader.attach_file("sphere_tc.glsl", GL_TESS_CONTROL_SHADER);
+	sphere_shader.attach_file("sphere_te.glsl", GL_TESS_EVALUATION_SHADER);
+	sphere_shader.attach_file("sphere_fs.glsl", GL_FRAGMENT_SHADER);
+	sphere_shader.link();
+
+	normal_shader.attach_file("normal_vs.glsl", GL_VERTEX_SHADER);
+	normal_shader.attach_file("normal_tc.glsl", GL_TESS_CONTROL_SHADER);
+	normal_shader.attach_file("normal_te.glsl", GL_TESS_EVALUATION_SHADER);
+	normal_shader.attach_file("normal_gs.glsl", GL_GEOMETRY_SHADER);
+	normal_shader.attach_file("normal_fs.glsl", GL_FRAGMENT_SHADER);
+	normal_shader.link();
 
 	cam = sgltk::P_Camera(glm::vec3(0, 0, 4), glm::vec3(0, 0, -1),
 			      glm::vec3(0, 1, 0), glm::radians(70.0f),
@@ -75,7 +91,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	sphere.attach_vertex_buffer<glm::vec3>(pos);
 	sphere.attach_index_buffer(ind);
 	sphere.setup_camera(&cam.view_matrix, &cam.projection_matrix);
-	sphere.setup_shader(&shader);
+	sphere.setup_shader(&sphere_shader);
 	sphere.set_vertex_attribute("pos_in", 0, 3, GL_FLOAT, 0, 0);
 
 	light_shader.attach_string(	"#version 130\n"
@@ -95,7 +111,6 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	light.attach_vertex_buffer<glm::vec4>(light_vert);
 	light.set_vertex_attribute("pos_in", 0, 4, GL_FLOAT, 0, 0);
 	light.attach_index_buffer(light_ind);
-	//light.setup_camera(&cam.view_matrix, &cam.projection_matrix);
 	light.setup_camera(&cam);
 	light.setup_shader(&light_shader);
 
@@ -124,9 +139,14 @@ void Win::handle_key_press(const std::string& key, bool pressed) {
 		if(pressed) {
 			wireframe = !wireframe;
 		}
+	} else if(key == "N") {
+		if(pressed) {
+			normals = !normals;
+		}
 	} else if(key == "P") {
 		if(pressed) {
-			shader.recompile();
+			normal_shader.recompile();
+			sphere_shader.recompile();
 		}
 	}
 }
@@ -176,6 +196,8 @@ void Win::handle_mouse_motion(int x, int y) {
 void Win::handle_mouse_wheel(int x, int y) {
 	if(tess_level + y < 1)
 		return;
+	if(tess_level + y > sgltk::App::sys_info.max_tess_level)
+		return;
 	tess_level += y;
 }
 
@@ -189,10 +211,20 @@ void Win::display() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
-	shader.bind();
-	shader.set_uniform_float("tess_level", tess_level);
-	shader.set_uniform("light_pos", light_pos);
-	sphere.draw(GL_PATCHES);
+	sphere_shader.bind();
+	sphere_shader.set_uniform_float("tess_level", tess_level);
+	sphere_shader.set_uniform("light_pos", light_pos);
+	sphere.setup_shader(&sphere_shader);
+	sphere.draw(GL_PATCHES, &model_mat[0]);
+	sphere.draw(GL_PATCHES, &model_mat[1]);
+
+	if(normals) {
+		normal_shader.bind();
+		normal_shader.set_uniform_float("tess_level", tess_level);
+		sphere.setup_shader(&normal_shader);
+		sphere.draw(GL_PATCHES, &model_mat[0]);
+		sphere.draw(GL_PATCHES, &model_mat[1]);
+	}
 
 	light_shader.bind();
 	light_shader.set_uniform("light_pos", light_pos);

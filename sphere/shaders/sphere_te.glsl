@@ -16,7 +16,7 @@ void main() {
 			gl_TessCoord.z * gl_in[2].gl_Position;
 	pos_tmp = vec4(normalize(pos_tmp.xyz), 1);
 
-	norm = (model_matrix * pos_tmp).xyz;
+	norm = normal_matrix * pos_tmp.xyz;
 	light = light_pos - (model_matrix * pos_tmp).xyz;
 
 	gl_Position = model_view_proj_matrix * pos_tmp;
