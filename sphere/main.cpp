@@ -212,7 +212,7 @@ void Win::display() {
 	}
 
 	sphere_shader.bind();
-	sphere_shader.set_uniform_float("tess_level", tess_level);
+	sphere_shader.set_uniform_float("tess_level", (float)tess_level);
 	sphere_shader.set_uniform("light_pos", light_pos);
 	sphere.setup_shader(&sphere_shader);
 	sphere.draw(GL_PATCHES, &model_mat[0]);
@@ -220,7 +220,7 @@ void Win::display() {
 
 	if(normals) {
 		normal_shader.bind();
-		normal_shader.set_uniform_float("tess_level", tess_level);
+		normal_shader.set_uniform_float("tess_level", (float)tess_level);
 		sphere.setup_shader(&normal_shader);
 		sphere.draw(GL_PATCHES, &model_mat[0]);
 		sphere.draw(GL_PATCHES, &model_mat[1]);
