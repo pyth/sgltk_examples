@@ -57,5 +57,9 @@ int main(int argc, char **argv) {
 	output->store(0, 4 * sizeof(float), &out_data);
 	for(unsigned int i = 0; i < 4; i++)
 		std::cout << "square root of " << data[i] << " is " << out_data[i] << std::endl;
+
+	int stop;
+	std::cin >> stop;
+
 	return 0;
 }
