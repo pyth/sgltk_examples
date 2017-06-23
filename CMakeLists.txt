@@ -5,6 +5,7 @@ set(TARGETS system_info
 	hello_triangle
 	cubemap
 	sphere
+	compute_test
 	particle_system
 	shadow_mapping
 	shadow_mapping2
