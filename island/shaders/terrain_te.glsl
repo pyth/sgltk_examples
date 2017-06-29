@@ -18,31 +18,25 @@ float get_height(vec2 coordinates) {
 	return max_height * texture(texture_displacement, coordinates).x;
 }
 
-float get_height(vec2 coordinates, ivec2 offset) {
-	return max_height * textureOffset(texture_displacement, coordinates, offset).x;
-}
-
 vec3 get_normal(vec2 coordinates) {
-	vec3 v[8];
-	int index = 0;
 	vec3 normal = vec3(0, 0, 0);
-	vec3 v0 = vec3(0, get_height(coordinates), 0);
-	for(int i = -1; i <= 1; i++) {
-		for(int j = -1; j <= 1; j++) {
-			if(i == 0 && j == 0)
-				continue;
-			ivec2 offset = ivec2(i, j);
-			v[index++] = vec3(i, get_height(coordinates, offset), j);
-		}
-	}
-	normal += cross(v[0] - v0, v[1] - v0);
-	normal += cross(v[1] - v0, v[2] - v0);
-	normal += cross(v[2] - v0, v[4] - v0);
-	normal += cross(v[4] - v0, v[7] - v0);
-	normal += cross(v[7] - v0, v[6] - v0);
-	normal += cross(v[6] - v0, v[5] - v0);
-	normal += cross(v[5] - v0, v[3] - v0);
-	normal += cross(v[3] - v0, v[0] - v0);
+	vec3 v0 = vec3(0, max_height * texture(texture_displacement, coordinates).x, 0);
+	vec3 v1 = vec3(-1, max_height * textureOffset(texture_displacement, coordinates, ivec2(-1, -1)).x, -1);
+	vec3 v2 = vec3(-1, max_height * textureOffset(texture_displacement, coordinates, ivec2(-1, 0)).x, 0);
+	vec3 v3 = vec3(-1, max_height * textureOffset(texture_displacement, coordinates, ivec2(-1, 1)).x, 1);
+	vec3 v4 = vec3(0, max_height * textureOffset(texture_displacement, coordinates, ivec2(0, -1)).x, -1);
+	vec3 v5 = vec3(0, max_height * textureOffset(texture_displacement, coordinates, ivec2(0, 1)).x, 1);
+	vec3 v6 = vec3(1, max_height * textureOffset(texture_displacement, coordinates, ivec2(1, -1)).x, -1);
+	vec3 v7 = vec3(1, max_height * textureOffset(texture_displacement, coordinates, ivec2(1, 0)).x, 0);
+	vec3 v8 = vec3(1, max_height * textureOffset(texture_displacement, coordinates, ivec2(1, 1)).x, 1);
+	normal += cross(v1 - v0, v2 - v0);
+	normal += cross(v2 - v0, v3 - v0);
+	normal += cross(v3 - v0, v5 - v0);
+	normal += cross(v5 - v0, v8 - v0);
+	normal += cross(v8 - v0, v7 - v0);
+	normal += cross(v7 - v0, v6 - v0);
+	normal += cross(v6 - v0, v4 - v0);
+	normal += cross(v4 - v0, v1 - v0);
 	return normal;
 }
 

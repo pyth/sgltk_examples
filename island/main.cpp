@@ -70,9 +70,9 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	light_direction = glm::vec3(-10, -10, -10);
 
-	tile_size = 10;
+	tile_size = 20;
 	tile_radius = sqrt(2 * pow(tile_size, 2));
-	terrain_side = 200;
+	terrain_side = 50;
 	num_tiles = pow(terrain_side, 2);
 
 	std::vector<glm::vec4> pos = {	glm::vec4(-0.5, 0,-0.5, 1),
@@ -139,7 +139,7 @@ void Win::display() {
 	}
 
 	terrain_shader.bind();
-	terrain_shader.set_uniform_float("max_height", 50);
+	terrain_shader.set_uniform_float("max_height", 30);
 	terrain_shader.set_uniform("light_direction", light_direction);
 	terrain_shader.set_uniform_int("tile_size", tile_size);
 	terrain_shader.set_uniform_uint("terrain_side", terrain_side);
@@ -234,7 +234,7 @@ int main(int argc, char **argv) {
 
 	Win window("Island 0", w, h, x, y);
 
-	window.run(100);
+	window.run();
 
 	return 0;
 }

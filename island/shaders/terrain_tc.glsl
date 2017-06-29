@@ -11,7 +11,7 @@ uniform uint terrain_side;
 uniform int max_tess_level;
 
 float get_tess_level(float dist0, float dist1) {
-	float step = 30;
+	float step = 100;
 	float dist = mix(dist0, dist1, 0.5);
 
 	if(dist <= step)
