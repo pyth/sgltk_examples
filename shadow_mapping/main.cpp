@@ -220,13 +220,11 @@ void Win::normal_pass() {
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	box_shader.bind();
 	box_shader.set_uniform("light_pos", light_pos);
 	box_shader.set_uniform("cam_pos", camera.pos);
 	box_shader.set_uniform("light_matrix", false, light_matrix);
 	box_shader.set_uniform_int("soft_shadow", 4);
 
-	floor_shader.bind();
 	floor_shader.set_uniform("light_pos", light_pos);
 	floor_shader.set_uniform("cam_pos", camera.pos);
 	floor_shader.set_uniform("light_matrix", false, light_matrix);
@@ -264,7 +262,6 @@ void Win::display() {
 	glDisable(GL_CULL_FACE);
 	normal_pass();
 
-	display_shader.bind();
 	display_shader.set_uniform_float("near", light_cam.near_plane);
 	display_shader.set_uniform_float("far", light_cam.far_plane);
 	display_shader.set_uniform("resolution", glm::vec2(width, height));

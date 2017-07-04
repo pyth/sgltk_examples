@@ -211,7 +211,6 @@ void Win::display() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
-	sphere_shader.bind();
 	sphere_shader.set_uniform_float("tess_level", (float)tess_level);
 	sphere_shader.set_uniform("light_pos", light_pos);
 	sphere.setup_shader(&sphere_shader);
@@ -219,14 +218,12 @@ void Win::display() {
 	sphere.draw(GL_PATCHES, &model_mat[1]);
 
 	if(normals) {
-		normal_shader.bind();
 		normal_shader.set_uniform_float("tess_level", (float)tess_level);
 		sphere.setup_shader(&normal_shader);
 		sphere.draw(GL_PATCHES, &model_mat[0]);
 		sphere.draw(GL_PATCHES, &model_mat[1]);
 	}
 
-	light_shader.bind();
 	light_shader.set_uniform("light_pos", light_pos);
 	light.draw(GL_POINTS);
 }

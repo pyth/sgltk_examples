@@ -3,7 +3,6 @@
 #include <sgltk/shader.h>
 #include <sgltk/camera.h>
 #include <sgltk/mesh.h>
-#include <future>
 
 #ifdef __linux__
 	#include <unistd.h>
@@ -138,7 +137,6 @@ void Win::display() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
-	terrain_shader.bind();
 	terrain_shader.set_uniform_float("max_height", 30);
 	terrain_shader.set_uniform("light_direction", light_direction);
 	terrain_shader.set_uniform_int("tile_size", tile_size);

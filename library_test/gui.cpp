@@ -253,7 +253,6 @@ void GUI::display() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glPolygonMode(GL_FRONT, GL_FILL);
 
-	fps_shader.bind();
 	fps_shader.set_uniform_int("Texture", 0);
 	fps_tex.bind();
 	fps_display.draw(GL_TRIANGLES);
@@ -263,19 +262,16 @@ void GUI::display() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
-	floor_shader.bind();
 	floor_shader.set_uniform("light_pos", light_pos);
 	floor_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
 	floor.draw_instanced(GL_PATCHES, NUM_TILES);
 
-	material_shader.bind();
 	material_shader.set_uniform("light_pos", light_pos);
 	for(unsigned int i = 0; i < spikey_trafos.size(); i++) {
 		material_model.animate((float)time.get_time());
 		material_model.draw(&spikey_trafos[i]);
 	}
 
-	textured_shader.bind();
 	textured_shader.set_uniform("light_pos", light_pos);
 	textured_shader.set_uniform("cam_pos", camera.pos);
 	for(unsigned int i = 0; i < bob_trafos.size(); i++) {

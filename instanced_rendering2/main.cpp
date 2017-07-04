@@ -124,7 +124,6 @@ void Win::display() {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	shader.bind();
 	shader.set_uniform_float("light_pos", 25, 25, 20);
 	shader.set_uniform("cam_pos", cam.pos);
 

@@ -97,15 +97,12 @@ void Win::display() {
 
 	glm::vec3 light_pos(5, 10, 0);
 
-	bob_shader.bind();
 	bob_shader.set_uniform("light_pos", light_pos);
 	bob_shader.set_uniform("cam_pos", camera.pos);
 
-	spikey_shader.bind();
 	spikey_shader.set_uniform("light_pos", light_pos);
 	spikey_shader.set_uniform("cam_pos", camera.pos);
 
-	box_shader.bind();
 	box_shader.set_uniform("light_pos", light_pos);
 	box_shader.set_uniform("cam_pos", camera.pos);
 

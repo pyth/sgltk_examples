@@ -173,7 +173,6 @@ void Win::display() {
 
 	skybox.draw(GL_TRIANGLES, &skybox_mat);
 
-	obj_shader.bind();
 	obj_shader.set_uniform("cam_pos", cam.pos);
 	obj.draw(&obj_mat);
 }
