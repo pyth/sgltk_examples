@@ -29,6 +29,11 @@ class Win : public Window {
 	std::vector<glm::vec2> tiles_to_draw;
 
 	Texture_2d height_map;
+	Texture_2d water;
+	Texture_2d sand;
+	Texture_2d grass;
+	Texture_2d rock;
+	Texture_2d snow;
 	Buffer tile_buffer;
 	Mesh terrain_tile;
 	P_Camera camera;
@@ -95,6 +100,32 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	height_map.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NONE);
 	height_map.load("island.jpg");
 
+	water.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NONE);
+	water.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NONE);
+	water.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	water.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	water.load("terrain_water.jpg");
+	sand.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NONE);
+	sand.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NONE);
+	sand.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	sand.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	sand.load("terrain_sand.jpg");
+	grass.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NONE);
+	grass.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NONE);
+	grass.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	grass.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	grass.load("terrain_grass.jpg");
+	rock.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NONE);
+	rock.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NONE);
+	rock.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	rock.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	rock.load("terrain_rock.jpg");
+	snow.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NONE);
+	snow.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NONE);
+	snow.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	snow.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	snow.load("terrain_snow.jpg");
+
 	terrain_tile.setup_shader(&terrain_shader);
 	terrain_tile.setup_camera(&camera);
 	terrain_tile.add_vertex_attribute("vert_pos_in", 4, GL_FLOAT, pos);
@@ -110,6 +141,11 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	tile_buffer.load(tile_positions, GL_DYNAMIC_DRAW);
 	terrain_tile.set_buffer_vertex_attribute("tile_pos_in", &tile_buffer, 2, GL_FLOAT, 0, 0, 1);
 	terrain_tile.textures_displacement.push_back(&height_map);
+	terrain_tile.textures_misc.push_back(std::make_pair("water_texture", &water));
+	terrain_tile.textures_misc.push_back(std::make_pair("sand_texture", &sand));
+	terrain_tile.textures_misc.push_back(std::make_pair("grass_texture", &grass));
+	terrain_tile.textures_misc.push_back(std::make_pair("rock_texture", &rock));
+	terrain_tile.textures_misc.push_back(std::make_pair("snow_texture", &snow));
 }
 
 Win::~Win() {
@@ -138,6 +174,7 @@ void Win::display() {
 	}
 
 	terrain_shader.set_uniform_float("max_height", 30);
+	terrain_shader.set_uniform("cam_pos", camera.pos);
 	terrain_shader.set_uniform("light_direction", light_direction);
 	terrain_shader.set_uniform_int("tile_size", tile_size);
 	terrain_shader.set_uniform_uint("terrain_side", terrain_side);
