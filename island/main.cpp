@@ -53,7 +53,6 @@ public:
 Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y) :
 		Window(title, res_x, res_y, offset_x, offset_y) {
 
-	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
@@ -100,30 +99,20 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	height_map.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NONE);
 	height_map.load("island.jpg");
 
-	water.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NONE);
-	water.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NONE);
-	water.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	water.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	water.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	water.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	water.load("terrain_water.jpg");
-	sand.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NONE);
-	sand.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NONE);
-	sand.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	sand.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	sand.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	sand.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	sand.load("terrain_sand.jpg");
-	grass.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NONE);
-	grass.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NONE);
-	grass.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	grass.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	grass.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	grass.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	grass.load("terrain_grass.jpg");
-	rock.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NONE);
-	rock.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NONE);
-	rock.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	rock.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	rock.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	rock.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	rock.load("terrain_rock.jpg");
-	snow.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NONE);
-	snow.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NONE);
-	snow.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	snow.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	snow.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	snow.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	snow.load("terrain_snow.jpg");
 
 	terrain_tile.setup_shader(&terrain_shader);

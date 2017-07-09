@@ -1,6 +1,7 @@
 #version 400
 
 in vec2 tc;
+in vec2 tc2;
 in vec3 norm;
 in float height;
 in vec3 cam_vec;
@@ -27,11 +28,11 @@ void main() {
 	float rock_height = 0.4 * max_height;
 	float rock_mix = 0.45 * max_height;
 
-	vec3 tex_water = texture(water_texture, tc).xyz;
-	vec3 tex_sand = texture(sand_texture, tc).xyz;
-	vec3 tex_grass = texture(grass_texture, tc).xyz;
-	vec3 tex_rock = texture(rock_texture, tc).xyz;
-	vec3 tex_snow = texture(snow_texture, tc).xyz;
+	vec3 tex_water = texture(water_texture, tc2).xyz;
+	vec3 tex_sand = texture(sand_texture, tc2).xyz;
+	vec3 tex_grass = texture(grass_texture, tc2).xyz;
+	vec3 tex_rock = texture(rock_texture, tc2).xyz;
+	vec3 tex_snow = texture(snow_texture, tc2).xyz;
 
 	if(height >= 0) {
 		col = tex_water;
