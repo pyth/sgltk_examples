@@ -295,7 +295,7 @@ void Win::display() {
 	light_matrix[5] = light_cam.projection_matrix * light_cam.view_matrix;
 
 	shadow_pass();
-	glDisable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	normal_pass();
 }
 

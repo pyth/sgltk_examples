@@ -39,6 +39,10 @@ public:
 Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y) :
 		sgltk::Window(title, res_x, res_y, offset_x, offset_y) {
 
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
 	rel_mode = true;
 	wireframe = false;
 
@@ -162,9 +166,6 @@ void Win::display() {
 	glClearColor(0, 0, 0, 1);
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	if(wireframe) {

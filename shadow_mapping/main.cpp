@@ -58,6 +58,9 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	set_relative_mode(rel_mode);
 	glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
 
 	//create shaders
 	display_shader.attach_file("display_vs.glsl", GL_VERTEX_SHADER);
@@ -244,11 +247,6 @@ void Win::normal_pass() {
 }
 
 void Win::display() {
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-
 	light.model_matrix = glm::translate(glm::vec3(5, 14, -4)) *
 			     glm::rotate((float)(M_PI * light_timer.get_time()), glm::vec3(1, 0, 0)) *
 			     glm::translate(glm::vec3(0, 1, 0));
@@ -259,7 +257,7 @@ void Win::display() {
 	light_matrix = light_cam.projection_matrix * light_cam.view_matrix;
 
 	shadow_pass();
-	glDisable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	normal_pass();
 
 	display_shader.set_uniform_float("near", light_cam.near_plane);

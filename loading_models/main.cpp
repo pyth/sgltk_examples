@@ -41,6 +41,9 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	rel_mode = true;
 	set_relative_mode(rel_mode);
 
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
 	//create shaders
 	bob_shader.attach_file("bob_vs.glsl", GL_VERTEX_SHADER);
 	bob_shader.attach_file("bob_fs.glsl", GL_FRAGMENT_SHADER);
@@ -92,9 +95,6 @@ void Win::display() {
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
 	glm::vec3 light_pos(5, 10, 0);
 
 	bob_shader.set_uniform("light_pos", light_pos);
@@ -123,10 +123,10 @@ void Win::handle_keyboard(const std::string& key) {
 	float mov_speed = 0.1f;
 	float rot_speed = 0.01f;
 	float dt = 1000 * (float)delta_time;
-	if (dt < 0.001)
-		dt = 0.001f;
-	if(dt > 1.0)
-		dt = 1.0f;
+	if (dt < 0.1)
+		dt = 0.1f;
+	if(dt > 5.0)
+		dt = 5.0f;
 
 	if(key == "D") {
 		camera.move_right(mov_speed * dt);

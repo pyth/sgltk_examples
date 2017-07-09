@@ -7,8 +7,6 @@ GUI::GUI(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	sgltk::App::enable_vsync(true);
 
-	//enable textures and blending
-	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
