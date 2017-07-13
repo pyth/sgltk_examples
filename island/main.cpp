@@ -3,6 +3,7 @@
 #include <sgltk/shader.h>
 #include <sgltk/camera.h>
 #include <sgltk/mesh.h>
+#include <sgltk/framebuffer.h>
 
 #ifdef __linux__
 	#include <unistd.h>
@@ -34,10 +35,17 @@ class Win : public Window {
 	Texture_2d grass;
 	Texture_2d rock;
 	Texture_2d snow;
+	Texture_2d color_tex;
+	Texture_2d normal_tex;
+	Texture_2d position_tex;
+	Framebuffer framebuffer;
+	Renderbuffer depth_buffer;
 	Buffer tile_buffer;
+	Mesh display_mesh;
 	Mesh terrain_tile;
 	P_Camera camera;
 	Shader terrain_shader;
+	Shader display_shader;
 
 	void handle_key_press(const std::string& key, bool pressed);
 	void handle_keyboard(const std::string& key);
@@ -83,6 +91,11 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 					glm::vec4( 0.5, 0,-0.5, 1),
 					glm::vec4( 0.5, 0, 0.5, 1)};
 
+	std::vector<glm::vec2> tc = {	glm::vec2(0, 0),
+					glm::vec2(0, 1),
+					glm::vec2(1, 0),
+					glm::vec2(1, 1)};
+
 	std::vector<unsigned short> ind = {0, 1, 2, 3};
 
 	camera = P_Camera(glm::vec3(0, 40, 0), glm::vec3(0, 0, -1),
@@ -95,8 +108,12 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	terrain_shader.attach_file("terrain_fs.glsl", GL_FRAGMENT_SHADER);
 	terrain_shader.link();
 
-	height_map.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NONE);
-	height_map.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NONE);
+	display_shader.attach_file("display_vs.glsl", GL_VERTEX_SHADER);
+	display_shader.attach_file("display_fs.glsl", GL_FRAGMENT_SHADER);
+	display_shader.link();
+
+	height_map.set_parameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	height_map.set_parameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	height_map.load("island.jpg");
 
 	water.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -115,10 +132,31 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	snow.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	snow.load("terrain_snow.jpg");
 
+	color_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
+	normal_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
+	position_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
+	depth_buffer.set_format(GL_DEPTH_COMPONENT);
+	depth_buffer.set_size(width, height);
+	framebuffer.attach_texture(GL_COLOR_ATTACHMENT0, color_tex);
+	framebuffer.attach_texture(GL_COLOR_ATTACHMENT1, normal_tex);
+	framebuffer.attach_texture(GL_COLOR_ATTACHMENT2, position_tex);
+	framebuffer.attach_renderbuffer(GL_DEPTH_ATTACHMENT, depth_buffer);
+	framebuffer.finalize();
+
 	terrain_tile.setup_shader(&terrain_shader);
 	terrain_tile.setup_camera(&camera);
 	terrain_tile.add_vertex_attribute("vert_pos_in", 4, GL_FLOAT, pos);
 	terrain_tile.attach_index_buffer(ind);
+
+	display_mesh.model_matrix = glm::rotate(glm::mat4(1), (float)(M_PI / 2), glm::vec3(1, 0, 0));
+	display_mesh.setup_shader(&display_shader);
+	display_mesh.setup_camera(&camera);
+	display_mesh.textures_misc.push_back(std::make_pair("color_texture", &color_tex));
+	display_mesh.textures_misc.push_back(std::make_pair("normal_texture", &normal_tex));
+	display_mesh.textures_misc.push_back(std::make_pair("position_texture", &position_tex));
+	display_mesh.add_vertex_attribute("pos_in", 4, GL_FLOAT, pos);
+	display_mesh.add_vertex_attribute("tc_in", 2, GL_FLOAT, tc);
+	display_mesh.attach_index_buffer(ind);
 
 	tile_positions.resize(num_tiles);
 	for(unsigned int i = 0; i < terrain_side; i++) {
@@ -152,7 +190,6 @@ void Win::display() {
 
 	glClearColor(0, 0, 0, 1);
 	glClearDepth(1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -162,20 +199,36 @@ void Win::display() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
+	framebuffer.bind();
+	glDisable(GL_BLEND);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	terrain_shader.set_uniform_float("max_height", 30);
-	terrain_shader.set_uniform("cam_pos", camera.pos);
-	terrain_shader.set_uniform("light_direction", light_direction);
 	terrain_shader.set_uniform_int("tile_size", tile_size);
 	terrain_shader.set_uniform_uint("terrain_side", terrain_side);
 	terrain_shader.set_uniform_int("max_tess_level",
 				App::sys_info.max_tess_level);
 	terrain_tile.draw_instanced(GL_PATCHES, tile_positions.size());
+	framebuffer.unbind();
+	framebuffer.blit_to(NULL, 0, 0, width, height, 0, 0,
+			    width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+	glEnable(GL_BLEND);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glEnable(GL_CULL_FACE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	display_shader.set_uniform("cam_pos", camera.pos);
+	display_shader.set_uniform("light_direction", light_direction);
+	display_mesh.draw(GL_TRIANGLE_STRIP);
 }
 
 void Win::handle_key_press(const std::string &key, bool pressed) {
 	if(key == "Escape" && pressed) {
 		stop();
 	} else if(key == "P" && pressed) {
+		display_shader.recompile();
 		terrain_shader.recompile();
 	} else if(key == "L") {
 		if(pressed) {

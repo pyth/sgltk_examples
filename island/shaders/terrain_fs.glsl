@@ -1,15 +1,16 @@
 #version 400
 
+in vec3 pos_w;
 in vec2 tc;
 in vec2 tc2;
 in vec3 norm;
 in float height;
-in vec3 cam_vec;
 
-out vec4 color;
+layout (location = 0) out vec4 color;
+layout (location = 1) out vec3 normals;
+layout (location = 2) out vec3 position;
 
 uniform float max_height;
-uniform vec3 light_direction;
 uniform sampler2D water_texture;
 uniform sampler2D sand_texture;
 uniform sampler2D grass_texture;
@@ -54,17 +55,11 @@ void main() {
 		col = tex_snow;
 	}
 
-	vec4 amb, diff, spec;
-	vec3 n = normalize(norm);
-	vec3 l = normalize(light_direction);
-	vec3 v = normalize(cam_vec);
-	float ln = max(0, dot(-l, n));
-	float vr = max(0, dot(reflect(l, n), v));
-	amb = vec4(0.2 * col, 1);
-	diff = vec4(col, 1) * ln;
+	position = pos_w;
+	normals = normalize(norm);
+	color.rgb = col;
 	if(height > rock_mix ||	height < water_mix)
-		spec = vec4(0.3) * pow(vr, 10);
+		color.a = 1;
 	else
-		spec = vec4(0);
-	color = amb + diff + spec;
+		color.a = 0;
 }

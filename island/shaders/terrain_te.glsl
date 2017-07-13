@@ -5,7 +5,7 @@ layout (quads, equal_spacing, cw) in;
 in vec2 tc_te[];
 in vec2 tc2_te[];
 
-out vec3 cam_vec;
+out vec3 pos_w;
 out vec2 tc;
 out vec2 tc2;
 out vec3 norm;
@@ -17,7 +17,6 @@ uniform mat4 view_matrix;
 uniform mat4 view_proj_matrix;
 uniform uint terrain_side;
 uniform int max_tess_level;
-uniform vec3 cam_pos;
 
 float get_height(vec2 coordinates) {
 	return max_height * texture(texture_displacement, coordinates).x;
@@ -62,6 +61,6 @@ void main() {
 	vec4 pos1 = mix(gl_in[1].gl_Position, gl_in[3].gl_Position, gl_TessCoord.x);
 	vec4 pos = mix(pos0, pos1, gl_TessCoord.y);
 	pos.y += height;
-	cam_vec = cam_pos - pos.xyz;
+	pos_w = pos.xyz;
 	gl_Position = view_proj_matrix *  pos;
 }
