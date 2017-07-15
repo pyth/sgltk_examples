@@ -7,6 +7,7 @@ set(TARGETS system_info
 	sphere
 	island
 	compute_test
+	mandelbrot_set
 	particle_system
 	shadow_mapping
 	shadow_mapping2
