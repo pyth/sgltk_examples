@@ -243,7 +243,6 @@ int main(int argc, char **argv) {
 	//this should be done prior to using any of the classes and
 	//functions provided by sgltk
 	sgltk::App::init();
-	sgltk::App::set_gl_version(4, 0);
 	sgltk::App::set_msaa_sample_number(8);
 	sgltk::Shader::add_path("../sphere/shaders");
 
@@ -255,6 +254,8 @@ int main(int argc, char **argv) {
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
 	Win window("Tessellation sphere", w, h, x, y);
+	if(window.gl_maj < 4)
+		return -1;
 
 	window.run(60);
 

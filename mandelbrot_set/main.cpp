@@ -2,7 +2,7 @@
 #include <sgltk/mesh.h>
 #include <sgltk/camera.h>
 #include <sgltk/shader.h>
-#include <fstream>
+#include <float.h>
 
 #ifdef __linux__
 	#include <unistd.h>
@@ -13,9 +13,9 @@
 using namespace sgltk;
 
 class Win : public Window {
-	float scale;
+	double scale;
 	int interations;
-	glm::vec2 center;
+	glm::dvec2 center;
 
 	Texture_1d texture;
 	Mesh display_mesh;
@@ -78,6 +78,7 @@ void Win::display() {
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	shader.set_uniform("screen_res", glm::vec2(width, height));
 	shader.set_uniform_int("iter", interations);
 	shader.set_uniform_float("scale", scale);
 	shader.set_uniform("center", center);
@@ -101,24 +102,23 @@ void Win::handle_mouse_wheel(int x, int y) {
 void Win::handle_keyboard(const std::string& key) {
 	float dt = 1000 * (float)delta_time;
 	float mov_speed = 1.f * dt;
-	float rot_speed = 0.01f * dt;
-	if(mov_speed < 0.8)
-		mov_speed = 0.8;
-	if(mov_speed > 1.0)
-		mov_speed = 1.0;
-	if(rot_speed < 0.05)
-		rot_speed = 0.05;
-	if(rot_speed > 0.3)
-		rot_speed = 0.3;
+	if(mov_speed < 0.005)
+		mov_speed = 0.005;
+	if(mov_speed > 0.01)
+		mov_speed = 0.01;
 
 	if(key == "D") {
-		center -= glm::vec2(0.01, 0) * scale;
+		center -= glm::dvec2(mov_speed, 0) * scale;
 	} else if(key == "A") {
-		center += glm::vec2(0.01, 0) * scale;
+		center += glm::dvec2(mov_speed, 0) * scale;
 	} else if(key == "W") {
-		center += glm::vec2(0, 0.01) * scale;
+		center += glm::dvec2(0, mov_speed) * scale;
 	} else if(key == "S") {
-		center -= glm::vec2(0, 0.01) * scale;
+		center -= glm::dvec2(0, mov_speed) * scale;
+	} else if(key == "Keypad +") {
+		scale -= 0.01 * scale;
+	} else if(key == "Keypad -") {
+		scale += 0.01 * scale;
 	}
 }
 
@@ -150,6 +150,8 @@ int main(int argc, char **argv) {
 		(int)(0.125 * App::sys_info.display_bounds[0].h);
 
 	Win window("Mandelbrot set", w, h, x, y);
+	if(window.gl_maj < 4)
+		return -1;
 
 	window.run();
 

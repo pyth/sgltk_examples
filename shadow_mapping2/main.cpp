@@ -364,7 +364,6 @@ int main(int argc, char **argv) {
 
 	//initialize the library
 	App::init();
-	App::set_gl_version(3, 2);
 
 	//set the pathes to search for assets and shaders
 	Model::add_path("../data/models");
@@ -380,6 +379,8 @@ int main(int argc, char **argv) {
 
 	//open a window
 	Win window("Shadow mapping 2", w, h, x, y);
+	if(window.gl_maj == 3 && window.gl_min < 2)
+		return -1;
 
 	//start the mainloop
 	window.run(100);

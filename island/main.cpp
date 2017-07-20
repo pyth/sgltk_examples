@@ -297,8 +297,6 @@ int main(int argc, char **argv) {
 
 	App::init();
 
-	App::set_gl_version(4, 0);
-
 	Shader::add_path("../island/shaders");
 	Texture::add_path("../data/textures");
 
@@ -310,6 +308,8 @@ int main(int argc, char **argv) {
 		(int)(0.125 * App::sys_info.display_bounds[0].h);
 
 	Win window("Island 0", w, h, x, y);
+	if(window.gl_maj < 3)
+		return -1;
 
 	window.run();
 

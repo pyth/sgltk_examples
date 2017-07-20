@@ -106,7 +106,6 @@ int main(int argc, char **argv) {
 	//this should be done prior to using any of the classes and
 	//functions provided by sgltk
 	sgltk::App::init();
-	sgltk::App::set_gl_version(3, 3);
 
 	//setup the shader files location
 	sgltk::Shader::add_path("../instanced_rendering/shaders");
@@ -119,6 +118,9 @@ int main(int argc, char **argv) {
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
 	Win window("Instanced rendering", w, h, x, y);
+	std::cout << window.gl_maj << "." << window.gl_min;
+	if(window.gl_maj == 3 && window.gl_min < 3)
+		return -1;
 
 	window.run();
 

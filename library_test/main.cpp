@@ -22,7 +22,6 @@ int main(int argc, char** argv) {
 #endif //__linux__
 
 	App::init();
-	App::set_gl_version(4, 0);
 
 	//set the paths to the resources
 	Model::add_path("../data/models");
@@ -38,6 +37,8 @@ int main(int argc, char** argv) {
 		(int)(0.125 * sgltk::App::sys_info.display_bounds[0].h);
 
 	GUI window("Test", w, h, x, y);
+	if(window.gl_maj < 4)
+		return -1;
 
 	window.run();
 	return 0;

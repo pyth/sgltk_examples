@@ -31,10 +31,11 @@ int main(int argc, char **argv) {
 #endif
 
 	App::init();
-	App::set_gl_version(4, 3);
 	Shader::add_path("../compute_test/shaders");
 
 	Win win("compute_test", 100, 100, 100, 100, SDL_WINDOW_HIDDEN);
+	if(win.gl_maj < 4 || win.gl_min < 3)
+		return -1;
 
 	Buffer output;
 	Buffer data_buffer;
