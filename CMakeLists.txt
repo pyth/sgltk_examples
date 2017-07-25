@@ -12,6 +12,7 @@ set(TARGETS system_info
 	shadow_mapping
 	shadow_mapping2
 	loading_models
+	transform_feedback
 	instanced_rendering
 	instanced_rendering2
 	controller_handling

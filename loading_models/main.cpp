@@ -1,8 +1,4 @@
-#include <sgltk/app.h>
-#include <sgltk/model.h>
-#include <sgltk/camera.h>
-#include <sgltk/timer.h>
-#include <sgltk/window.h>
+#include <sgltk/sgltk.h>
 
 #ifdef __linux__
 	#include <unistd.h>

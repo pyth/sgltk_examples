@@ -1,5 +1,5 @@
-#include <sgltk/app.h>
-#include <sgltk/texture.h>
+#include <sgltk/sgltk.h>
+
 #ifdef __linux__
 	#include <unistd.h>
 #else

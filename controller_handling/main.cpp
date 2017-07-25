@@ -1,5 +1,4 @@
-#include <sgltk/app.h>
-#include <sgltk/window.h>
+#include <sgltk/sgltk.h>
 
 using namespace std;
 

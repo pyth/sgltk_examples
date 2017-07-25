@@ -1,4 +1,4 @@
-#include <sgltk/app.h>
+#include <sgltk/sgltk.h>
 
 #include <iostream>
 

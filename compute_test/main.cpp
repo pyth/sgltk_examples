@@ -1,7 +1,4 @@
-#include <sgltk/app.h>
-#include <sgltk/buffer.h>
-#include <sgltk/shader.h>
-#include <sgltk/window.h>
+#include <sgltk/sgltk.h>
 
 #ifdef __linux__
 	#include <unistd.h>
@@ -10,16 +7,6 @@
 #endif //__linux__
 
 using namespace sgltk;
-
-class Win : public Window {
-	Shader compute_shader;
-public:
-	Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y, int flags) :
-		Window(title, res_x, res_y, offset_x, offset_y, flags) {
-	}
-	~Win() {
-	}
-};
 
 int main(int argc, char **argv) {
 	std::string path(argv[0]);
@@ -33,7 +20,7 @@ int main(int argc, char **argv) {
 	App::init();
 	Shader::add_path("../compute_test/shaders");
 
-	Win win("compute_test", 100, 100, 100, 100, SDL_WINDOW_HIDDEN);
+	Window win("compute_test", 100, 100, 100, 100, SDL_WINDOW_HIDDEN);
 	if(win.gl_maj < 4 || win.gl_min < 3)
 		return -1;
 
@@ -41,7 +28,7 @@ int main(int argc, char **argv) {
 	Buffer data_buffer;
 
 	std::vector<float> data = {100.f, 9.f, 16.f, 243.14f};
-	data_buffer.load<float>(data, GL_STATIC_DRAW);
+	data_buffer.load(data, GL_STATIC_DRAW);
 	output.load<float>(data.size(), NULL, GL_STATIC_READ);
 
 	Shader comp_shader;

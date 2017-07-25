@@ -1,8 +1,4 @@
-#include <sgltk/window.h>
-#include <sgltk/mesh.h>
-#include <sgltk/camera.h>
-#include <sgltk/shader.h>
-#include <float.h>
+#include <sgltk/sgltk.h>
 
 #ifdef __linux__
 	#include <unistd.h>

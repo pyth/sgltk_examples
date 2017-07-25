@@ -1,8 +1,4 @@
-#include "sgltk/app.h"
-#include "sgltk/window.h"
-#include "sgltk/shader.h"
-#include "sgltk/camera.h"
-#include "sgltk/particle.h"
+#include <sgltk/sgltk.h>
 
 #include <stdlib.h>
 #include <time.h>
