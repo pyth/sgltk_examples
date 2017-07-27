@@ -260,6 +260,7 @@ void GUI::display() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
+	floor_shader.set_uniform("cam_pos", camera.pos);
 	floor_shader.set_uniform("light_pos", light_pos);
 	floor_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
 	floor.draw_instanced(GL_PATCHES, NUM_TILES);
