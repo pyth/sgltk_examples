@@ -18,9 +18,6 @@ set(TARGETS system_info
 	controller_handling
 	library_test)
 
-set(TYPE DYNAMIC)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 set(CMAKE_PREFIX_PATH "" CACHE PATH "3rd party libraries and headers")
 
 include_directories(${CMAKE_PREFIX_PATH})
@@ -36,11 +33,6 @@ set(ExternalProjectCMakeArgs
 		-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
 
 set(LIBS sgltk)
-if(WIN32)
-	set(LIBS OpenGL32 glew32 ${LIBS})
-else()
-	set(LIBS GL GLEW ${LIBS})
-endif()
 
 find_library(SGLTK_FOUND sgltk)
 if(${SGLTK_FOUND})
@@ -54,13 +46,12 @@ foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
 endforeach()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/sgltk/CMakeLists.txt)
-	set(assimp_FOUND)
 	add_subdirectory(sgltk)
-else()
-	find_library(assimp_FOUND assimp)
-	if(assimp_FOUND)
-		set(HAVE_ASSIMP_H 1)
-	endif()
+endif()
+
+find_library(assimp_FOUND assimp)
+if(assimp_FOUND)
+	set(HAVE_ASSIMP_H 1)
 endif()
 
 foreach(target ${TARGETS})
