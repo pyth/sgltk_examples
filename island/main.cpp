@@ -77,9 +77,9 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	light_direction = glm::vec3(-10, -10, -10);
 
 	tile_size = 20;
-	tile_radius = sqrt(2 * pow(tile_size, 2));
+	tile_radius = static_cast<float>(sqrt(2 * pow(tile_size, 2)));
 	terrain_side = 50;
-	num_tiles = pow(terrain_side, 2);
+	num_tiles = static_cast<unsigned int>(pow(terrain_side, 2));
 
 	std::vector<glm::vec4> pos = {	glm::vec4(-0.5, 0,-0.5, 1),
 					glm::vec4(-0.5, 0, 0.5, 1),
@@ -242,13 +242,13 @@ void Win::handle_keyboard(const std::string& key) {
 	float mov_speed = 1.f * dt;
 	float rot_speed = 0.01f * dt;
 	if(mov_speed < 0.8)
-		mov_speed = 0.8;
+		mov_speed = 0.8f;
 	if(mov_speed > 1.0)
-		mov_speed = 1.0;
+		mov_speed = 1.0f;
 	if(rot_speed < 0.05)
-		rot_speed = 0.05;
+		rot_speed = 0.05f;
 	if(rot_speed > 0.3)
-		rot_speed = 0.3;
+		rot_speed = 0.3f;
 
 	if(key == "D") {
 		camera.move_right(mov_speed);

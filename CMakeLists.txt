@@ -18,10 +18,12 @@ set(TARGETS system_info
 	controller_handling
 	library_test)
 
-set(CMAKE_PREFIX_PATH "" CACHE PATH "3rd party libraries and headers")
+set(LIBRARY_PATH "" CACHE PATH "3rd party libraries")
+set(INCLUDE_PATH "" CACHE PATH "3rd party library headers")
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${LIBRARY_PATH};${INCLUDE_PATH}")
 
-include_directories(${CMAKE_PREFIX_PATH})
-link_directories(${CMAKE_PREFIX_PATH})
+include_directories(${INCLUDE_PATH})
+link_directories(${LIBRARY_PATH})
 
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wno-int-to-pointer-cast")
@@ -34,11 +36,6 @@ set(ExternalProjectCMakeArgs
 
 set(LIBS sgltk)
 
-find_library(SGLTK_FOUND sgltk)
-if(${SGLTK_FOUND})
-	message(STATUS "FOUND sgltk")
-endif()
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
 	string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
@@ -46,12 +43,19 @@ foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
 endforeach()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/sgltk/CMakeLists.txt)
+	set(SGLTK_FOUND 1)
+	message(STATUS "FOUND sgltk")
 	add_subdirectory(sgltk)
-endif()
+else()
+	find_library(SGLTK_FOUND sgltk)
+	if(${SGLTK_FOUND})
+		message(STATUS "FOUND sgltk")
+	endif()
 
-find_library(assimp_FOUND assimp)
-if(assimp_FOUND)
-	set(HAVE_ASSIMP_H 1)
+	find_library(assimp_FOUND assimp)
+	if(assimp_FOUND)
+		set(HAVE_ASSIMP_H 1)
+	endif()
 endif()
 
 foreach(target ${TARGETS})

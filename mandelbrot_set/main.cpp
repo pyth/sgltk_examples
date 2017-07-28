@@ -31,7 +31,7 @@ public:
 Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y) :
 		Window(title, res_x, res_y, offset_x, offset_y) {
 
-	scale = 2.0f;
+	scale = 2.0;
 	interations = 100;
 	center = glm::vec2(0.5, 0);
 
@@ -76,7 +76,7 @@ void Win::display() {
 
 	shader.set_uniform("screen_res", glm::vec2(width, height));
 	shader.set_uniform_int("iter", interations);
-	shader.set_uniform_float("scale", scale);
+	shader.set_uniform_float("scale", static_cast<float>(scale));
 	shader.set_uniform("center", center);
 	display_mesh.draw(GL_TRIANGLE_STRIP);
 }
@@ -99,9 +99,9 @@ void Win::handle_keyboard(const std::string& key) {
 	float dt = 1000 * (float)delta_time;
 	float mov_speed = 1.f * dt;
 	if(mov_speed < 0.005)
-		mov_speed = 0.005;
+		mov_speed = 0.005f;
 	if(mov_speed > 0.01)
-		mov_speed = 0.01;
+		mov_speed = 0.01f;
 
 	if(key == "D") {
 		center -= glm::dvec2(mov_speed, 0) * scale;
