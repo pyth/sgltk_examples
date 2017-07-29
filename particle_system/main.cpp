@@ -1,7 +1,7 @@
 #include <sgltk/sgltk.h>
 
-#include <stdlib.h>
-#include <time.h>
+#include <random>
+#include <functional>
 
 class Win : public sgltk::Window {
 	bool rel_mode;
@@ -12,6 +12,10 @@ class Win : public sgltk::Window {
 	sgltk::Shader shader;
 	unsigned int num_particles;
 	sgltk::Particles particle_system;
+
+	std::default_random_engine generator;
+	std::uniform_real_distribution<float> distribution;
+	std::function<float()> rand_float;
 
 	void handle_resize();
 	void handle_mouse_motion(int x, int y);
@@ -29,7 +33,8 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	fps = 0;
 	frame_sum = 0;
 	frame_cnt = 0;
-	srand((unsigned int)time(NULL));
+	distribution = std::uniform_real_distribution<float>(-1.0f, 1.0f);
+	rand_float = std::bind(distribution, generator);
 
 	num_particles = 300000;
 
@@ -90,9 +95,9 @@ void Win::display() {
 
 
 	pos = glm::vec3(0);
-	vel = glm::vec3(2 * (float)rand() / RAND_MAX - 1, 2 * (float)rand() / RAND_MAX - 1, 2 * (float)rand() / RAND_MAX - 1);
-	vel = (3 * (float)rand() / RAND_MAX + 0.5f) * glm::normalize(vel);
-	lt = (float)(rand() % 30 + 5);
+	vel = glm::vec3(rand_float(), rand_float(), rand_float());
+	vel = (3 * std::abs(rand_float()) + 0.5f) * glm::normalize(vel);
+	lt = std::abs(20 * rand_float() + 10);
 	particle_system.add_particle(pos, vel, lt);
 	particle_system.update();
 
