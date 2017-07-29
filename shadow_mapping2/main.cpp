@@ -1,11 +1,5 @@
 #include <sgltk/sgltk.h>
 
-#ifdef __linux__
-	#include <unistd.h>
-#else
-	#include <direct.h>
-#endif //__linux__
-
 using namespace sgltk;
 
 class Win : public sgltk::Window {
@@ -349,17 +343,10 @@ void Win::handle_mouse_motion(int x, int y) {
 }
 
 int main(int argc, char **argv) {
-	//change the current working directory to the one containing the executable
-	std::string path(argv[0]);
-	path = path.substr(0, path.find_last_of("\\/"));
-#ifdef __linux__
-	chdir(path.c_str());
-#else
-	_chdir(path.c_str());
-#endif //__linux__
-
 	//initialize the library
 	App::init();
+	//change the current working directory to the one containing the executable
+	App::chdir_to_bin(argv);
 
 	//set the pathes to search for assets and shaders
 	Model::add_path("../data/models");

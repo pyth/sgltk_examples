@@ -1,13 +1,7 @@
 #ifndef __GUI_H__
 #define __GUI_H__
 
-#include <sgltk/window.h>
-#include <sgltk/mesh.h>
-#include <sgltk/model.h>
-#include <sgltk/camera.h>
-#include <sgltk/texture.h>
-#include <sgltk/timer.h>
-#include <sgltk/shader.h>
+#include <sgltk/sgltk.h>
 
 using namespace sgltk;
 

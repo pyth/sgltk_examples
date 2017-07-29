@@ -1,23 +1,10 @@
 #include <sgltk/sgltk.h>
 
-#ifdef __linux__
-	#include <unistd.h>
-#else
-	#include <direct.h>
-#endif //__linux__
-
 using namespace sgltk;
 
 int main(int argc, char **argv) {
-	std::string path(argv[0]);
-	path = path.substr(0, path.find_last_of("\\/"));
-#ifdef __linux__
-	chdir(path.c_str());
-#else
-	_chdir(path.c_str());
-#endif
-
 	App::init();
+	App::chdir_to_bin(argv);
 	Shader::add_path("../compute_test/shaders");
 
 	Window win("compute_test", 100, 100, 100, 100, SDL_WINDOW_HIDDEN);

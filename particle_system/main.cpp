@@ -3,12 +3,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#ifdef __linux__
-	#include <unistd.h>
-#else
-	#include <direct.h>
-#endif //__linux__
-
 class Win : public sgltk::Window {
 	bool rel_mode;
 	unsigned int fps;
@@ -118,15 +112,8 @@ void Win::display() {
 }
 
 int main(int argc, char **argv) {
-	std::string path(argv[0]);
-	path = path.substr(0, path.find_last_of("\\/"));
-	#ifdef __linux__
-		chdir(path.c_str());
-	#else
-		_chdir(path.c_str());
-	#endif //__linux__
-
 	sgltk::App::init();
+	sgltk::App::chdir_to_bin(argv);
 	sgltk::Shader::add_path("../particle_system/shaders");
 
 	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);

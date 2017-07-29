@@ -1,11 +1,5 @@
 #include <sgltk/sgltk.h>
 
-#ifdef __linux__
-	#include <unistd.h>
-#else
-	#include <direct.h>
-#endif //__linux__
-
 using namespace sgltk;
 
 class Win : public Window {
@@ -119,20 +113,14 @@ void Win::handle_keyboard(const std::string& key) {
 }
 
 int main(int argc, char **argv) {
-	//change the current working directory to the location
-	//of the executable
-	std::string path(argv[0]);
-	path = path.substr(0, path.find_last_of("\\/"));
-	#ifdef __linux__
-		chdir(path.c_str());
-	#else
-		_chdir(path.c_str());
-	#endif //__linux__
-
-	//initialize the library
-	//this should be done prior to using any of the classes and
-	//functions provided by sgltk
+	/*
+	initialize the library
+	this should be done prior to using any of the classes and
+	functions provided by sgltk
+	*/
 	App::init();
+	//change the current working directory to the location of the executable
+	App::chdir_to_bin(argv);
 
 	//setup the shader files location
 	Shader::add_path("../mandelbrot_set/shaders");

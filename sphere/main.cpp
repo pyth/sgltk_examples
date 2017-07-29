@@ -1,11 +1,5 @@
 #include <sgltk/sgltk.h>
 
-#ifdef __linux__
-	#include <unistd.h>
-#else
-	#include <direct.h>
-#endif //__linux__
-
 class Win : public sgltk::Window {
 	bool rel_mode;
 	bool wireframe;
@@ -225,20 +219,14 @@ void Win::display() {
 }
 
 int main(int argc, char **argv) {
-	//change the current working directory to the location
-	//of the executable
-	std::string path(argv[0]);
-	path = path.substr(0, path.find_last_of("\\/"));
-	#ifdef __linux__
-		chdir(path.c_str());
-	#else
-		_chdir(path.c_str());
-	#endif //__linux__
-
-	//initialize the library
-	//this should be done prior to using any of the classes and
-	//functions provided by sgltk
+	/*
+	initialize the library
+	this should be done prior to using any of the classes and
+	functions provided by sgltk
+	*/
 	sgltk::App::init();
+	//change the current working directory to the location of the executable
+	sgltk::App::chdir_to_bin(argv);
 	sgltk::App::set_msaa_sample_number(8);
 	sgltk::Shader::add_path("../sphere/shaders");
 

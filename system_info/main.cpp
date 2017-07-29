@@ -1,15 +1,15 @@
 #include <sgltk/sgltk.h>
 
-#include <iostream>
-
 using namespace std;
 
 int main(int argc, char **argv) {
 	sgltk::App::init();
+	sgltk::Window win("System info", 1200, 800, 100, 100, SDL_WINDOW_HIDDEN);
 	cout<<"System info"<<endl<<endl;
 	cout<<"OS: "<<sgltk::App::sys_info.platform_name<<endl;
 	cout<<"CPU Cores: "<<sgltk::App::sys_info.num_logical_cores<<endl;
 	cout<<"RAM: "<<sgltk::App::sys_info.system_ram<<"MB"<<endl;
+	cout<<"Highest supported OpenGL version: "<<win.gl_maj<<"."<<win.gl_min<<std::endl;
 	cout<<"Number of displays: "<<sgltk::App::sys_info.num_displays<<endl;
 
 	SDL_Rect bounds;
