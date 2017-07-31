@@ -40,8 +40,6 @@ class Win : public Window {
 	void handle_keyboard(const std::string& key);
 	void handle_mouse_motion(int x, int y);
 	void display();
-
-	void frustum_culling();
 public:
 	Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y);
 	~Win();
@@ -70,7 +68,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	light_direction = glm::vec3(-10, -10, -10);
 
-	tile_size = 20;
+	tile_size = 40;
 	tile_radius = static_cast<float>(sqrt(2 * pow(tile_size, 2)));
 	terrain_side = 50;
 	num_tiles = static_cast<unsigned int>(pow(terrain_side, 2));
@@ -168,15 +166,6 @@ Win::~Win() {
 }
 
 void Win::display() {
-	frame_cnt++;
-	frame_sum += (unsigned int)(1.0 / delta_time);
-	if(frame_cnt > 100) {
-		fps = (unsigned int)(frame_sum / frame_cnt);
-		frame_cnt = 0;
-		frame_sum = 0;
-	}
-	set_title("Island " + std::to_string(fps));
-
 	glClearColor(0, 0, 0, 1);
 	glClearDepth(1.0);
 
@@ -192,7 +181,7 @@ void Win::display() {
 	glDisable(GL_BLEND);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	terrain_shader.set_uniform_float("max_height", 30);
+	terrain_shader.set_uniform_float("max_height", 50);
 	terrain_shader.set_uniform_int("tile_size", tile_size);
 	terrain_shader.set_uniform_uint("terrain_side", terrain_side);
 	terrain_shader.set_uniform_int("max_tess_level",
@@ -232,45 +221,44 @@ void Win::handle_key_press(const std::string &key, bool pressed) {
 }
 
 void Win::handle_keyboard(const std::string& key) {
-	float dt = 1000 * (float)delta_time;
-	float mov_speed = 1.f * dt;
-	float rot_speed = 0.01f * dt;
-	if(mov_speed < 0.8)
-		mov_speed = 0.8f;
-	if(mov_speed > 1.0)
-		mov_speed = 1.0f;
-	if(rot_speed < 0.05)
-		rot_speed = 0.05f;
-	if(rot_speed > 0.3)
-		rot_speed = 0.3f;
+	bool update = false;
+	float mov_speed = (float)(100 * delta_time);
+	float rot_speed = (float)(5 * delta_time);
 
 	if(key == "D") {
 		camera.move_right(mov_speed);
+		update = true;
 	} else if(key == "A") {
 		camera.move_right(-mov_speed);
+		update = true;
 	} else if(key == "W") {
 		camera.move_forward(mov_speed);
+		update = true;
 	} else if(key == "S") {
 		camera.move_forward(-mov_speed);
+		update = true;
 	} else if(key == "R") {
 		camera.move_up(mov_speed);
+		update = true;
 	} else if(key == "F") {
 		camera.move_up(-mov_speed);
+		update = true;
 	} else if(key == "E") {
 		camera.roll(rot_speed);
+		update = true;
 	} else if(key == "Q") {
 		camera.roll(-rot_speed);
+		update = true;
 	}
-	camera.update_view_matrix();
+	if(update)
+		camera.update_view_matrix();
 }
 
 void Win::handle_mouse_motion(int x, int y) {
 	if(rel_mode) {
-		float dt = 10 * (float)delta_time;
-		if(dt > 0.01)
-			dt = 0.01f;
-		camera.yaw(-glm::atan((float)x) * dt);
-		camera.pitch(-glm::atan((float)y) * dt);
+		float rot_speed = (float)(2 * delta_time);
+		camera.yaw(-glm::atan((float)x) * rot_speed);
+		camera.pitch(-glm::atan((float)y) * rot_speed);
 		camera.update_view_matrix();
 	}
 }
@@ -289,11 +277,11 @@ int main(int argc, char **argv) {
 	int y = App::sys_info.display_bounds[0].y +
 		(int)(0.125 * App::sys_info.display_bounds[0].h);
 
-	Win window("Island 0", w, h, x, y);
+	Win window("Island", w, h, x, y);
 	if(window.gl_maj < 3)
 		return -1;
 
-	window.run();
+	window.run(100);
 
 	return 0;
 }

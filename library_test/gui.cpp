@@ -267,14 +267,14 @@ void GUI::display() {
 
 	material_shader.set_uniform("light_pos", light_pos);
 	for(unsigned int i = 0; i < spikey_trafos.size(); i++) {
-		material_model.animate((float)time.get_time());
+		material_model.animate((float)time.get_time_s());
 		material_model.draw(&spikey_trafos[i]);
 	}
 
 	textured_shader.set_uniform("light_pos", light_pos);
 	textured_shader.set_uniform("cam_pos", camera.pos);
 	for(unsigned int i = 0; i < bob_trafos.size(); i++) {
-		textured_model.animate((float)time.get_time());
+		textured_model.animate((float)time.get_time_s());
 		textured_model.draw(&bob_trafos[i]);
 	}
 
@@ -285,6 +285,10 @@ void GUI::display() {
 void GUI::handle_resize() {
 	glViewport(0, 0, width, height);
 	camera.update_projection_matrix((float)width, (float)height);
+}
+
+void GUI::handle_hamepad_added(unsigned int gamepad_id) {
+	Gamepad::id_map[gamepad_id]->set_deadzone(1600);
 }
 
 void GUI::handle_gamepad_button_press(unsigned int id, int button, bool pressed) {
@@ -304,19 +308,13 @@ void GUI::handle_gamepad_button(unsigned int id, int button) {
 	if(id != 0)
 		return;
 
-	float dt = (float)delta_time * 50;
-	if(dt < 0.01)
-		dt = 0.01f;
-	if(dt > 0.03)
-		dt = 0.03f;
-
 	switch(button) {
 		case 9: //L1
-			camera.roll(-dt);
+			camera.roll(-static_cast<float>(delta_time));
 			camera.update_view_matrix();
 			break;
 		case 10: //R1
-			camera.roll(dt);
+			camera.roll(static_cast<float>(delta_time));
 			camera.update_view_matrix();
 			break;
 	}
@@ -326,35 +324,27 @@ void GUI::handle_gamepad_axis(unsigned int id, unsigned int axis, int value) {
 	if(id != 0)
 		return;
 
-	float dt = (float)delta_time * 50;
-	if(dt < 0.1)
-		dt = 0.1f;
-	if(dt > 0.3)
-		dt = 0.3f;
-
-	if(abs(value) > 1400) { //deadzone
-		switch(axis) {
-			case 0: //left stick x-axis
-				camera.move_right(0.0001f * value * dt);
-				break;
-			case 1: //left stick y-axis
-				camera.move_forward(-0.0001f * value * dt);
-				break;
-			case 2: //right stick x-axis
-				camera.yaw(-0.00001f * value * dt);
-				break;
-			case 3: //right stick y-axis
-				camera.pitch(-0.00001f * value * dt);
-				break;
-			case 4: //L2
-				camera.move_up(-0.0001f * value * dt);
-				break;
-			case 5: //R2
-				camera.move_up(0.0001f * value * dt);
-				break;
-		}
-		camera.update_view_matrix();
+	switch(axis) {
+		case 0: //left stick x-axis
+			camera.move_right(value / 1000 * static_cast<float>(delta_time));
+			break;
+		case 1: //left stick y-axis
+			camera.move_forward(-value / 1000 * static_cast<float>(delta_time));
+			break;
+		case 2: //right stick x-axis
+			camera.yaw(-value / 10000 * static_cast<float>(delta_time));
+			break;
+		case 3: //right stick y-axis
+			camera.pitch(-value / 10000 * static_cast<float>(delta_time));
+			break;
+		case 4: //L2
+			camera.move_up(-value / 1000 * static_cast<float>(delta_time));
+			break;
+		case 5: //R2
+			camera.move_up(value / 1000 * static_cast<float>(delta_time));
+			break;
 	}
+	camera.update_view_matrix();
 }
 
 void GUI::handle_key_press(const std::string& key, bool pressed) {
@@ -398,42 +388,45 @@ void GUI::handle_key_press(const std::string& key, bool pressed) {
 }
 
 void GUI::handle_keyboard(const std::string& key) {
-	float mov_speed = 0.1f;
-	float rot_speed = 0.01f;
-	float dt = 1000 * (float)delta_time;
-	if(dt < 2.0)
-		dt = 2.0;
-	if(dt > 3.0)
-		dt = 3.0;
+	bool update = false;
+	float mov_speed = 100.0f;
+	float rot_speed = 2.0f;
 
 	if(key == "D") {
-		camera.move_right(mov_speed * dt);
+		camera.move_right(mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "A") {
-		camera.move_right(-mov_speed * dt);
+		camera.move_right(-mov_speed * static_cast<float>(delta_time));
+		update = true;
 	}else if(key == "W") {
-		camera.move_forward(mov_speed * dt);
+		camera.move_forward(mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "S") {
-		camera.move_forward(-mov_speed * dt);
+		camera.move_forward(-mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "R") {
-		camera.move_up(mov_speed * dt);
+		camera.move_up(mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "F") {
-		if(!ctrl)
-			camera.move_up(-mov_speed * dt);
+		if(!ctrl) {
+			camera.move_up(-mov_speed * static_cast<float>(delta_time));
+			update = true;
+		}
 	} else if(key == "E") {
-		camera.roll(rot_speed * dt);
+		camera.roll(rot_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "Q") {
-		camera.roll(-rot_speed * dt);
+		camera.roll(-rot_speed * static_cast<float>(delta_time));
+		update = true;
 	}
-	camera.update_view_matrix();
+	if(update)
+		camera.update_view_matrix();
 }
 
 void GUI::handle_mouse_motion(int x, int y) {
 	if(rel_mode) {
-		float dt = 10 * (float)delta_time;
-		if(dt > 0.1)
-			dt = 0.1f;
-		camera.yaw(-glm::atan((float)x) * dt);
-		camera.pitch(-glm::atan((float)y) * dt);
+		camera.yaw(-glm::atan((float)x) * static_cast<float>(delta_time));
+		camera.pitch(-glm::atan((float)y) * static_cast<float>(delta_time));
 		camera.update_view_matrix();
 	}
 }

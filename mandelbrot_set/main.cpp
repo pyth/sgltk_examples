@@ -90,25 +90,20 @@ void Win::handle_mouse_wheel(int x, int y) {
 }
 
 void Win::handle_keyboard(const std::string& key) {
-	float dt = 1000 * (float)delta_time;
-	float mov_speed = 1.f * dt;
-	if(mov_speed < 0.005)
-		mov_speed = 0.005f;
-	if(mov_speed > 0.01)
-		mov_speed = 0.01f;
+	float mov_speed = 5.f;
 
 	if(key == "D") {
-		center -= glm::dvec2(mov_speed, 0) * scale;
+		center -= glm::dvec2(mov_speed * static_cast<float>(delta_time), 0) * scale;
 	} else if(key == "A") {
-		center += glm::dvec2(mov_speed, 0) * scale;
+		center += glm::dvec2(mov_speed * static_cast<float>(delta_time), 0) * scale;
 	} else if(key == "W") {
-		center += glm::dvec2(0, mov_speed) * scale;
+		center += glm::dvec2(0, mov_speed * static_cast<float>(delta_time)) * scale;
 	} else if(key == "S") {
-		center -= glm::dvec2(0, mov_speed) * scale;
+		center -= glm::dvec2(0, mov_speed * static_cast<float>(delta_time)) * scale;
 	} else if(key == "Keypad +") {
-		scale -= 0.01 * scale;
+		scale -= 0.01 * static_cast<float>(delta_time) * scale;
 	} else if(key == "Keypad -") {
-		scale += 0.01 * scale;
+		scale += 0.01 * static_cast<float>(delta_time) * scale;
 	}
 }
 

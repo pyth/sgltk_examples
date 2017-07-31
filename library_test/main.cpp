@@ -24,6 +24,6 @@ int main(int argc, char** argv) {
 	if(window.gl_maj < 4)
 		return -1;
 
-	window.run();
+	window.run(100);
 	return 0;
 }

@@ -10,9 +10,9 @@ uniform float time;
 uniform mat4 model_view_proj_matrix;
 
 void main() {
-	float t = time - lifetime_in.x;
-	life = (lifetime_in.x + lifetime_in.y - time) / lifetime_in.y;
-	vec3 pos = position_in + velocity_in * t;
-	gl_PointSize = 10 * (life);
+	life = ((lifetime_in.y - lifetime_in.x) - mod(time - lifetime_in.x, lifetime_in.y - lifetime_in.x)) / (lifetime_in.y - lifetime_in.x);
+	gl_PointSize = 10 * life;
+
+	vec3 pos = position_in + velocity_in * mod(time - lifetime_in.x, lifetime_in.y - lifetime_in.x);
 	gl_Position = model_view_proj_matrix * vec4(pos, 1);
 }

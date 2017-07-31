@@ -97,15 +97,15 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 		//front
 		0, 1, 2, 2, 1, 3,
 		//back
-		4, 5, 6, 6, 5, 7,
+		6, 5, 4, 7, 5, 6,
 		//left
 		4, 0, 6, 6, 0, 2,
 		//right
 		1, 5, 7, 1, 7, 3,
 		//bottom
-		0, 1, 4, 1, 4, 5,
+		0, 4, 1, 1, 4, 5,
 		//top
-		2, 3, 6, 3, 6, 7
+		2, 3, 6, 3, 7, 6
 	};
 
 	depth_tex.create_empty(1024, 1024, GL_DEPTH_COMPONENT,
@@ -255,7 +255,7 @@ void Win::display() {
 	glFrontFace(GL_CCW);
 
 	light.model_matrix = glm::translate(glm::vec3(-2, 5, 0)) *
-			     glm::translate(glm::vec3(0, 2 * cos(M_PI * light_timer.get_time()), 0));
+			     glm::translate(glm::vec3(0, 2 * cos(M_PI * light_timer.get_time_s()), 0));
 	light_pos = glm::vec3(light.model_matrix * glm::vec4(0, 0, 0, 1));
 	light_cam.pos = light_pos;
 
@@ -290,32 +290,37 @@ void Win::display() {
 }
 
 void Win::handle_keyboard(const std::string& key) {
-	float mov_speed = 0.1f;
-	float rot_speed = 0.01f;
-	float dt = 1000 * (float)delta_time;
-	if(dt < 2.0)
-		dt = 2.0;
-	if(dt > 3.0)
-		dt = 3.0;
+	bool update = false;
+	float mov_speed = 20.0f;
+	float rot_speed = 2.0f;
 
 	if(key == "D") {
-		camera.move_right(mov_speed * dt);
+		camera.move_right(mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "A") {
-		camera.move_right(-mov_speed * dt);
+		camera.move_right(-mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "W") {
-		camera.move_forward(mov_speed * dt);
+		camera.move_forward(mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "S") {
-		camera.move_forward(-mov_speed * dt);
+		camera.move_forward(-mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "R") {
-		camera.move_up(mov_speed * dt);
+		camera.move_up(mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "F") {
-		camera.move_up(-mov_speed * dt);
+		camera.move_up(-mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "E") {
-		camera.roll(rot_speed * dt);
+		camera.roll(rot_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "Q") {
-		camera.roll(-rot_speed * dt);
+		camera.roll(-rot_speed * static_cast<float>(delta_time));
+		update = true;
 	}
-	camera.update_view_matrix();
+	if(update)
+		camera.update_view_matrix();
 }
 
 void Win::handle_key_press(const std::string& key, bool pressed) {
@@ -330,14 +335,9 @@ void Win::handle_key_press(const std::string& key, bool pressed) {
 }
 
 void Win::handle_mouse_motion(int x, int y) {
-	float dt = (float)delta_time;
-	if(dt < 0.01)
-		dt = 0.01f;
-	if(dt > 1.0)
-		dt = 1.0f;
 	if (rel_mode) {
-		camera.yaw(-glm::atan((float)x) * dt);
-		camera.pitch(-glm::atan((float)y) * dt);
+		camera.yaw(-glm::atan((float)x) * static_cast<float>(delta_time));
+		camera.pitch(-glm::atan((float)y) * static_cast<float>(delta_time));
 		camera.update_view_matrix();
 	}
 }

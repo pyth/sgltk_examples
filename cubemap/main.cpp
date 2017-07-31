@@ -139,14 +139,11 @@ void Win::handle_key_press(const std::string& key, bool pressed) {
 
 void Win::handle_keyboard(const std::string& key) {
 	float rot_speed = 0.005f;
-	float dt = 1000 * (float)delta_time;
-	if (dt < 2.0)
-		dt = 2.0;
 
 	if(key == "E") {
-		cam.roll(rot_speed * dt);
+		cam.roll(rot_speed * static_cast<float>(delta_time));
 	} else if(key == "Q") {
-		cam.roll(-rot_speed * dt);
+		cam.roll(-rot_speed * static_cast<float>(delta_time));
 	}
 	cam.update_view_matrix();
 }

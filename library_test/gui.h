@@ -59,6 +59,7 @@ class GUI : public Window {
 	Mesh *create_sphere(unsigned int slices, unsigned int stacks);
 
 	void handle_resize();
+	void handle_hamepad_added(unsigned int gamepad_id);
 	void handle_gamepad_button_press(unsigned int id, int button, bool pressed);
 	void handle_gamepad_button(unsigned int id, int button);
 	void handle_gamepad_axis(unsigned int id, unsigned int axis, int value);

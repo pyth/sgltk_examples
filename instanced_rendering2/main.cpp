@@ -61,12 +61,11 @@ void Win::handle_resize() {
 }
 
 void Win::handle_mouse_motion(int x, int y) {
-	float dt = (float)delta_time;
-	if (dt < 0.01)
-		dt = 0.01f;
+	float rot_speed = 20.0f;
+	set_title(std::to_string(glm::atan(float(y))));
 	if (rel_mode) {
-		cam.yaw(-glm::atan((float)x) * dt);
-		cam.pitch(-glm::atan((float)y) * dt);
+		cam.yaw(-glm::atan((float)x) * rot_speed * static_cast<float>(delta_time));
+		cam.pitch(-glm::atan((float)y) * rot_speed * static_cast<float>(delta_time));
 		cam.update_view_matrix();
 	}
 }
@@ -83,30 +82,37 @@ void Win::handle_key_press(const std::string& key, bool pressed) {
 }
 
 void Win::handle_keyboard(const std::string& key) {
-	float mov_speed = 1;
-	float rot_speed = 0.05f;
-	float dt = 1000 * (float)delta_time;
-	if (dt < 1.0)
-		dt = 1.0;
+	bool update = false;
+	float mov_speed = 100;
+	float rot_speed = 20.0f;
 
 	if(key == "D") {
-		cam.move_right(mov_speed * dt);
+		cam.move_right(mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "A") {
-		cam.move_right(-mov_speed * dt);
+		cam.move_right(-mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "W") {
-		cam.move_forward(mov_speed * dt);
+		cam.move_forward(mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "S") {
-		cam.move_forward(-mov_speed * dt);
+		cam.move_forward(-mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "R") {
-		cam.move_up(mov_speed * dt);
+		cam.move_up(mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "F") {
-		cam.move_up(-mov_speed * dt);
+		cam.move_up(-mov_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "E") {
-		cam.roll(rot_speed * dt);
+		cam.roll(rot_speed * static_cast<float>(delta_time));
+		update = true;
 	} else if(key == "Q") {
-		cam.roll(-rot_speed * dt);
+		cam.roll(-rot_speed * static_cast<float>(delta_time));
+		update = true;
 	}
-	cam.update_view_matrix();
+	if(update)
+		cam.update_view_matrix();
 }
 
 void Win::display() {
