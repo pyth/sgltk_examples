@@ -5,8 +5,8 @@ in vec2 tc;
 out vec4 color;
 
 uniform vec2 screen_res;
-uniform vec2 center;
-uniform float scale;
+uniform dvec2 center;
+uniform double scale;
 uniform int iter;
 
 uniform sampler1D textures_ambient;

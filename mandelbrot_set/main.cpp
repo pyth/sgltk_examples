@@ -3,6 +3,7 @@
 using namespace sgltk;
 
 class Win : public Window {
+	bool shift;
 	double scale;
 	int interations;
 	glm::dvec2 center;
@@ -26,8 +27,9 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 		Window(title, res_x, res_y, offset_x, offset_y) {
 
 	scale = 2.0;
+	shift = false;
 	interations = 100;
-	center = glm::vec2(0.5, 0);
+	center = glm::dvec2(0.5, 0);
 
 	std::vector<glm::vec4> pos = {	glm::vec4(-1,  1, 0, 1),
 					glm::vec4(-1, -1, 0, 1),
@@ -70,7 +72,7 @@ void Win::display() {
 
 	shader.set_uniform("screen_res", glm::vec2(width, height));
 	shader.set_uniform_int("iter", interations);
-	shader.set_uniform_float("scale", static_cast<float>(scale));
+	shader.set_uniform_double("scale", scale);
 	shader.set_uniform("center", center);
 	display_mesh.draw(GL_TRIANGLE_STRIP);
 }
@@ -81,7 +83,9 @@ void Win::handle_resize() {
 }
 
 void Win::handle_key_press(const std::string& key, bool pressed) {
-	if(key == "Escape")
+	if(key == "Left Shift" || key == "Right Shift")
+		shift = pressed;
+	else if(key == "Escape")
 		stop();
 }
 
@@ -90,20 +94,24 @@ void Win::handle_mouse_wheel(int x, int y) {
 }
 
 void Win::handle_keyboard(const std::string& key) {
-	float mov_speed = 5.f;
+	double mov_speed = 100.0;
 
 	if(key == "D") {
-		center -= glm::dvec2(mov_speed * static_cast<float>(delta_time), 0) * scale;
+		center -= glm::dvec2(mov_speed * delta_time, 0) * scale;
 	} else if(key == "A") {
-		center += glm::dvec2(mov_speed * static_cast<float>(delta_time), 0) * scale;
+		center += glm::dvec2(mov_speed * delta_time, 0) * scale;
 	} else if(key == "W") {
-		center += glm::dvec2(0, mov_speed * static_cast<float>(delta_time)) * scale;
+		center += glm::dvec2(0, mov_speed * delta_time) * scale;
 	} else if(key == "S") {
-		center -= glm::dvec2(0, mov_speed * static_cast<float>(delta_time)) * scale;
+		center -= glm::dvec2(0, mov_speed * delta_time) * scale;
+	} else if(key == "=" && shift) {
+		scale -= 0.01 * scale;
+	} else if(key == "-") {
+		scale += 0.01 * scale;
 	} else if(key == "Keypad +") {
-		scale -= 0.01 * static_cast<float>(delta_time) * scale;
+		scale -= 0.01 * scale;
 	} else if(key == "Keypad -") {
-		scale += 0.01 * static_cast<float>(delta_time) * scale;
+		scale += 0.01 * scale;
 	}
 }
 
