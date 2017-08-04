@@ -60,8 +60,12 @@ Win::~Win() {
 
 void Win::handle_resize() {
 	glViewport(0, 0, width, height);
-	cam1.update_projection_matrix((float)width, (float)height);
-	cam2.update_projection_matrix((float)width, (float)height);
+	cam1.width = static_cast<float>(width);
+	cam1.width = static_cast<float>(height);
+	cam2.width = static_cast<float>(width);
+	cam2.width = static_cast<float>(height);
+	cam1.update_projection_matrix();
+	cam2.update_projection_matrix();
 }
 
 void Win::handle_key_press(const std::string& key, bool pressed) {

@@ -284,7 +284,9 @@ void GUI::display() {
 
 void GUI::handle_resize() {
 	glViewport(0, 0, width, height);
-	camera.update_projection_matrix((float)width, (float)height);
+	camera.width = static_cast<float>(width);
+	camera.width = static_cast<float>(height);
+	camera.update_projection_matrix();
 }
 
 void GUI::handle_hamepad_added(unsigned int gamepad_id) {

@@ -192,7 +192,9 @@ Win::~Win() {}
 
 void Win::handle_resize() {
 	glViewport(0, 0, width, height);
-	camera.update_projection_matrix((float)width, (float)height);
+	camera.width = static_cast<float>(width);
+	camera.width = static_cast<float>(height);
+	camera.update_projection_matrix();
 }
 
 void Win::shadow_pass() {
