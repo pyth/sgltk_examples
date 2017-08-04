@@ -81,7 +81,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 			  glm::vec3(0, 1, 0), glm::radians(70.0f), (float)width,
 			  (float)height, 0.1f, 800.0f);
 
-	std::vector<glm::vec4> pos = {
+	std::vector<glm::vec4> position = {
 		glm::vec4(-1, -1, -1, 1),
 		glm::vec4( 1, -1, -1, 1),
 		glm::vec4(-1,  1, -1, 1),
@@ -115,7 +115,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	wall_tex.load(img, img, img, img, img, img);
 
 	int pos_loc = wall_shader.get_attribute_location("pos_in");
-	int pos_buf = walls.attach_vertex_buffer<glm::vec4>(pos);
+	int pos_buf = walls.attach_vertex_buffer<glm::vec4>(position);
 	walls.attach_index_buffer(ind);
 	walls.set_vertex_attribute(pos_loc, pos_buf, 4, GL_FLOAT, 0, 0);
 	walls.model_matrix = glm::scale(glm::vec3(20.f, 20.f, 20.f));
@@ -157,27 +157,27 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	light_cam = P_Camera(light_pos, glm::vec3(1, 0, 0), glm::vec3(0, 1, 0),
 			     glm::radians(90.f), (float)depth_tex.width, (float)depth_tex.height, 1.0f, 50.f);
 
-	light_cam.dir = glm::vec3(1, 0, 0);
+	light_cam.direction = glm::vec3(1, 0, 0);
 	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[0] = light_cam.projection_matrix * light_cam.view_matrix;
-	light_cam.dir = glm::vec3(-1, 0, 0);
+	light_cam.direction = glm::vec3(-1, 0, 0);
 	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[1] = light_cam.projection_matrix * light_cam.view_matrix;
-	light_cam.dir = glm::vec3(0, 1, 0);
+	light_cam.direction = glm::vec3(0, 1, 0);
 	light_cam.up = glm::vec3(0, 0, 1);
 	light_cam.update_view_matrix();
 	light_matrix[2] = light_cam.projection_matrix * light_cam.view_matrix;
-	light_cam.dir = glm::vec3(0, -1, 0);
+	light_cam.direction = glm::vec3(0, -1, 0);
 	light_cam.up = glm::vec3(0, 0, -1);
 	light_cam.update_view_matrix();
 	light_matrix[3] = light_cam.projection_matrix * light_cam.view_matrix;
-	light_cam.dir = glm::vec3(0, 0, 1);
+	light_cam.direction = glm::vec3(0, 0, 1);
 	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[4] = light_cam.projection_matrix * light_cam.view_matrix;
-	light_cam.dir = glm::vec3(0, 0, -1);
+	light_cam.direction = glm::vec3(0, 0, -1);
 	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[5] = light_cam.projection_matrix * light_cam.view_matrix;
@@ -227,13 +227,13 @@ void Win::normal_pass() {
 
 	box_shader.set_uniform_float("far_plane", light_cam.far_plane);
 	box_shader.set_uniform("light_pos", light_pos);
-	box_shader.set_uniform("cam_pos", camera.pos);
+	box_shader.set_uniform("cam_pos", camera.position);
 	box_shader.set_uniform("light_matrix", false, light_matrix);
 	box_shader.set_uniform_int("soft_shadow", 1);
 
 	wall_shader.set_uniform_float("far_plane", light_cam.far_plane);
 	wall_shader.set_uniform("light_pos", light_pos);
-	wall_shader.set_uniform("cam_pos", camera.pos);
+	wall_shader.set_uniform("cam_pos", camera.position);
 	wall_shader.set_uniform("light_matrix", false, light_matrix);
 	wall_shader.set_uniform_int("soft_shadow", 1);
 
@@ -259,29 +259,29 @@ void Win::display() {
 	light.model_matrix = glm::translate(glm::vec3(-2, 5, 0)) *
 			     glm::translate(glm::vec3(0, 2 * cos(M_PI * light_timer.get_time_s()), 0));
 	light_pos = glm::vec3(light.model_matrix * glm::vec4(0, 0, 0, 1));
-	light_cam.pos = light_pos;
+	light_cam.position = light_pos;
 
-	light_cam.dir = glm::vec3(1, 0, 0);
+	light_cam.direction = glm::vec3(1, 0, 0);
 	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[0] = light_cam.projection_matrix * light_cam.view_matrix;
-	light_cam.dir = glm::vec3(-1, 0, 0);
+	light_cam.direction = glm::vec3(-1, 0, 0);
 	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[1] = light_cam.projection_matrix * light_cam.view_matrix;
-	light_cam.dir = glm::vec3(0, 1, 0);
+	light_cam.direction = glm::vec3(0, 1, 0);
 	light_cam.up = glm::vec3(0, 0, 1);
 	light_cam.update_view_matrix();
 	light_matrix[2] = light_cam.projection_matrix * light_cam.view_matrix;
-	light_cam.dir = glm::vec3(0, -1, 0);
+	light_cam.direction = glm::vec3(0, -1, 0);
 	light_cam.up = glm::vec3(0, 0, -1);
 	light_cam.update_view_matrix();
 	light_matrix[3] = light_cam.projection_matrix * light_cam.view_matrix;
-	light_cam.dir = glm::vec3(0, 0, 1);
+	light_cam.direction = glm::vec3(0, 0, 1);
 	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[4] = light_cam.projection_matrix * light_cam.view_matrix;
-	light_cam.dir = glm::vec3(0, 0, -1);
+	light_cam.direction = glm::vec3(0, 0, -1);
 	light_cam.up = glm::vec3(0, -1, 0);
 	light_cam.update_view_matrix();
 	light_matrix[5] = light_cam.projection_matrix * light_cam.view_matrix;

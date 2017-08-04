@@ -85,8 +85,8 @@ void Win::handle_key_press(const std::string& key, bool pressed) {
 
 void Win::handle_keyboard(const std::string& key) {
 	bool update = false;
-	float mov_speed = 100;
-	float rot_speed = 20.0f;
+	float mov_speed = 10000.0f;
+	float rot_speed = 2.0f;
 
 	if(key == "D") {
 		cam.move_right(mov_speed * static_cast<float>(delta_time));
@@ -123,7 +123,7 @@ void Win::display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	shader.set_uniform_float("light_pos", 25, 25, 20);
-	shader.set_uniform("cam_pos", cam.pos);
+	shader.set_uniform("cam_pos", cam.position);
 
 	box.draw_instanced(125);
 }

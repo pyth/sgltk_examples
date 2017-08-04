@@ -36,7 +36,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	wireframe = false;
 
 	//skybox vertex positions
-	std::vector<glm::vec4> pos = {
+	std::vector<glm::vec4> position = {
 		glm::vec4(-1, -1, -1, 1),
 		glm::vec4( 1, -1, -1, 1),
 		glm::vec4(-1,  1, -1, 1),
@@ -88,7 +88,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	//create the triangle mesh
 	skybox_mat = glm::scale(glm::vec3(200));
-	int pos_buf = skybox.attach_vertex_buffer<glm::vec4>(pos);
+	int pos_buf = skybox.attach_vertex_buffer<glm::vec4>(position);
 	skybox.attach_index_buffer(ind);
 	skybox.setup_shader(&skybox_shader);
 	skybox.setup_camera(&cam.view_matrix, &cam.projection_matrix);
@@ -119,7 +119,7 @@ void Win::handle_mouse_motion(int x, int y) {
 		float dt = (float)delta_time;
 		cam.yaw(-glm::atan((float)x) * dt);
 		cam.pitch(-glm::atan((float)y) * dt);
-		cam.pos = -10.f * glm::normalize(cam.dir);
+		cam.position = -10.f * glm::normalize(cam.direction);
 		cam.update_view_matrix();
 	}
 }
@@ -162,7 +162,7 @@ void Win::display() {
 
 	skybox.draw(GL_TRIANGLES, &skybox_mat);
 
-	obj_shader.set_uniform("cam_pos", cam.pos);
+	obj_shader.set_uniform("cam_pos", cam.position);
 	obj.draw(&obj_mat);
 }
 

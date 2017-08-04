@@ -48,16 +48,16 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	glEnable(GL_DEPTH_TEST);
 	set_relative_mode(rel_mode);
 
-	glm::vec3 pos;
+	glm::vec3 position;
 	glm::vec3 vel;
 	float lt;
 
 	for(unsigned int i = 0; i < num_particles; i++) {
-		pos = glm::vec3(0);
+		position = glm::vec3(0);
 		vel = glm::vec3(rand_float(), rand_float(), rand_float());
 		vel = (3 * std::abs(rand_float()) + 0.5f) * glm::normalize(vel);
 		lt = std::abs(10 * std::abs(rand_float()) + 10);
-		particle_system.add_particle(pos, vel, lt);
+		particle_system.add_particle(position, vel, lt);
 	}
 	particle_system.update_all();
 }
@@ -76,7 +76,7 @@ void Win::handle_mouse_motion(int x, int y) {
 	if(rel_mode) {
 		cam.yaw(-glm::atan((float)x) * static_cast<float>(delta_time));
 		cam.pitch(-glm::atan((float)y) * static_cast<float>(delta_time));
-		cam.pos = -10.f * glm::normalize(cam.dir);
+		cam.position = -10.f * glm::normalize(cam.direction);
 		cam.update_view_matrix();
 	}
 }

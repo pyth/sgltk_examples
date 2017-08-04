@@ -86,7 +86,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 			  glm::vec3(0, 1, 0), glm::radians(70.0f), (float)width,
 			  (float)height, 0.1f, 800.0f);
 
-	std::vector<glm::vec4> pos = {		glm::vec4(-0.5, 0,  0.5, 1),
+	std::vector<glm::vec4> position = {		glm::vec4(-0.5, 0,  0.5, 1),
 						glm::vec4( 0.5, 0,  0.5, 1),
 						glm::vec4(-0.5, 0, -0.5, 1),
 						glm::vec4( 0.5, 0, -0.5, 1)};
@@ -116,7 +116,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	int pos_loc_floor = floor_shader.get_attribute_location("pos_in");
 	int norm_loc_floor = floor_shader.get_attribute_location("norm_in");
 	int tc_loc_floor = floor_shader.get_attribute_location("tc_in");
-	int pos_buf = floor.attach_vertex_buffer<glm::vec4>(pos);
+	int pos_buf = floor.attach_vertex_buffer<glm::vec4>(position);
 	int norm_buf = floor.attach_vertex_buffer<glm::vec3>(norm);
 	int tc_buf = floor.attach_vertex_buffer<glm::vec2>(tex_coord);
 	floor.attach_index_buffer(ind);
@@ -136,7 +136,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	//create a mini display
 	depth_display.setup_shader(&display_shader);
-	pos_buf = depth_display.attach_vertex_buffer<glm::vec4>(pos);
+	pos_buf = depth_display.attach_vertex_buffer<glm::vec4>(position);
 	tc_buf = depth_display.attach_vertex_buffer<glm::vec2>(tex_coord);
 	depth_display.attach_index_buffer(ind);
 	depth_display.set_vertex_attribute("pos_in", pos_buf, 4, GL_FLOAT, 0, 0);
@@ -215,12 +215,12 @@ void Win::normal_pass() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	box_shader.set_uniform("light_pos", light_pos);
-	box_shader.set_uniform("cam_pos", camera.pos);
+	box_shader.set_uniform("cam_pos", camera.position);
 	box_shader.set_uniform("light_matrix", false, light_matrix);
 	box_shader.set_uniform_int("soft_shadow", 4);
 
 	floor_shader.set_uniform("light_pos", light_pos);
-	floor_shader.set_uniform("cam_pos", camera.pos);
+	floor_shader.set_uniform("cam_pos", camera.position);
 	floor_shader.set_uniform("light_matrix", false, light_matrix);
 	floor_shader.set_uniform_int("soft_shadow", 4);
 
@@ -242,8 +242,8 @@ void Win::display() {
 			     glm::rotate((float)(M_PI * light_timer.get_time_s()), glm::vec3(1, 0, 0)) *
 			     glm::translate(glm::vec3(0, 1, 0));
 	light_pos = glm::vec3(light.model_matrix * glm::vec4(0, 0, 0, 1));
-	light_cam.pos = light_pos;
-	light_cam.dir = -glm::normalize(light_pos);
+	light_cam.position = light_pos;
+	light_cam.direction = -glm::normalize(light_pos);
 	light_cam.update_view_matrix();
 	light_matrix = light_cam.projection_matrix * light_cam.view_matrix;
 

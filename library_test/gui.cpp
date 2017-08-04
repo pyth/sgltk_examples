@@ -260,7 +260,7 @@ void GUI::display() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
-	floor_shader.set_uniform("cam_pos", camera.pos);
+	floor_shader.set_uniform("cam_pos", camera.position);
 	floor_shader.set_uniform("light_pos", light_pos);
 	floor_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
 	floor.draw_instanced(GL_PATCHES, NUM_TILES);
@@ -272,7 +272,7 @@ void GUI::display() {
 	}
 
 	textured_shader.set_uniform("light_pos", light_pos);
-	textured_shader.set_uniform("cam_pos", camera.pos);
+	textured_shader.set_uniform("cam_pos", camera.position);
 	for(unsigned int i = 0; i < bob_trafos.size(); i++) {
 		textured_model.animate((float)time.get_time_s());
 		textured_model.draw(&bob_trafos[i]);
@@ -391,7 +391,7 @@ void GUI::handle_key_press(const std::string& key, bool pressed) {
 
 void GUI::handle_keyboard(const std::string& key) {
 	bool update = false;
-	float mov_speed = 100.0f;
+	float mov_speed = 50.0f;
 	float rot_speed = 2.0f;
 
 	if(key == "D") {

@@ -73,7 +73,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	terrain_side = 50;
 	num_tiles = static_cast<unsigned int>(pow(terrain_side, 2));
 
-	std::vector<glm::vec4> pos = {	glm::vec4(-0.5, 0,-0.5, 1),
+	std::vector<glm::vec4> position = {	glm::vec4(-0.5, 0,-0.5, 1),
 					glm::vec4(-0.5, 0, 0.5, 1),
 					glm::vec4( 0.5, 0,-0.5, 1),
 					glm::vec4( 0.5, 0, 0.5, 1)};
@@ -132,7 +132,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	terrain_tile.setup_shader(&terrain_shader);
 	terrain_tile.setup_camera(&camera);
-	terrain_tile.add_vertex_attribute("vert_pos_in", 4, GL_FLOAT, pos);
+	terrain_tile.add_vertex_attribute("vert_pos_in", 4, GL_FLOAT, position);
 	terrain_tile.attach_index_buffer(ind);
 
 	display_mesh.model_matrix = glm::rotate(glm::mat4(1), (float)(M_PI / 2), glm::vec3(1, 0, 0));
@@ -141,7 +141,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	display_mesh.textures_misc.push_back(std::make_pair("color_texture", &color_tex));
 	display_mesh.textures_misc.push_back(std::make_pair("normal_texture", &normal_tex));
 	display_mesh.textures_misc.push_back(std::make_pair("position_texture", &position_tex));
-	display_mesh.add_vertex_attribute("pos_in", 4, GL_FLOAT, pos);
+	display_mesh.add_vertex_attribute("pos_in", 4, GL_FLOAT, position);
 	display_mesh.add_vertex_attribute("tc_in", 2, GL_FLOAT, tc);
 	display_mesh.attach_index_buffer(ind);
 
@@ -197,7 +197,7 @@ void Win::display() {
 	glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	display_shader.set_uniform("cam_pos", camera.pos);
+	display_shader.set_uniform("cam_pos", camera.position);
 	display_shader.set_uniform("light_direction", light_direction);
 	display_mesh.draw(GL_TRIANGLE_STRIP);
 }

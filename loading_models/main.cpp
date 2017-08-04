@@ -89,13 +89,13 @@ void Win::display() {
 	glm::vec3 light_pos(5, 10, 0);
 
 	bob_shader.set_uniform("light_pos", light_pos);
-	bob_shader.set_uniform("cam_pos", camera.pos);
+	bob_shader.set_uniform("cam_pos", camera.position);
 
 	spikey_shader.set_uniform("light_pos", light_pos);
-	spikey_shader.set_uniform("cam_pos", camera.pos);
+	spikey_shader.set_uniform("cam_pos", camera.position);
 
 	box_shader.set_uniform("light_pos", light_pos);
-	box_shader.set_uniform("cam_pos", camera.pos);
+	box_shader.set_uniform("cam_pos", camera.position);
 
 	//draw the models
 	bob.animate((float)timer.get_time_s());
