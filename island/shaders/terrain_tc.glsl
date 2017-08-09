@@ -48,27 +48,26 @@ void main() {
 	gl_TessLevelOuter[2] = get_tess_level(dist2, dist3);
 	gl_TessLevelOuter[3] = get_tess_level(dist1, dist3);
 
-	gl_TessLevelInner[0] = 0.5 * (gl_TessLevelOuter[1] + gl_TessLevelOuter[3]);
-	gl_TessLevelInner[1] = 0.5 * (gl_TessLevelOuter[0] + gl_TessLevelOuter[2]);
+	gl_TessLevelInner[0] = max(gl_TessLevelOuter[1], gl_TessLevelOuter[3]);
+	gl_TessLevelInner[1] = max(gl_TessLevelOuter[0], gl_TessLevelOuter[2]);
 
 	float tc_per_tile = 1.0 / int(terrain_side);
-	int tiles = 6;
 	switch(gl_InvocationID) {
 		case 0:
 			tc_te[gl_InvocationID] = vec2(tile_pos_tc[0].x, tile_pos_tc[0].y) * tc_per_tile;
-			tc2_te[gl_InvocationID] = vec2(mod(tile_pos_tc[0].x, tiles), mod(tile_pos_tc[0].y, tiles)) * 1.0 / tiles;
+			tc2_te[gl_InvocationID] = vec2(0, 0);
 			break;
 		case 1:
 			tc_te[gl_InvocationID] = vec2(tile_pos_tc[0].x + 1, tile_pos_tc[0].y) * tc_per_tile;
-			tc2_te[gl_InvocationID] = vec2(mod(tile_pos_tc[0].x, tiles) + 1, mod(tile_pos_tc[0].y, tiles)) * 1.0 / tiles;
+			tc2_te[gl_InvocationID] = vec2(1, 0);
 			break;
 		case 2:
 			tc_te[gl_InvocationID] = vec2(tile_pos_tc[0].x, tile_pos_tc[0].y + 1) * tc_per_tile;
-			tc2_te[gl_InvocationID] = vec2(mod(tile_pos_tc[0].x, tiles), mod(tile_pos_tc[0].y, tiles) + 1) * 1.0 / tiles;
+			tc2_te[gl_InvocationID] = vec2(0, 1);
 			break;
 		case 3:
 			tc_te[gl_InvocationID] = vec2(tile_pos_tc[0].x + 1, tile_pos_tc[0].y + 1) * tc_per_tile;
-			tc2_te[gl_InvocationID] = vec2(mod(tile_pos_tc[0].x, tiles) + 1, mod(tile_pos_tc[0].y, tiles) + 1) * 1.0 / tiles;
+			tc2_te[gl_InvocationID] = vec2(1, 1);
 			break;
 	}
 

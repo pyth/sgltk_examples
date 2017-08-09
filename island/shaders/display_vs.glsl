@@ -5,9 +5,7 @@ in vec2 tc_in;
 
 out vec2 tc;
 
-uniform vec2 screen_res;
 uniform mat4 model_matrix;
-uniform mat4 model_view_proj_matrix;
 
 void main() {
 	tc = tc_in;
