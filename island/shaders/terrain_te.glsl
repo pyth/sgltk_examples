@@ -7,7 +7,6 @@ in vec2 tc2_te[];
 
 out vec3 pos_w;
 out vec2 tc;
-out vec2 tc2;
 out vec3 norm;
 out float height;
 
@@ -48,15 +47,15 @@ vec3 get_normal(vec2 coordinates) {
 void main() {
 	vec2 tc0 = mix(tc_te[0], tc_te[1], gl_TessCoord.x);
 	vec2 tc1 = mix(tc_te[2], tc_te[3], gl_TessCoord.x);
-	tc = mix(tc0, tc1, gl_TessCoord.y);
+	vec2 tc_height = mix(tc0, tc1, gl_TessCoord.y);
 
 	tc0 = mix(tc2_te[0], tc2_te[1], gl_TessCoord.x);
 	tc1 = mix(tc2_te[2], tc2_te[3], gl_TessCoord.x);
-	tc2 = mix(tc0, tc1, gl_TessCoord.y);
+	tc = mix(tc0, tc1, gl_TessCoord.y);
 
-	norm = get_normal(tc);
+	norm = get_normal(tc_height);
 
-	height = get_height(tc);
+	height = get_height(tc_height);
 
 	vec4 pos0 = mix(gl_in[0].gl_Position, gl_in[2].gl_Position, gl_TessCoord.x);
 	vec4 pos1 = mix(gl_in[1].gl_Position, gl_in[3].gl_Position, gl_TessCoord.x);

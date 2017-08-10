@@ -2,14 +2,12 @@
 
 in vec3 pos_w;
 in vec2 tc;
-in vec2 tc2;
 in vec3 norm;
 in float height;
 
 layout (location = 0) out vec4 color_refl;
 
 uniform float max_height;
-uniform float water_level;
 uniform float sand_level;
 uniform float sand_mix_level;
 uniform float grass_level;
@@ -27,10 +25,10 @@ void main() {
 	vec3 col;
 	float eta = 0.0001;
 
-	vec3 tex_sand = texture(sand_texture, tc2).xyz;
-	vec3 tex_grass = texture(grass_texture, tc2).xyz;
-	vec3 tex_rock = texture(rock_texture, tc2).xyz;
-	vec3 tex_snow = texture(snow_texture, tc2).xyz;
+	vec3 tex_sand = texture(sand_texture, tc).xyz;
+	vec3 tex_grass = texture(grass_texture, tc).xyz;
+	vec3 tex_rock = texture(rock_texture, tc).xyz;
+	vec3 tex_snow = texture(snow_texture, tc).xyz;
 
 	if(height <= sand_level) {
 		col = tex_sand;

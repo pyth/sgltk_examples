@@ -2,7 +2,6 @@
 
 in vec3 pos_w;
 in vec2 tc;
-in vec2 tc2;
 in vec3 norm;
 in float height;
 
@@ -11,8 +10,6 @@ layout (location = 1) out vec3 normals;
 layout (location = 2) out vec3 position;
 layout (location = 3) out float spec;
 
-uniform float max_height;
-uniform float water_level;
 uniform float sand_level;
 uniform float sand_mix_level;
 uniform float grass_level;
@@ -23,16 +20,14 @@ uniform sampler2D sand_texture;
 uniform sampler2D grass_texture;
 uniform sampler2D rock_texture;
 uniform sampler2D snow_texture;
-uniform vec3 light_direction;
-uniform vec3 cam_pos;
 
 void main() {
 	float eta = 0.0001;
 
-	vec4 tex_sand = texture(sand_texture, tc2);
-	vec4 tex_grass = texture(grass_texture, tc2);
-	vec4 tex_rock = texture(rock_texture, tc2);
-	vec4 tex_snow = texture(snow_texture, tc2);
+	vec4 tex_sand = texture(sand_texture, tc);
+	vec4 tex_grass = texture(grass_texture, tc);
+	vec4 tex_rock = texture(rock_texture, tc);
+	vec4 tex_snow = texture(snow_texture, tc);
 
 	if(height <= sand_level) {
 		color = tex_sand;

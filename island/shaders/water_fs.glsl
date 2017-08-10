@@ -13,7 +13,7 @@ uniform vec3 cam_pos;
 uniform vec2 near_far;
 uniform vec3 light_direction;
 uniform sampler2D depth_texture;
-uniform sampler2D water_texture;
+//uniform sampler2D water_texture;
 uniform sampler2D water_dudv_texture;
 uniform sampler2D refraction_texture;
 uniform sampler2D reflection_texture;
@@ -42,7 +42,7 @@ void main() {
 	vec3 refr_tex = texture(refraction_texture, refr_coord).rgb;
 	vec3 refl_tex = texture(reflection_texture, refl_coord).rgb;
 
-	vec4 water_tex = texture(water_texture, tc);
+	//vec4 water_tex = texture(water_texture, tc);
 
 	vec4 refr = vec4(refr_tex, 1);
 	vec4 refl = vec4(refl_tex, 1);
@@ -58,8 +58,7 @@ void main() {
 	float fresnell = pow(dot(normalize(cam_vec), n), 0.5);
 	vec4 refl_refr = mix(refl, refr, fresnell);
 
-	color = vec4(mix(refl_refr, water_tex, 0.25).rgb + spec, 0);
+	//color = vec4(mix(refl_refr, water_tex, 0.25).rgb + spec, 0);
 	color = vec4(refl_refr.rgb + spec, 1);
-	//color = vec4(vec3(water_depth) * 100, 0);
 	color.a = water_depth;
 }
