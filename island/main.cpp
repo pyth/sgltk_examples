@@ -5,7 +5,6 @@ using namespace sgltk;
 class Win : public Window {
 	bool rel_mode;
 	bool wireframe;
-	bool update_viewport;
 	int tile_size;
 	glm::vec2 near_far;
 	unsigned int fps;
@@ -95,7 +94,6 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	frame_sum = 0;
 	rel_mode = true;
 	wireframe = false;
-	update_viewport = false;
 
 	set_relative_mode(rel_mode);
 
@@ -318,12 +316,13 @@ Win::~Win() {
 }
 
 void Win::handle_resize() {
-	update_viewport = true;
 	glViewport(0, 0, width, height);
 	depth_buffer.set_size(width, height);
 	color_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
 	normal_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
 	position_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
+	spec_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
+	depth_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
 	refraction_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
 	reflection_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
 	camera.width = static_cast<float>(width);
