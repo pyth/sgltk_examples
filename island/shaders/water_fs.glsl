@@ -2,12 +2,14 @@
 
 in vec3 cam_vec;
 in vec3 pos_w;
+in vec4 pos_ls;
 in vec4 pos;
 in vec2 tc;
 
 layout (location = 0) out vec4 color;
 layout (location = 1) out vec3 normals;
 layout (location = 2) out vec3 position;
+layout (location = 3) out vec4 position_ls;
 
 uniform vec3 cam_pos;
 uniform vec2 near_far;
@@ -50,6 +52,7 @@ void main() {
 
 	normals = vec3(0, 1, 0);
 	position = pos_w;
+	position_ls = pos_ls;
 
 	vec3 cam_vec = cam_pos - pos_w;
 	vec3 n = normalize(vec3(0, 1, 0) + vec3(distortion.x, 0, distortion.y) * water_depth);

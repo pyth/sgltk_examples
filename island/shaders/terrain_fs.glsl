@@ -1,6 +1,7 @@
 #version 400
 
 in vec3 pos_w;
+in vec4 pos_ls;
 in vec2 tc;
 in vec3 norm;
 in float height;
@@ -8,7 +9,8 @@ in float height;
 layout (location = 0) out vec4 color;
 layout (location = 1) out vec3 normals;
 layout (location = 2) out vec3 position;
-layout (location = 3) out float spec;
+layout (location = 3) out vec4 position_ls;
+layout (location = 4) out float spec;
 
 uniform float sand_level;
 uniform float sand_mix_level;
@@ -47,6 +49,7 @@ void main() {
 	}
 
 	position = pos_w;
+	position_ls = pos_ls;
 	normals = normalize(norm);
 	if(height > rock_mix_level)
 		spec = 1;

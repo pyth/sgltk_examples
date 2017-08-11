@@ -36,6 +36,7 @@ class Win : public Window {
 	Texture_2d color_tex;
 	Texture_2d normal_tex;
 	Texture_2d position_tex;
+	Texture_2d position_ls_tex;
 	Texture_2d spec_tex;
 	Texture_2d refraction_tex;
 	Texture_2d reflection_tex;
@@ -246,12 +247,14 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	color_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
 	normal_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
 	position_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
+	position_ls_tex.create_empty(width, height, GL_RGBA16F, GL_FLOAT, GL_RGBA);
 	spec_tex.create_empty(width, height, GL_R32F, GL_FLOAT, GL_RED);
 	depth_tex.create_empty(width, height, GL_R32F, GL_FLOAT, GL_RED);
 	fb_normal.attach_texture(GL_COLOR_ATTACHMENT0, color_tex);
 	fb_normal.attach_texture(GL_COLOR_ATTACHMENT1, normal_tex);
 	fb_normal.attach_texture(GL_COLOR_ATTACHMENT2, position_tex);
-	fb_normal.attach_texture(GL_COLOR_ATTACHMENT3, spec_tex);
+	fb_normal.attach_texture(GL_COLOR_ATTACHMENT3, position_ls_tex);
+	fb_normal.attach_texture(GL_COLOR_ATTACHMENT4, spec_tex);
 	fb_normal.attach_renderbuffer(GL_DEPTH_ATTACHMENT, depth_buffer);
 	fb_normal.finalize();
 
@@ -277,6 +280,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	display_mesh.textures_misc.push_back(std::make_pair("color_texture", &color_tex));
 	display_mesh.textures_misc.push_back(std::make_pair("normal_texture", &normal_tex));
 	display_mesh.textures_misc.push_back(std::make_pair("position_texture", &position_tex));
+	display_mesh.textures_misc.push_back(std::make_pair("position_ls_texture", &position_ls_tex));
 	display_mesh.textures_misc.push_back(std::make_pair("spec_texture", &spec_tex));
 	display_mesh.textures_misc.push_back(std::make_pair("depth_texture", &depth_tex));
 	display_mesh.add_vertex_attribute("pos_in", 4, GL_FLOAT, position);
@@ -328,6 +332,7 @@ void Win::handle_resize() {
 	color_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
 	normal_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
 	position_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
+	position_ls_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
 	spec_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
 	depth_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
 	refraction_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
