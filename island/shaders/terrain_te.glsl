@@ -6,11 +6,13 @@ in vec2 tc_te[];
 in vec2 tc2_te[];
 
 out vec3 pos_w;
+out vec4 pos_ls;
 out vec2 tc;
 out vec3 norm;
 out float height;
 
 uniform vec4 clip_plane;
+uniform mat4 light_matrix;
 uniform sampler2D texture_displacement;
 uniform float max_height;
 uniform mat4 view_matrix;
@@ -62,6 +64,9 @@ void main() {
 	vec4 pos = mix(pos0, pos1, gl_TessCoord.y);
 	pos.y += height;
 	pos_w = pos.xyz;
-	gl_ClipDistance[0] = dot(pos, clip_plane);
+	pos_ls = light_matrix * pos;
+
 	gl_Position = view_proj_matrix *  pos;
+
+	gl_ClipDistance[0] = dot(pos, clip_plane);
 }

@@ -13,11 +13,6 @@ uniform sampler2D normal_texture;
 uniform vec3 light_direction;
 uniform vec3 cam_pos;
 
-float linearize_depth(float depth) {
-	float d = 2.0 * depth - 1.0;
-	return (2.0 * 0.1 * 1000) / (1000 + 0.1 - d * (1000 - 0.1)) / 1000;
-}
-
 void main() {
 	vec3 pos_w = texture(position_texture, vec2(tc.x, 1.0 - tc.y)).xyz;
 	vec4 col = texture(color_texture, vec2(tc.x, 1.0 - tc.y));
@@ -32,5 +27,4 @@ void main() {
 	float vr = max(0, dot(reflect(l, n), v));
 	vec4 spec = sp * 0.1 * vec4(1) * pow(vr, 2);
 	color = amb + diff + spec;
-	//color = vec4(vec3(linearize_depth(texture(shadow_texture, vec2(tc.x, 1.0 - tc.y)).r)), 1);
 }

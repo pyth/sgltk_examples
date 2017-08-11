@@ -20,6 +20,7 @@ uniform sampler2D sand_texture;
 uniform sampler2D grass_texture;
 uniform sampler2D rock_texture;
 uniform sampler2D snow_texture;
+uniform sampler2D shadow_texture;
 
 void main() {
 	float eta = 0.0001;

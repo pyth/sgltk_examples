@@ -1,11 +1,12 @@
 #version 400
 
 in vec3 pos_w;
+in vec4 pos_ls;
 in vec2 tc;
 in vec3 norm;
 in float height;
 
-layout (location = 0) out vec4 color_refl;
+layout (location = 0) out vec4 color;
 
 uniform float max_height;
 uniform float sand_level;
@@ -18,12 +19,16 @@ uniform sampler2D sand_texture;
 uniform sampler2D grass_texture;
 uniform sampler2D rock_texture;
 uniform sampler2D snow_texture;
+uniform sampler2D shadow_texture;
 uniform vec3 light_direction;
 uniform vec3 cam_pos;
 
 void main() {
 	vec3 col;
 	float eta = 0.0001;
+
+	vec2 tc_shadow = pos_ls.xy / pos_ls.w * 0.5 + 0.5;
+	float saved_depth = texture(shadow_texture, tc_shadow).r;
 
 	vec3 tex_sand = texture(sand_texture, tc).xyz;
 	vec3 tex_grass = texture(grass_texture, tc).xyz;
@@ -50,9 +55,13 @@ void main() {
 	vec3 light = normalize(light_direction);
 	float vr = max(0, dot(reflect(light, normalize(norm)), v));
 	vec4 amb = vec4(0.2 * col, 1);
-	vec4 diff = vec4(max(0, dot(normalize(norm), -light)) * col, 1);
-	vec4 spec = vec4(0, 0, 0, 1);
-	if(height >= rock_mix_level)
-		spec = vec4(0.3) * pow(vr, 10);
-	color_refl = amb + diff + spec;
+	if(saved_depth < pos_ls.z / pos_ls.w) {
+		color = amb;
+	} else {
+		vec4 diff = vec4(max(0, dot(normalize(norm), -light)) * col, 1);
+		vec4 spec = vec4(0, 0, 0, 1);
+		if(height >= rock_mix_level)
+			spec = vec4(0.3) * pow(vr, 10);
+		color = amb + diff + spec;
+	}
 }

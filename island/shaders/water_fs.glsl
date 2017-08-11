@@ -19,7 +19,8 @@ uniform sampler2D refraction_texture;
 uniform sampler2D reflection_texture;
 
 float lin_depth(in float depth, in float near, in float far) {
-	return (2.0 * near) / (far + near - depth * (far - near));
+	float d = 2.0 * depth - 1.0;
+	return (2.0 * near * far) / (far + near - d * (far - near)) / far;
 }
 
 void main() {
