@@ -22,7 +22,6 @@ uniform sampler2D sand_texture;
 uniform sampler2D grass_texture;
 uniform sampler2D rock_texture;
 uniform sampler2D snow_texture;
-uniform sampler2D shadow_texture;
 
 void main() {
 	float eta = 0.0001;
@@ -47,6 +46,8 @@ void main() {
 	} else {
 		color = tex_snow;
 	}
+	if(height <= rock_level)
+		color = mix(color, tex_rock, 1.0f - dot(normalize(norm), vec3(0, 1, 0)));
 
 	position = pos_w;
 	position_ls = pos_ls;

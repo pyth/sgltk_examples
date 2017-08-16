@@ -60,6 +60,7 @@ void main() {
 	vec3 spec = vec3(0.4) * pow(vr, 10);
 
 	float fresnell = pow(dot(normalize(cam_vec), n), 0.5);
+	refr = mix(refr, vec4(0, 1, 1, 1), 0.1);
 	vec4 refl_refr = mix(refl, refr, fresnell);
 
 	//color = vec4(mix(refl_refr, water_tex, 0.25).rgb + spec, 0);

@@ -2,12 +2,12 @@
 
 layout (vertices = 4) out;
 
-in vec3 pos_v[];
 in vec2 tile_pos_tc[];
 
 out vec2 tc_te[];
 out vec2 tc2_te[];
 
+uniform vec3 cam_pos;
 uniform uint terrain_side;
 uniform int max_tess_level;
 
@@ -38,10 +38,10 @@ float get_tess_level(float dist0, float dist1) {
 }
 
 void main() {
-	float dist0 = abs(pos_v[0].z);
-	float dist1 = abs(pos_v[1].z);
-	float dist2 = abs(pos_v[2].z);
-	float dist3 = abs(pos_v[3].z);
+	float dist0 = length(cam_pos - gl_in[0].gl_Position.xyz);
+	float dist1 = length(cam_pos - gl_in[1].gl_Position.xyz);
+	float dist2 = length(cam_pos - gl_in[2].gl_Position.xyz);
+	float dist3 = length(cam_pos - gl_in[3].gl_Position.xyz);
 
 	gl_TessLevelOuter[0] = get_tess_level(dist0, dist1);
 	gl_TessLevelOuter[1] = get_tess_level(dist0, dist2);

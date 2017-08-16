@@ -53,7 +53,7 @@ void main() {
 
 	tc0 = mix(tc2_te[0], tc2_te[1], gl_TessCoord.x);
 	tc1 = mix(tc2_te[2], tc2_te[3], gl_TessCoord.x);
-	tc = mix(tc0, tc1, gl_TessCoord.y);
+	tc = mix(tc0, tc1, gl_TessCoord.y) * 4;
 
 	norm = get_normal(tc_height);
 

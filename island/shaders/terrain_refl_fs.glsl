@@ -27,8 +27,8 @@ void main() {
 	vec3 col;
 	float eta = 0.0001;
 
-	vec2 tc_shadow = pos_ls.xy / pos_ls.w * 0.5 + 0.5;
-	float saved_depth = texture(shadow_texture, tc_shadow).r;
+	vec3 pos_shadow = pos_ls.xyz / pos_ls.w * 0.5 + vec3(0.5);
+	float saved_depth = texture(shadow_texture, pos_shadow.xy).r;
 
 	vec3 tex_sand = texture(sand_texture, tc).xyz;
 	vec3 tex_grass = texture(grass_texture, tc).xyz;
@@ -50,18 +50,20 @@ void main() {
 	} else {
 		col = tex_snow;
 	}
+	if(height <= rock_level)
+		col = mix(col, tex_rock, 1.0f - dot(normalize(norm), vec3(0, 1, 0)));
 
 	vec3 v = normalize(cam_pos - pos_w);
 	vec3 light = normalize(light_direction);
 	float vr = max(0, dot(reflect(light, normalize(norm)), v));
 	vec4 amb = vec4(0.2 * col, 1);
-	if(saved_depth < pos_ls.z / pos_ls.w) {
-		color = amb;
-	} else {
+	//if(pos_shadow.z - eta > saved_depth) {
+	//	color = amb;
+	//} else {
 		vec4 diff = vec4(max(0, dot(normalize(norm), -light)) * col, 1);
 		vec4 spec = vec4(0, 0, 0, 1);
 		if(height >= rock_mix_level)
 			spec = vec4(0.3) * pow(vr, 10);
 		color = amb + diff + spec;
-	}
+	//}
 }
