@@ -7,18 +7,20 @@ in vec4 pos;
 in vec2 tc;
 
 layout (location = 0) out vec4 color;
-layout (location = 1) out vec3 normals;
-layout (location = 2) out vec3 position;
-layout (location = 3) out vec4 position_ls;
+layout (location = 1) out float shadow;
+layout (location = 2) out vec4 position;
+layout (location = 4) out vec3 normals;
+layout (location = 5) out float spec;
 
 uniform vec3 cam_pos;
 uniform vec2 near_far;
 uniform vec3 light_direction;
+uniform vec3 shadow_distance;
 uniform sampler2D depth_texture;
-//uniform sampler2D water_texture;
 uniform sampler2D water_dudv_texture;
 uniform sampler2D refraction_texture;
 uniform sampler2D reflection_texture;
+uniform sampler2DShadow shadow_map;
 
 float lin_depth(in float depth, in float near, in float far) {
 	float d = 2.0 * depth - 1.0;
@@ -26,7 +28,9 @@ float lin_depth(in float depth, in float near, in float far) {
 }
 
 void main() {
-	float distortion_factor = 0.02;
+	float shadow_fade_dist = 5;
+	float distortion_factor = 0.007;
+
 	vec2 tex_coord = (pos.xy / pos.w + vec2(1)) / 2;
 	float depth = texture(depth_texture, tex_coord).r;
 	float dist1 = lin_depth(depth, near_far.x, near_far.y);
@@ -42,28 +46,40 @@ void main() {
 	vec2 refl_coord = vec2(tex_coord.x, 1.0 - tex_coord.y);
 	refl_coord += distortion;
 	refl_coord = clamp(refl_coord, 0, 1);
-	vec3 refr_tex = texture(refraction_texture, refr_coord).rgb;
-	vec3 refl_tex = texture(reflection_texture, refl_coord).rgb;
+	vec4 refr_tex = texture(refraction_texture, refr_coord);
+	vec4 refl_tex = texture(reflection_texture, refl_coord);
 
-	//vec4 water_tex = texture(water_texture, tc);
-
-	vec4 refr = vec4(refr_tex, 1);
-	vec4 refl = vec4(refl_tex, 1);
-
-	normals = vec3(0, 1, 0);
-	position = pos_w;
-	position_ls = pos_ls;
+	vec4 refr = vec4(refr_tex.rgb, 1);
+	vec4 refl = vec4(refl_tex.rgb, 1);
 
 	vec3 cam_vec = cam_pos - pos_w;
 	vec3 n = normalize(vec3(0, 1, 0) + vec3(distortion.x, 0, distortion.y) * water_depth);
 	float vr = max(0, dot(reflect(-normalize(light_direction), n), -normalize(cam_vec)));
-	vec3 spec = vec3(0.4) * pow(vr, 10);
+	float fresnell = clamp(pow(dot(normalize(cam_vec), n), 0.5), 0, 1);
+	vec3 sp = vec3(0.4) * pow(vr, 10) * fresnell;
 
-	float fresnell = pow(dot(normalize(cam_vec), n), 0.5);
-	refr = mix(refr, vec4(0, 1, 1, 1), 0.1);
-	vec4 refl_refr = mix(refl, refr, fresnell);
+	refr = mix(refr, vec4(0, 0.5, 0.5, 1), 0.1);
+	refl = mix(refl, vec4(0, 0.5, 0.5, 1), 0.1);
+	vec4 refl_refr = mix(refl, refr, fresnell * (1 - refr_tex.a));
 
-	//color = vec4(mix(refl_refr, water_tex, 0.25).rgb + spec, 0);
-	color = vec4(refl_refr.rgb + spec, 1);
-	color.a = water_depth;
+	float cam_dist = length(cam_pos - pos_w.xyz);
+	cam_dist = clamp(1.0 - ((cam_dist - (shadow_distance.x - shadow_fade_dist)) / shadow_fade_dist), 0, 1);
+	vec3 pos_shadow = pos_ls.xyz;
+	pos_shadow += vec3(distortion, 0);
+	pos_shadow.z -= 0.03;
+	shadow = shadow = 0.0;
+	for(int i = -2; i < 3; i++) {
+		for(int j = -2; j < 3; j++) {
+			shadow += textureOffset(shadow_map, pos_shadow, ivec2(i, j));
+		}
+	}
+	shadow = (1 - shadow / 25) * cam_dist;
+	refl_refr *= max((1 - shadow), 0.8);
+	sp *= (1 - shadow);
+
+	color = vec4(refl_refr.rgb + sp, 1);
+	shadow = 1.0;
+	position = vec4(pos_w, 0);
+	normals = vec3(0, 1, 0);
+	spec = mix(refr_tex.a, refl_tex.a, 0.5);
 }

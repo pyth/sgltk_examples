@@ -7,24 +7,28 @@ in vec3 norm;
 in float height;
 
 layout (location = 0) out vec4 color;
-layout (location = 1) out vec3 normals;
-layout (location = 2) out vec3 position;
-layout (location = 3) out vec4 position_ls;
+layout (location = 1) out float shadow;
+layout (location = 2) out vec4 position;
+layout (location = 3) out vec3 normals;
 layout (location = 4) out float spec;
 
+uniform vec3 cam_pos;
 uniform float sand_level;
 uniform float sand_mix_level;
 uniform float grass_level;
 uniform float grass_mix_level;
 uniform float rock_level;
 uniform float rock_mix_level;
+uniform vec3 shadow_distance;
 uniform sampler2D sand_texture;
 uniform sampler2D grass_texture;
 uniform sampler2D rock_texture;
 uniform sampler2D snow_texture;
+uniform sampler2DShadow shadow_map;
 
 void main() {
 	float eta = 0.0001;
+	float shadow_fade_dist = 5;
 
 	vec4 tex_sand = texture(sand_texture, tc);
 	vec4 tex_grass = texture(grass_texture, tc);
@@ -48,9 +52,20 @@ void main() {
 	}
 	if(height <= rock_level)
 		color = mix(color, tex_rock, 1.0f - dot(normalize(norm), vec3(0, 1, 0)));
+	color.a = 1;
 
-	position = pos_w;
-	position_ls = pos_ls;
+	float cam_dist = length(cam_pos - pos_w.xyz);
+	cam_dist = clamp(1.0 - ((cam_dist - (shadow_distance.x - shadow_fade_dist)) / shadow_fade_dist), 0, 1);
+	vec3 pos_shadow = pos_ls.xyz;
+	pos_shadow.z -= 0.03;
+	shadow = 0.0;
+	for(int i = -2; i < 3; i++) {
+		for(int j = -2; j < 3; j++) {
+			shadow += textureOffset(shadow_map, pos_shadow, ivec2(i, j));
+		}
+	}
+	shadow = (1 - shadow / 25) * cam_dist;
+	position = vec4(pos_w, 1);
 	normals = normalize(norm);
 	if(height > rock_mix_level)
 		spec = 1;

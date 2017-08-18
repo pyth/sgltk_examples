@@ -21,15 +21,15 @@ class Win : public Window {
 	float rock_level;
 	float rock_mix_level;
 
+	glm::vec3 shadow_dist;
 	glm::vec3 light_direction;
 
 	std::vector<glm::vec2> tile_positions;
 
 	glm::vec2 near_far;
-	glm::mat4 light_matrix;
+	std::vector<glm::mat4> light_matrix;
 
 	Texture_2d height_map;
-	Texture_2d water;
 	Texture_2d sand;
 	Texture_2d grass;
 	Texture_2d rock;
@@ -37,19 +37,19 @@ class Win : public Window {
 	Texture_2d color_tex;
 	Texture_2d normal_tex;
 	Texture_2d position_tex;
-	Texture_2d position_ls_tex;
 	Texture_2d spec_tex;
+	Texture_2d depth_tex;
 	Texture_2d refraction_tex;
 	Texture_2d reflection_tex;
 	Texture_2d shadow_tex;
+	std::vector<Texture_2d> shadow_map;
 	Texture_2d water_dudv;
-	Texture_2d depth_tex;
 	Cubemap sky_tex;
 
-	Framebuffer fb_shadow;
+	std::vector<Framebuffer> fb_shadow;
 	Framebuffer fb_refract;
 	Framebuffer fb_reflect;
-	Framebuffer fb_normal;
+	Framebuffer fb_color;
 	Renderbuffer depth_buffer;
 
 	Buffer tile_buffer;
@@ -63,7 +63,6 @@ class Win : public Window {
 	IP_Camera ip_cam;
 	IP_Camera refl_ip_cam;
 	Shader water_shader;
-	Shader water_shadow_shader;
 	Shader terrain_shader;
 	Shader terrain_refr_shader;
 	Shader terrain_refl_shader;
@@ -81,7 +80,8 @@ class Win : public Window {
 	void shadow_pass();
 	void reflect_pass();
 	void refract_pass();
-	void normal_pass();
+	void color_pass();
+	void position_pass();
 	void calculate_shadow_frustum();
 public:
 	Win(const std::string& title, int res_x, int res_y, int offset_x, int offset_y);
@@ -107,6 +107,10 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	set_relative_mode(rel_mode);
 
+	fb_shadow.resize(3);
+	shadow_map.resize(3);
+	light_matrix.resize(3);
+	shadow_dist = glm::vec3(50, 100, 800);
 	light_direction = glm::vec3(-10, -10, -10);
 
 	terrain_max_height = 50.0f;
@@ -150,20 +154,20 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 		//front
 		0, 1, 2, 2, 1, 3,
 		//back
-		4, 5, 6, 6, 5, 7,
+		6, 5, 4, 7, 5, 6,
 		//left
 		4, 0, 6, 6, 0, 2,
 		//right
 		1, 5, 7, 1, 7, 3,
 		//bottom
-		0, 1, 4, 1, 4, 5,
+		0, 4, 1, 1, 4, 5,
 		//top
-		2, 3, 6, 3, 6, 7
+		2, 3, 6, 3, 7, 6
 	};
 
-	camera = P_Camera(glm::vec3(0, 40, 0), glm::vec3(0, 0, -1),
+	camera = P_Camera(glm::vec3(0, 20, 0), glm::vec3(0, 0, -1),
 				 glm::vec3(0, 1, 0), glm::radians(70.f),
-				 (float)width, (float)height, 0.1f, 1000.0f);
+				 (float)width, (float)height, 0.1f, 800.0f);
 
 	near_far = glm::vec2(camera.near_plane, camera.far_plane);
 
@@ -174,9 +178,12 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	reflection_cam.direction[1] *= -1;
 	reflection_cam.update_view_matrix();
 
-	ip_cam = IP_Camera(glm::vec3(0, 40, 0), glm::vec3(0, 0, -1),
+	ip_cam = IP_Camera(glm::vec3(0, 20, 0), glm::vec3(0, 0, -1),
 				 glm::vec3(0, 1, 0), glm::radians(70.f),
 				 (float)width, (float)height, 0.1f);
+
+	shadow_cam = O_Camera(glm::vec3(0), light_direction,
+			      glm::vec3(0, 1, 0), (float)width, (float)height, 0.1, 100);
 
 	refl_ip_cam.position = reflection_cam.position;
 	refl_ip_cam.direction = reflection_cam.direction;
@@ -194,6 +201,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	terrain_shader.attach_file("terrain_fs.glsl", GL_FRAGMENT_SHADER);
 	terrain_shader.link();
 
+	terrain_shader.set_uniform("shadow_distance", shadow_dist);
 	terrain_shader.set_uniform_float("max_height", terrain_max_height);
 	terrain_shader.set_uniform_float("sand_level", sand_level);
 	terrain_shader.set_uniform_float("sand_mix_level", sand_mix_level);
@@ -214,6 +222,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	terrain_refr_shader.attach_file("terrain_refr_fs.glsl", GL_FRAGMENT_SHADER);
 	terrain_refr_shader.link();
 
+	terrain_refr_shader.set_uniform("shadow_distance", shadow_dist);
 	terrain_refr_shader.set_uniform_float("max_height", terrain_max_height);
 	terrain_refr_shader.set_uniform_float("sand_level", sand_level);
 	terrain_refr_shader.set_uniform_float("sand_mix_level", sand_mix_level);
@@ -234,6 +243,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	terrain_refl_shader.attach_file("terrain_refl_fs.glsl", GL_FRAGMENT_SHADER);
 	terrain_refl_shader.link();
 
+	terrain_refl_shader.set_uniform("shadow_distance", shadow_dist);
 	terrain_refl_shader.set_uniform_float("max_height", terrain_max_height);
 	terrain_refl_shader.set_uniform_float("sand_level", sand_level);
 	terrain_refl_shader.set_uniform_float("sand_mix_level", sand_mix_level);
@@ -271,21 +281,16 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	water_shader.attach_file("water_fs.glsl", GL_FRAGMENT_SHADER);
 	water_shader.link();
 
+	water_shader.set_uniform("shadow_distance", shadow_dist);
 	water_shader.set_uniform("near_far", near_far);
 	water_shader.set_uniform("cam_pos", camera.position);
 	water_shader.set_uniform("light_direction", light_direction);
 	water_shader.set_uniform_uint("terrain_side", terrain_side);
 
-	water_shadow_shader.attach_file("water_vs.glsl", GL_VERTEX_SHADER);
-	water_shadow_shader.attach_file("water_shadow_fs.glsl", GL_FRAGMENT_SHADER);
-	water_shadow_shader.link();
-
 	skybox_shader.attach_file("skybox_vs.glsl", GL_VERTEX_SHADER);
 	skybox_shader.attach_file("skybox_fs.glsl", GL_FRAGMENT_SHADER);
 	skybox_shader.link();
 
-	shadow_cam = O_Camera(glm::vec3(20), light_direction,
-			      glm::vec3(0, 1, 0), 2048, 2048, 1, 1000);
 	calculate_shadow_frustum();
 
 	height_map.load("island.jpg");
@@ -294,11 +299,6 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	water_dudv.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	water_dudv.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 	water_dudv.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	water.load("terrain_water.jpg");
-	water.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	water.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	water.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	water.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 	sand.load("terrain_sand.jpg");
 	sand.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	sand.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -327,17 +327,17 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	depth_buffer.set_size(width, height);
 
 	color_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
-	normal_tex.create_empty(width, height, GL_RGB32F, GL_FLOAT, GL_RGB);
-	position_tex.create_empty(width, height, GL_RGB32F, GL_FLOAT, GL_RGB);
-	position_ls_tex.create_empty(width, height, GL_RGBA32F, GL_FLOAT, GL_RGBA);
-	spec_tex.create_empty(width, height, GL_R32F, GL_FLOAT, GL_RED);
-	fb_normal.attach_texture(GL_COLOR_ATTACHMENT0, color_tex);
-	fb_normal.attach_texture(GL_COLOR_ATTACHMENT1, normal_tex);
-	fb_normal.attach_texture(GL_COLOR_ATTACHMENT2, position_tex);
-	fb_normal.attach_texture(GL_COLOR_ATTACHMENT3, position_ls_tex);
-	fb_normal.attach_texture(GL_COLOR_ATTACHMENT4, spec_tex);
-	fb_normal.attach_renderbuffer(GL_DEPTH_ATTACHMENT, depth_buffer);
-	fb_normal.finalize();
+	shadow_tex.create_empty(width, height, GL_R16F, GL_FLOAT, GL_RED);
+	position_tex.create_empty(width, height, GL_RGBA16F, GL_FLOAT, GL_RGBA);
+	normal_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
+	spec_tex.create_empty(width, height, GL_R16F, GL_FLOAT, GL_RED);
+	fb_color.attach_texture(GL_COLOR_ATTACHMENT0, color_tex);
+	fb_color.attach_texture(GL_COLOR_ATTACHMENT1, shadow_tex);
+	fb_color.attach_texture(GL_COLOR_ATTACHMENT2, position_tex);
+	fb_color.attach_texture(GL_COLOR_ATTACHMENT3, normal_tex);
+	fb_color.attach_texture(GL_COLOR_ATTACHMENT4, spec_tex);
+	fb_color.attach_renderbuffer(GL_DEPTH_ATTACHMENT, depth_buffer);
+	fb_color.finalize();
 
 	refraction_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
 	depth_tex.create_empty(width, height, GL_R32F, GL_FLOAT, GL_RED);
@@ -351,20 +351,19 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	fb_reflect.attach_renderbuffer(GL_DEPTH_ATTACHMENT, depth_buffer);
 	fb_reflect.finalize();
 
-	shadow_tex.create_empty(shadow_cam.width, shadow_cam.height, GL_DEPTH_COMPONENT32F, GL_FLOAT, GL_DEPTH_COMPONENT);
-	fb_shadow.attach_texture(GL_DEPTH_ATTACHMENT, shadow_tex);
-	fb_shadow.finalize();
+	shadow_map[0].create_empty(2048, 2048, GL_DEPTH_COMPONENT32F, GL_FLOAT, GL_DEPTH_COMPONENT);
+	shadow_map[0].set_parameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+	fb_shadow[0].attach_texture(GL_DEPTH_ATTACHMENT, shadow_map[0]);
+	fb_shadow[0].finalize();
 
 	display_mesh.model_matrix = glm::rotate((float)(M_PI / 2), glm::vec3(1, 0, 0));
 	display_mesh.setup_shader(&display_shader);
 	display_mesh.setup_camera(&camera);
-	display_mesh.textures_misc.push_back(std::make_pair("shadow_texture", &shadow_tex));
 	display_mesh.textures_misc.push_back(std::make_pair("color_texture", &color_tex));
 	display_mesh.textures_misc.push_back(std::make_pair("normal_texture", &normal_tex));
 	display_mesh.textures_misc.push_back(std::make_pair("position_texture", &position_tex));
-	display_mesh.textures_misc.push_back(std::make_pair("position_ls_texture", &position_ls_tex));
 	display_mesh.textures_misc.push_back(std::make_pair("spec_texture", &spec_tex));
-	display_mesh.textures_misc.push_back(std::make_pair("depth_texture", &depth_tex));
+	display_mesh.textures_misc.push_back(std::make_pair("shadow_texture", &shadow_tex));
 	display_mesh.add_vertex_attribute("pos_in", 4, GL_FLOAT, position);
 	display_mesh.add_vertex_attribute("tc_in", 2, GL_FLOAT, tc);
 	display_mesh.attach_index_buffer(ind);
@@ -387,7 +386,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	terrain_tile.textures_misc.push_back(std::make_pair("grass_texture", &grass));
 	terrain_tile.textures_misc.push_back(std::make_pair("rock_texture", &rock));
 	terrain_tile.textures_misc.push_back(std::make_pair("snow_texture", &snow));
-	terrain_tile.textures_misc.push_back(std::make_pair("shadow_texture", &shadow_tex));
+	terrain_tile.textures_misc.push_back(std::make_pair("shadow_map", &shadow_map[0]));
 
 	float water_size = terrain_side * tile_size * 1.1f;
 	water_mesh.model_matrix = glm::scale(glm::vec3(water_size, 1, water_size));
@@ -397,14 +396,13 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	water_mesh.add_vertex_attribute("pos_in", 4, GL_FLOAT, position);
 	water_mesh.add_vertex_attribute("tc_in", 2, GL_FLOAT, tc);
 	water_mesh.attach_index_buffer(ind);
-	water_mesh.textures_misc.push_back(std::make_pair("water_texture", &water));
 	water_mesh.textures_misc.push_back(std::make_pair("water_dudv_texture", &water_dudv));
-	water_mesh.textures_misc.push_back(std::make_pair("depth_texture", &depth_tex));
 	water_mesh.textures_misc.push_back(std::make_pair("refraction_texture", &refraction_tex));
 	water_mesh.textures_misc.push_back(std::make_pair("reflection_texture", &reflection_tex));
-	water_mesh.textures_misc.push_back(std::make_pair("shadow_texture", &shadow_tex));
+	water_mesh.textures_misc.push_back(std::make_pair("depth_texture", &depth_tex));
+	water_mesh.textures_misc.push_back(std::make_pair("shadow_map", &shadow_map[0]));
 
-	skybox.model_matrix = glm::scale(glm::vec3(terrain_side * tile_size * 0.8f));
+	skybox.model_matrix = glm::scale(glm::vec3(terrain_side * tile_size));
 	skybox.setup_shader(&skybox_shader);
 	skybox.setup_camera(&ip_cam);
 	skybox.add_vertex_attribute("pos_in", 4, GL_FLOAT, skybox_pos);
@@ -418,12 +416,12 @@ Win::~Win() {
 void Win::handle_resize() {
 	glViewport(0, 0, width, height);
 	depth_buffer.set_size(width, height);
+	depth_tex.create_empty(width, height, GL_R32F, GL_FLOAT, GL_R);
+	shadow_tex.create_empty(width, height, GL_R16F, GL_FLOAT, GL_R);
 	color_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
 	normal_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
-	position_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
-	position_ls_tex.create_empty(width, height, GL_RGBA16F, GL_FLOAT, GL_RGBA);
+	position_tex.create_empty(width, height, GL_RGBA16F, GL_FLOAT, GL_RGBA);
 	spec_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
-	depth_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
 	refraction_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
 	reflection_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
 	camera.width = static_cast<float>(width);
@@ -439,73 +437,68 @@ void Win::handle_resize() {
 
 void Win::calculate_shadow_frustum() {
 	std::vector<glm::vec3> frustum_points(8);
-	std::vector<glm::vec4> frustum_points_ls(8);
-	camera.calculate_frustum_points(&frustum_points[0], &frustum_points[1],
-					&frustum_points[2], &frustum_points[3],
-					&frustum_points[4], &frustum_points[5],
-					&frustum_points[6], &frustum_points[7]);
+
+	P_Camera cam = P_Camera(camera);
+	cam.far_plane = 50.0f;
+	cam.update_projection_matrix();
+
+	cam.calculate_frustum_points(&frustum_points[0], &frustum_points[1],
+				     &frustum_points[2], &frustum_points[3],
+				     &frustum_points[4], &frustum_points[5],
+				     &frustum_points[6], &frustum_points[7]);
 
 	glm::vec3 forward = glm::normalize(light_direction);
-	glm::vec3 right = glm::cross(forward, glm::vec3(0, 1, 0));
-	glm::vec3 up = glm::cross(right, forward);
+	glm::vec3 right = normalize(glm::cross(forward, glm::vec3(0, 1, 0)));
+	glm::vec3 up = normalize(glm::cross(right, forward));
 
-	glm::mat4 lm = glm::mat4(glm::vec4(right, 0), glm::vec4(up, 0), glm::vec4(forward, 0), glm::vec4(shadow_cam.position, 1));
+	glm::mat4 lm = glm::lookAt(glm::vec3(0), forward, up);
 	glm::mat4 lm_inv = glm::inverse(lm);
 
 	for(int i = 0; i < 8; i++) {
-		frustum_points_ls[i] = lm * glm::vec4(frustum_points[i], 1);
+		frustum_points[i] = glm::vec3(lm * glm::vec4(frustum_points[i], 1));
 	}
 
-	glm::vec4 min = frustum_points_ls[0];
-	glm::vec4 max = frustum_points_ls[0];
+	glm::vec3 min = frustum_points[0];
+	glm::vec3 max = frustum_points[0];
 
 	for(int i = 1; i < 8; i++) {
 		for(int j = 0; j < 3; j++) {
-			if(frustum_points_ls[i][j] > max[j])
-				max[j] = frustum_points_ls[i][j];
-			else if(frustum_points_ls[i][j] < min[j])
-				min[j] = frustum_points_ls[i][j];
+			if(frustum_points[i][j] > max[j])
+				max[j] = frustum_points[i][j];
+			else if(frustum_points[i][j] < min[j])
+				min[j] = frustum_points[i][j];
 		}
 	}
 
 	shadow_cam.far_plane = abs(max[2] - min[2]);
 	shadow_cam.width = abs(max[0] - min[0]);
 	shadow_cam.height = abs(max[1] - min[1]);
-	shadow_tex.create_empty(shadow_cam.width, shadow_cam.height, GL_DEPTH_COMPONENT, GL_FLOAT, GL_DEPTH_COMPONENT);
-	//std::cout << shadow_cam.far_plane << std::endl;
 
-	glm::vec4 position = 0.5f * (min + max);
-	position -= (0.5f * shadow_cam.far_plane + shadow_cam.near_plane) * glm::vec4(0, 0, 1, 0);
-	position = lm_inv * position;
-	shadow_cam.position = glm::vec3(position);
-	//shadow_cam.position -= (0.5f * shadow_cam.far_plane + shadow_cam.near_plane) * glm::normalize(light_direction);
-	//shadow_cam.position = glm::vec3(30, 30, -30);
+	shadow_cam.position = glm::vec3(lm_inv * glm::vec4(0.5f * (min + max), 1));
 
 	shadow_cam.update_view_matrix();
-	shadow_cam.update_projection_matrix();
+	shadow_cam.projection_matrix = glm::ortho(-0.5f * shadow_cam.width, 0.5f * shadow_cam.width,
+						  -0.5f * shadow_cam.height, 0.5f * shadow_cam.height,
+						  -0.8f * shadow_cam.far_plane, 0.5f * shadow_cam.far_plane);
 
-	light_matrix = shadow_cam.projection_matrix * shadow_cam.view_matrix;
+	light_matrix[0] = shadow_cam.projection_matrix * shadow_cam.view_matrix;
 
 	terrain_shader.set_uniform("light_matrix", false, light_matrix);
 	terrain_refr_shader.set_uniform("light_matrix", false, light_matrix);
 	terrain_refl_shader.set_uniform("light_matrix", false, light_matrix);
 	water_shader.set_uniform("light_matrix", false, light_matrix);
-
-	//std::cout << "cam_pos: " << camera.position[0] << ", " << camera.position[1] << ", " << camera.position[2] << std::endl;
-	//std::cout << "shadow_pos: " << shadow_cam.position[0] << ", " << shadow_cam.position[1] << ", " << shadow_cam.position[2] << std::endl << std::endl;
 }
 
 void Win::shadow_pass() {
+	glViewport(0, 0, shadow_map[0].width, shadow_map[0].height);
 	glClearDepth(1.0);
 	glClear(GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_CLIP_DISTANCE0);
+	glEnable(GL_CULL_FACE);
 
 	terrain_tile.setup_camera(&shadow_cam);
 	terrain_tile.setup_shader(&terrain_shadow_shader);
 	terrain_tile.draw_instanced(GL_PATCHES, tile_positions.size());
-
-	water_mesh.setup_camera(&shadow_cam);
-	water_mesh.setup_shader(&water_shadow_shader);
-	water_mesh.draw(GL_TRIANGLE_STRIP);
 }
 
 void Win::reflect_pass() {
@@ -515,8 +508,10 @@ void Win::reflect_pass() {
 	glEnable(GL_CLIP_DISTANCE0);
 	glDisable(GL_CULL_FACE);
 
+	glDepthMask(GL_FALSE);
 	skybox.setup_camera(&refl_ip_cam);
 	skybox.draw(GL_TRIANGLES);
+	glDepthMask(GL_TRUE);
 
 	terrain_tile.setup_camera(&reflection_cam);
 	terrain_tile.setup_shader(&terrain_refl_shader);
@@ -528,28 +523,31 @@ void Win::refract_pass() {
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_CLIP_DISTANCE0);
+	glEnable(GL_CULL_FACE);
+
 	terrain_tile.setup_camera(&camera);
 	terrain_tile.setup_shader(&terrain_refr_shader);
 	terrain_tile.draw_instanced(GL_PATCHES, tile_positions.size());
 }
 
-void Win::normal_pass() {
+void Win::color_pass() {
 	glClearColor(1, 1, 1, 1);
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_CLIP_DISTANCE0);
+	glEnable(GL_CULL_FACE);
 
+	glDepthMask(GL_FALSE);
 	skybox.setup_camera(&ip_cam);
 	skybox.draw(GL_TRIANGLES);
+	glDepthMask(GL_TRUE);
 
 	terrain_tile.setup_camera(&camera);
-	//terrain_tile.setup_camera(&shadow_cam);
 	terrain_tile.setup_shader(&terrain_shader);
 	terrain_tile.draw_instanced(GL_PATCHES, tile_positions.size());
 
 	water_shader.set_uniform_float("time", time);
 	water_mesh.setup_camera(&camera);
-	//water_mesh.setup_camera(&shadow_cam);
 	water_mesh.setup_shader(&water_shader);
 	water_mesh.draw(GL_TRIANGLE_STRIP);
 }
@@ -568,19 +566,20 @@ void Win::display() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
-	skybox.model_matrix = glm::rotate(glm::radians(0.1f * static_cast<float>(delta_time * 10)),
+	skybox.model_matrix = glm::rotate(glm::radians(static_cast<float>(delta_time * 0.5)),
 			      glm::vec3(0, 1, 0)) * skybox.model_matrix;
 
-	fb_shadow.bind();
+	fb_shadow[0].bind();
 	shadow_pass();
+	glViewport(0, 0, width, height);
 	fb_reflect.bind();
 	reflect_pass();
 	fb_refract.bind();
 	refract_pass();
-	fb_normal.bind();
-	normal_pass();
-	fb_normal.unbind();
-	fb_normal.blit_to(NULL, 0, 0, width, height, 0, 0,
+	fb_color.bind();
+	color_pass();
+	fb_color.unbind();
+	fb_color.blit_to(NULL, 0, 0, width, height, 0, 0,
 			   width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
 	glEnable(GL_CULL_FACE);
@@ -599,9 +598,11 @@ void Win::handle_key_press(const std::string &key, bool pressed) {
 		terrain_refl_shader.recompile();
 		terrain_shadow_shader.recompile();
 		water_shader.recompile();
-		water_shadow_shader.recompile();
 		skybox_shader.recompile();
 
+		calculate_shadow_frustum();
+
+		terrain_shader.set_uniform("shadow_distance", shadow_dist);
 		terrain_shader.set_uniform_float("max_height", terrain_max_height);
 		terrain_shader.set_uniform_float("sand_level", sand_level);
 		terrain_shader.set_uniform_float("sand_mix_level", sand_mix_level);
@@ -612,11 +613,11 @@ void Win::handle_key_press(const std::string &key, bool pressed) {
 		terrain_shader.set_uniform_int("tile_size", tile_size);
 		terrain_shader.set_uniform_uint("terrain_side", terrain_side);
 		terrain_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
-		terrain_shader.set_uniform("light_matrix", false, light_matrix);
 		terrain_shader.set_uniform("cam_pos", camera.position);
 		terrain_shader.set_uniform("light_direction", light_direction);
 		terrain_shader.set_uniform("clip_plane", glm::vec4(0, -1, 0, 0));
 
+		terrain_refr_shader.set_uniform("shadow_distance", shadow_dist);
 		terrain_refr_shader.set_uniform_float("max_height", terrain_max_height);
 		terrain_refr_shader.set_uniform_float("sand_level", sand_level);
 		terrain_refr_shader.set_uniform_float("sand_mix_level", sand_mix_level);
@@ -628,10 +629,10 @@ void Win::handle_key_press(const std::string &key, bool pressed) {
 		terrain_refr_shader.set_uniform_uint("terrain_side", terrain_side);
 		terrain_refr_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
 		terrain_refr_shader.set_uniform("clip_plane", glm::vec4(0, -1, 0, 1.1 * water_height));
-		terrain_refr_shader.set_uniform("light_matrix", false, light_matrix);
 		terrain_refr_shader.set_uniform("cam_pos", camera.position);
 		terrain_refr_shader.set_uniform("light_direction", light_direction);
 
+		terrain_refl_shader.set_uniform("shadow_distance", shadow_dist);
 		terrain_refl_shader.set_uniform_float("max_height", terrain_max_height);
 		terrain_refl_shader.set_uniform_float("sand_level", sand_level);
 		terrain_refl_shader.set_uniform_float("sand_mix_level", sand_mix_level);
@@ -643,7 +644,6 @@ void Win::handle_key_press(const std::string &key, bool pressed) {
 		terrain_refl_shader.set_uniform_uint("terrain_side", terrain_side);
 		terrain_refl_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
 		terrain_refl_shader.set_uniform("clip_plane", glm::vec4(0, 1, 0, -water_height));
-		terrain_refl_shader.set_uniform("light_matrix", false, light_matrix);
 		terrain_refl_shader.set_uniform("cam_pos", camera.position);
 		terrain_refl_shader.set_uniform("light_direction", light_direction);
 
@@ -656,9 +656,9 @@ void Win::handle_key_press(const std::string &key, bool pressed) {
 		display_shader.set_uniform("cam_pos", camera.position);
 		display_shader.set_uniform("light_direction", light_direction);
 
+		water_shader.set_uniform("shadow_distance", shadow_dist);
 		water_shader.set_uniform("near_far", near_far);
 		water_shader.set_uniform("cam_pos", camera.position);
-		water_shader.set_uniform("light_matrix", false, light_matrix);
 		water_shader.set_uniform("light_direction", light_direction);
 		water_shader.set_uniform_uint("terrain_side", terrain_side);
 	} else if(key == "L") {
@@ -713,6 +713,18 @@ void Win::handle_keyboard(const std::string& key) {
 		ip_cam.roll(-rot_speed);
 		reflection_cam.roll(rot_speed);
 		refl_ip_cam.roll(rot_speed);
+		update = true;
+	} else if(key == "Z") {
+		camera.yaw(rot_speed);
+		ip_cam.yaw(rot_speed);
+		reflection_cam.yaw(rot_speed);
+		refl_ip_cam.yaw(rot_speed);
+		update = true;
+	} else if(key == "X") {
+		camera.yaw(-rot_speed);
+		ip_cam.yaw(-rot_speed);
+		reflection_cam.yaw(-rot_speed);
+		refl_ip_cam.yaw(-rot_speed);
 		update = true;
 	}
 	if(update) {
