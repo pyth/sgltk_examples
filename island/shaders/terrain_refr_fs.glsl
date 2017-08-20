@@ -1,10 +1,10 @@
 #version 400
 
 in vec3 pos_w;
-in vec4 pos_ls;
 in vec2 tc;
 in vec3 norm;
 in float height;
+in vec4 pos_ls[3];
 
 layout (location = 0) out vec4 color;
 layout (location = 1) out float depth;
@@ -24,7 +24,9 @@ uniform sampler2D grass_texture;
 uniform sampler2D rock_texture;
 uniform sampler2D snow_texture;
 uniform sampler2D shadow_texture;
-uniform sampler2DShadow shadow_map;
+uniform sampler2DShadow shadow_map_near;
+uniform sampler2DShadow shadow_map_mid;
+uniform sampler2DShadow shadow_map_far;
 
 void main() {
 	vec3 col;
@@ -60,16 +62,20 @@ void main() {
 	vec4 amb = vec4(0.2 * col, 1);
 
 	float cam_dist = length(cam_pos - pos_w.xyz);
-	cam_dist = clamp(1.0 - ((cam_dist - (shadow_distance.x - shadow_fade_dist)) / shadow_fade_dist), 0, 1);
-	vec3 pos_shadow = pos_ls.xyz;
-	pos_shadow.z -= 0.03;
+	float cam_dist0 = clamp(1.0 - ((cam_dist - (shadow_distance.x - shadow_fade_dist)) / shadow_fade_dist), 0, 1);
+	vec3 pos_shadow0 = pos_ls[0].xyz;
+	pos_shadow0.z -= 0.03;
 	float shadow = 0.0;
-	for(int i = -2; i < 3; i++) {
-		for(int j = -2; j < 3; j++) {
-			shadow += textureOffset(shadow_map, pos_shadow, ivec2(i, j));
-		}
-	}
-	shadow = (1 - shadow / 25) * cam_dist;
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, -1));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, 0));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, 1));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, -1));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, 0));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, 1));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, -1));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, 0));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, 1));
+	shadow = (1 - shadow / 9) * cam_dist0;
 
 	vec4 diff = vec4(max(0, dot(normalize(norm), -light)) * col, 1);
 	vec4 spec = vec4(0, 0, 0, 1);

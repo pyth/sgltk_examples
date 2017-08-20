@@ -6,10 +6,10 @@ in vec2 tc_te[];
 in vec2 tc2_te[];
 
 out vec3 pos_w;
-out vec4 pos_ls;
 out vec2 tc;
 out vec3 norm;
 out float height;
+out vec4 pos_ls[3];
 
 uniform vec4 clip_plane;
 uniform mat4 light_matrix[3];
@@ -64,7 +64,10 @@ void main() {
 	vec4 pos = mix(pos0, pos1, gl_TessCoord.y);
 	pos.y += height;
 	pos_w = pos.xyz;
-	pos_ls = 0.5f * (light_matrix[0] * pos) + vec4(vec3(0.5), 0);
+
+	for(int i = 0; i < 3; i++) {
+		pos_ls[i] = 0.5f * (light_matrix[i] * pos) + vec4(vec3(0.5), 0);
+	}
 
 	gl_Position = view_proj_matrix *  pos;
 

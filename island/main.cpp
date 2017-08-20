@@ -59,7 +59,7 @@ class Win : public Window {
 	Mesh skybox;
 	P_Camera camera;
 	P_Camera reflection_cam;
-	O_Camera shadow_cam;
+	std::vector<O_Camera> shadow_cam;
 	IP_Camera ip_cam;
 	IP_Camera refl_ip_cam;
 	Shader water_shader;
@@ -109,8 +109,8 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	fb_shadow.resize(3);
 	shadow_map.resize(3);
+	shadow_cam.resize(3);
 	light_matrix.resize(3);
-	shadow_dist = glm::vec3(50, 100, 800);
 	light_direction = glm::vec3(-10, -10, -10);
 
 	terrain_max_height = 50.0f;
@@ -170,6 +170,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 				 (float)width, (float)height, 0.1f, 800.0f);
 
 	near_far = glm::vec2(camera.near_plane, camera.far_plane);
+	shadow_dist = glm::vec3(50, 100, camera.far_plane);
 
 	reflection_cam = P_Camera(camera);
 	reflection_cam.position = camera.position;
@@ -182,8 +183,10 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 				 glm::vec3(0, 1, 0), glm::radians(70.f),
 				 (float)width, (float)height, 0.1f);
 
-	shadow_cam = O_Camera(glm::vec3(0), light_direction,
-			      glm::vec3(0, 1, 0), (float)width, (float)height, 0.1, 100);
+	for(unsigned int i = 0; i < shadow_cam.size(); i++) {
+		shadow_cam[i] = O_Camera(glm::vec3(0), light_direction,
+					 glm::vec3(0, 1, 0), (float)width, (float)height, 0.1, 100);
+	}
 
 	refl_ip_cam.position = reflection_cam.position;
 	refl_ip_cam.direction = reflection_cam.direction;
@@ -351,10 +354,19 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	fb_reflect.attach_renderbuffer(GL_DEPTH_ATTACHMENT, depth_buffer);
 	fb_reflect.finalize();
 
-	shadow_map[0].create_empty(2048, 2048, GL_DEPTH_COMPONENT32F, GL_FLOAT, GL_DEPTH_COMPONENT);
+	shadow_map[0].create_empty(4096, 4096, GL_DEPTH_COMPONENT32F, GL_FLOAT, GL_DEPTH_COMPONENT);
 	shadow_map[0].set_parameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+	shadow_map[1].create_empty(4096, 4096, GL_DEPTH_COMPONENT32F, GL_FLOAT, GL_DEPTH_COMPONENT);
+	shadow_map[1].set_parameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+	shadow_map[2].create_empty(4096, 4096, GL_DEPTH_COMPONENT32F, GL_FLOAT, GL_DEPTH_COMPONENT);
+	shadow_map[2].set_parameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+
 	fb_shadow[0].attach_texture(GL_DEPTH_ATTACHMENT, shadow_map[0]);
 	fb_shadow[0].finalize();
+	fb_shadow[1].attach_texture(GL_DEPTH_ATTACHMENT, shadow_map[1]);
+	fb_shadow[1].finalize();
+	fb_shadow[2].attach_texture(GL_DEPTH_ATTACHMENT, shadow_map[2]);
+	fb_shadow[2].finalize();
 
 	display_mesh.model_matrix = glm::rotate((float)(M_PI / 2), glm::vec3(1, 0, 0));
 	display_mesh.setup_shader(&display_shader);
@@ -386,7 +398,9 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	terrain_tile.textures_misc.push_back(std::make_pair("grass_texture", &grass));
 	terrain_tile.textures_misc.push_back(std::make_pair("rock_texture", &rock));
 	terrain_tile.textures_misc.push_back(std::make_pair("snow_texture", &snow));
-	terrain_tile.textures_misc.push_back(std::make_pair("shadow_map", &shadow_map[0]));
+	terrain_tile.textures_misc.push_back(std::make_pair("shadow_map_near", &shadow_map[0]));
+	terrain_tile.textures_misc.push_back(std::make_pair("shadow_map_mid", &shadow_map[1]));
+	terrain_tile.textures_misc.push_back(std::make_pair("shadow_map_far", &shadow_map[2]));
 
 	float water_size = terrain_side * tile_size * 1.1f;
 	water_mesh.model_matrix = glm::scale(glm::vec3(water_size, 1, water_size));
@@ -400,7 +414,9 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	water_mesh.textures_misc.push_back(std::make_pair("refraction_texture", &refraction_tex));
 	water_mesh.textures_misc.push_back(std::make_pair("reflection_texture", &reflection_tex));
 	water_mesh.textures_misc.push_back(std::make_pair("depth_texture", &depth_tex));
-	water_mesh.textures_misc.push_back(std::make_pair("shadow_map", &shadow_map[0]));
+	water_mesh.textures_misc.push_back(std::make_pair("shadow_map_near", &shadow_map[0]));
+	water_mesh.textures_misc.push_back(std::make_pair("shadow_map_mid", &shadow_map[1]));
+	water_mesh.textures_misc.push_back(std::make_pair("shadow_map_far", &shadow_map[2]));
 
 	skybox.model_matrix = glm::scale(glm::vec3(terrain_side * tile_size));
 	skybox.setup_shader(&skybox_shader);
@@ -436,52 +452,65 @@ void Win::handle_resize() {
 }
 
 void Win::calculate_shadow_frustum() {
+	std::vector<P_Camera> cams(3);
 	std::vector<glm::vec3> frustum_points(8);
 
-	P_Camera cam = P_Camera(camera);
-	cam.far_plane = 50.0f;
-	cam.update_projection_matrix();
+	cams[0] = P_Camera(camera);
+	cams[0].far_plane = shadow_dist[0];
+	cams[0].update_projection_matrix();
 
-	cam.calculate_frustum_points(&frustum_points[0], &frustum_points[1],
-				     &frustum_points[2], &frustum_points[3],
-				     &frustum_points[4], &frustum_points[5],
-				     &frustum_points[6], &frustum_points[7]);
+	cams[1] = P_Camera(camera);
+	cams[1].near_plane = shadow_dist[0];
+	cams[1].far_plane = shadow_dist[1];
+	cams[1].update_projection_matrix();
 
-	glm::vec3 forward = glm::normalize(light_direction);
-	glm::vec3 right = normalize(glm::cross(forward, glm::vec3(0, 1, 0)));
-	glm::vec3 up = normalize(glm::cross(right, forward));
+	cams[2] = P_Camera(camera);
+	cams[2].near_plane = shadow_dist[1];
+	cams[2].far_plane = shadow_dist[2];
+	cams[2].update_projection_matrix();
 
-	glm::mat4 lm = glm::lookAt(glm::vec3(0), forward, up);
-	glm::mat4 lm_inv = glm::inverse(lm);
+	for(unsigned int i = 0; i < cams.size(); i++) {
+		cams[i].calculate_frustum_points(&frustum_points[0], &frustum_points[1],
+						 &frustum_points[2], &frustum_points[3],
+						 &frustum_points[4], &frustum_points[5],
+						 &frustum_points[6], &frustum_points[7]);
 
-	for(int i = 0; i < 8; i++) {
-		frustum_points[i] = glm::vec3(lm * glm::vec4(frustum_points[i], 1));
-	}
+		glm::vec3 forward = glm::normalize(light_direction);
+		glm::vec3 right = normalize(glm::cross(forward, glm::vec3(0, 1, 0)));
+		glm::vec3 up = normalize(glm::cross(right, forward));
 
-	glm::vec3 min = frustum_points[0];
-	glm::vec3 max = frustum_points[0];
+		glm::mat4 lm = glm::lookAt(glm::vec3(0), forward, up);
+		glm::mat4 lm_inv = glm::inverse(lm);
 
-	for(int i = 1; i < 8; i++) {
-		for(int j = 0; j < 3; j++) {
-			if(frustum_points[i][j] > max[j])
-				max[j] = frustum_points[i][j];
-			else if(frustum_points[i][j] < min[j])
-				min[j] = frustum_points[i][j];
+		for(int i = 0; i < 8; i++) {
+			frustum_points[i] = glm::vec3(lm * glm::vec4(frustum_points[i], 1));
 		}
+
+		glm::vec3 min = frustum_points[0];
+		glm::vec3 max = frustum_points[0];
+
+		for(int i = 1; i < 8; i++) {
+			for(int j = 0; j < 3; j++) {
+				if(frustum_points[i][j] > max[j])
+					max[j] = frustum_points[i][j];
+				else if(frustum_points[i][j] < min[j])
+					min[j] = frustum_points[i][j];
+			}
+		}
+
+		shadow_cam[i].far_plane = abs(max[2] - min[2]);
+		shadow_cam[i].width = abs(max[0] - min[0]);
+		shadow_cam[i].height = abs(max[1] - min[1]);
+
+		shadow_cam[i].position = glm::vec3(lm_inv * glm::vec4(0.5f * (min + max), 1));
+
+		shadow_cam[i].update_view_matrix();
+		shadow_cam[i].projection_matrix = glm::ortho(-0.5f * shadow_cam[i].width, 0.5f * shadow_cam[i].width,
+							     -0.5f * shadow_cam[i].height, 0.5f * shadow_cam[i].height,
+							     -0.8f * shadow_cam[i].far_plane, 0.5f * shadow_cam[i].far_plane);
+
+		light_matrix[i] = shadow_cam[i].projection_matrix * shadow_cam[i].view_matrix;
 	}
-
-	shadow_cam.far_plane = abs(max[2] - min[2]);
-	shadow_cam.width = abs(max[0] - min[0]);
-	shadow_cam.height = abs(max[1] - min[1]);
-
-	shadow_cam.position = glm::vec3(lm_inv * glm::vec4(0.5f * (min + max), 1));
-
-	shadow_cam.update_view_matrix();
-	shadow_cam.projection_matrix = glm::ortho(-0.5f * shadow_cam.width, 0.5f * shadow_cam.width,
-						  -0.5f * shadow_cam.height, 0.5f * shadow_cam.height,
-						  -0.8f * shadow_cam.far_plane, 0.5f * shadow_cam.far_plane);
-
-	light_matrix[0] = shadow_cam.projection_matrix * shadow_cam.view_matrix;
 
 	terrain_shader.set_uniform("light_matrix", false, light_matrix);
 	terrain_refr_shader.set_uniform("light_matrix", false, light_matrix);
@@ -490,15 +519,18 @@ void Win::calculate_shadow_frustum() {
 }
 
 void Win::shadow_pass() {
-	glViewport(0, 0, shadow_map[0].width, shadow_map[0].height);
-	glClearDepth(1.0);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glDisable(GL_CLIP_DISTANCE0);
-	glEnable(GL_CULL_FACE);
+	for(unsigned int i = 0; i < shadow_map.size(); i++) {
+		fb_shadow[i].bind();
+		glViewport(0, 0, shadow_map[i].width, shadow_map[i].height);
+		glClearDepth(1.0);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glDisable(GL_CLIP_DISTANCE0);
+		glEnable(GL_CULL_FACE);
 
-	terrain_tile.setup_camera(&shadow_cam);
-	terrain_tile.setup_shader(&terrain_shadow_shader);
-	terrain_tile.draw_instanced(GL_PATCHES, tile_positions.size());
+		terrain_tile.setup_camera(&shadow_cam[i]);
+		terrain_tile.setup_shader(&terrain_shadow_shader);
+		terrain_tile.draw_instanced(GL_PATCHES, tile_positions.size());
+	}
 }
 
 void Win::reflect_pass() {
@@ -569,7 +601,6 @@ void Win::display() {
 	skybox.model_matrix = glm::rotate(glm::radians(static_cast<float>(delta_time * 0.5)),
 			      glm::vec3(0, 1, 0)) * skybox.model_matrix;
 
-	fb_shadow[0].bind();
 	shadow_pass();
 	glViewport(0, 0, width, height);
 	fb_reflect.bind();

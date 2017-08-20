@@ -2,9 +2,9 @@
 
 in vec3 cam_vec;
 in vec3 pos_w;
-in vec4 pos_ls;
 in vec4 pos;
 in vec2 tc;
+in vec4 pos_ls[3];
 
 layout (location = 0) out vec4 color;
 layout (location = 1) out float shadow;
@@ -20,7 +20,9 @@ uniform sampler2D depth_texture;
 uniform sampler2D water_dudv_texture;
 uniform sampler2D refraction_texture;
 uniform sampler2D reflection_texture;
-uniform sampler2DShadow shadow_map;
+uniform sampler2DShadow shadow_map_near;
+uniform sampler2DShadow shadow_map_mid;
+uniform sampler2DShadow shadow_map_far;
 
 float lin_depth(in float depth, in float near, in float far) {
 	float d = 2.0 * depth - 1.0;
@@ -63,17 +65,20 @@ void main() {
 	vec4 refl_refr = mix(refl, refr, fresnell * (1 - refr_tex.a));
 
 	float cam_dist = length(cam_pos - pos_w.xyz);
-	cam_dist = clamp(1.0 - ((cam_dist - (shadow_distance.x - shadow_fade_dist)) / shadow_fade_dist), 0, 1);
-	vec3 pos_shadow = pos_ls.xyz;
-	pos_shadow += vec3(distortion, 0);
-	pos_shadow.z -= 0.03;
-	shadow = shadow = 0.0;
-	for(int i = -2; i < 3; i++) {
-		for(int j = -2; j < 3; j++) {
-			shadow += textureOffset(shadow_map, pos_shadow, ivec2(i, j));
-		}
-	}
-	shadow = (1 - shadow / 25) * cam_dist;
+	float cam_dist0 = clamp(1.0 - ((cam_dist - (shadow_distance.x - shadow_fade_dist)) / shadow_fade_dist), 0, 1);
+	vec3 pos_shadow0 = pos_ls[0].xyz;
+	pos_shadow0 += vec3(distortion, -0.03);
+	shadow = 0.0;
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, -1));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, 0));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, 1));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, -1));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, 0));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, 1));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, -1));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, 0));
+	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, 1));
+	shadow = (1 - shadow / 9) * cam_dist0;
 	refl_refr *= max((1 - shadow), 0.8);
 	sp *= (1 - shadow);
 
