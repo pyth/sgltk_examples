@@ -57,22 +57,53 @@ void main() {
 	color.a = 1;
 
 	float cam_dist = length(cam_pos - pos_w.xyz);
+	//float fade_factor = clamp(1.0 - ((cam_dist - (shadow_distance.z - shadow_fade_dist)) / shadow_fade_dist), 0, 1);
 
-	float cam_dist0 = clamp(1.0 - ((cam_dist - (shadow_distance.x - shadow_fade_dist)) / shadow_fade_dist), 0, 1);
 	vec3 pos_shadow0 = pos_ls[0].xyz;
-	pos_shadow0.z -= 0.03;
+	pos_shadow0.z -= 0.035;
+
+	vec3 pos_shadow1 = pos_ls[1].xyz;
+	pos_shadow1.z -= 0.01;
+
+	vec3 pos_shadow2 = pos_ls[2].xyz;
+	pos_shadow2.z -= 0.002;
 
 	shadow = 0.0;
-	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, -1));
-	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, 0));
-	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, 1));
-	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, -1));
-	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, 0));
-	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, 1));
-	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, -1));
-	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, 0));
-	shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, 1));
-	shadow = (1 - shadow / 9) * cam_dist0;
+	if(cam_dist <= shadow_distance.x) {
+		//color = vec4(1,0,0,1);
+		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, -1));
+		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, 0));
+		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, 1));
+		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, -1));
+		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, 0));
+		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, 1));
+		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, -1));
+		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, 0));
+		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, 1));
+	} else if(cam_dist <= shadow_distance.y) {
+		//color = vec4(0,1,0,1);
+		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(-1, -1));
+		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(-1, 0));
+		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(-1, 1));
+		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(0, -1));
+		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(0, 0));
+		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(0, 1));
+		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(1, -1));
+		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(1, 0));
+		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(1, 1));
+	} else {
+		//color = vec4(0,0,1,1);
+		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(-1, -1));
+		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(-1, 0));
+		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(-1, 1));
+		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(0, -1));
+		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(0, 0));
+		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(0, 1));
+		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(1, -1));
+		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(1, 0));
+		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(1, 1));
+	}
+	shadow = shadow / 9;
 
 	position = vec4(pos_w, 1);
 	normals = normalize(norm);

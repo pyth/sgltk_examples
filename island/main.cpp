@@ -170,7 +170,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 				 (float)width, (float)height, 0.1f, 800.0f);
 
 	near_far = glm::vec2(camera.near_plane, camera.far_plane);
-	shadow_dist = glm::vec3(50, 100, camera.far_plane);
+	shadow_dist = glm::vec3(40, 200, camera.far_plane);
 
 	reflection_cam = P_Camera(camera);
 	reflection_cam.position = camera.position;
@@ -354,12 +354,22 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	fb_reflect.attach_renderbuffer(GL_DEPTH_ATTACHMENT, depth_buffer);
 	fb_reflect.finalize();
 
+	float tex_color[] = {1.0f, 0.0f, 0.0f, 1.0f};
 	shadow_map[0].create_empty(4096, 4096, GL_DEPTH_COMPONENT32F, GL_FLOAT, GL_DEPTH_COMPONENT);
 	shadow_map[0].set_parameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+	shadow_map[0].set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	shadow_map[0].set_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	shadow_map[0].set_parameter(GL_TEXTURE_BORDER_COLOR, tex_color);
 	shadow_map[1].create_empty(4096, 4096, GL_DEPTH_COMPONENT32F, GL_FLOAT, GL_DEPTH_COMPONENT);
 	shadow_map[1].set_parameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+	shadow_map[1].set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	shadow_map[1].set_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	shadow_map[1].set_parameter(GL_TEXTURE_BORDER_COLOR, tex_color);
 	shadow_map[2].create_empty(4096, 4096, GL_DEPTH_COMPONENT32F, GL_FLOAT, GL_DEPTH_COMPONENT);
 	shadow_map[2].set_parameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+	shadow_map[2].set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	shadow_map[2].set_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	shadow_map[2].set_parameter(GL_TEXTURE_BORDER_COLOR, tex_color);
 
 	fb_shadow[0].attach_texture(GL_DEPTH_ATTACHMENT, shadow_map[0]);
 	fb_shadow[0].finalize();
@@ -466,48 +476,10 @@ void Win::calculate_shadow_frustum() {
 
 	cams[2] = P_Camera(camera);
 	cams[2].near_plane = shadow_dist[1];
-	cams[2].far_plane = shadow_dist[2];
 	cams[2].update_projection_matrix();
 
 	for(unsigned int i = 0; i < cams.size(); i++) {
-		cams[i].calculate_frustum_points(&frustum_points[0], &frustum_points[1],
-						 &frustum_points[2], &frustum_points[3],
-						 &frustum_points[4], &frustum_points[5],
-						 &frustum_points[6], &frustum_points[7]);
-
-		glm::vec3 forward = glm::normalize(light_direction);
-		glm::vec3 right = normalize(glm::cross(forward, glm::vec3(0, 1, 0)));
-		glm::vec3 up = normalize(glm::cross(right, forward));
-
-		glm::mat4 lm = glm::lookAt(glm::vec3(0), forward, up);
-		glm::mat4 lm_inv = glm::inverse(lm);
-
-		for(int i = 0; i < 8; i++) {
-			frustum_points[i] = glm::vec3(lm * glm::vec4(frustum_points[i], 1));
-		}
-
-		glm::vec3 min = frustum_points[0];
-		glm::vec3 max = frustum_points[0];
-
-		for(int i = 1; i < 8; i++) {
-			for(int j = 0; j < 3; j++) {
-				if(frustum_points[i][j] > max[j])
-					max[j] = frustum_points[i][j];
-				else if(frustum_points[i][j] < min[j])
-					min[j] = frustum_points[i][j];
-			}
-		}
-
-		shadow_cam[i].far_plane = abs(max[2] - min[2]);
-		shadow_cam[i].width = abs(max[0] - min[0]);
-		shadow_cam[i].height = abs(max[1] - min[1]);
-
-		shadow_cam[i].position = glm::vec3(lm_inv * glm::vec4(0.5f * (min + max), 1));
-
-		shadow_cam[i].update_view_matrix();
-		shadow_cam[i].projection_matrix = glm::ortho(-0.5f * shadow_cam[i].width, 0.5f * shadow_cam[i].width,
-							     -0.5f * shadow_cam[i].height, 0.5f * shadow_cam[i].height,
-							     -0.8f * shadow_cam[i].far_plane, 0.5f * shadow_cam[i].far_plane);
+		shadow_cam[i].calculate_bounding_frustum(cams[i], light_direction, terrain_max_height * (i + 1));
 
 		light_matrix[i] = shadow_cam[i].projection_matrix * shadow_cam[i].view_matrix;
 	}
@@ -525,7 +497,6 @@ void Win::shadow_pass() {
 		glClearDepth(1.0);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_CLIP_DISTANCE0);
-		glEnable(GL_CULL_FACE);
 
 		terrain_tile.setup_camera(&shadow_cam[i]);
 		terrain_tile.setup_shader(&terrain_shadow_shader);
@@ -534,7 +505,7 @@ void Win::shadow_pass() {
 }
 
 void Win::reflect_pass() {
-	glClearColor(0, 1, 1, 1);
+	glClearColor(1, 1, 1, 1);
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_CLIP_DISTANCE0);
@@ -551,7 +522,7 @@ void Win::reflect_pass() {
 }
 
 void Win::refract_pass() {
-	glClearColor(0, 1, 1, 1);
+	glClearColor(1, 1, 1, 1);
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_CLIP_DISTANCE0);
@@ -586,7 +557,7 @@ void Win::color_pass() {
 
 void Win::display() {
 	time = timer.get_time_s();
-	glClearColor(0, 1, 1, 1);
+	glClearColor(1, 1, 1, 1);
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

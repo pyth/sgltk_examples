@@ -29,6 +29,7 @@ void main() {
 		vec4 diff = vec4(col.rgb * ln, col.a);
 		float vr = max(0, dot(reflect(l, norm), v));
 		vec4 spec = 0.3 * sp * vec4(vec3(1), col.a) * pow(vr, 2);
-		color = amb + (1 - shadow) * (diff + spec);
+		color = amb + shadow * (diff + spec);
+		//color = vec4(shadow);
 	}
 }
