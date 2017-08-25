@@ -30,6 +30,5 @@ void main() {
 		float vr = max(0, dot(reflect(l, norm), v));
 		vec4 spec = 0.3 * sp * vec4(vec3(1), col.a) * pow(vr, 2);
 		color = amb + shadow * (diff + spec);
-		//color = vec4(shadow);
 	}
 }

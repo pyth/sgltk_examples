@@ -42,11 +42,11 @@ class Win : public Window {
 	Texture_2d refraction_tex;
 	Texture_2d reflection_tex;
 	Texture_2d shadow_tex;
-	std::vector<Texture_2d> shadow_map;
+	Texture_2d_Array shadow_map;
 	Texture_2d water_dudv;
 	Cubemap sky_tex;
 
-	std::vector<Framebuffer> fb_shadow;
+	Framebuffer fb_shadow;
 	Framebuffer fb_refract;
 	Framebuffer fb_reflect;
 	Framebuffer fb_color;
@@ -107,8 +107,6 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	set_relative_mode(rel_mode);
 
-	fb_shadow.resize(3);
-	shadow_map.resize(3);
 	shadow_cam.resize(3);
 	light_matrix.resize(3);
 	light_direction = glm::vec3(-10, -10, -10);
@@ -264,6 +262,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	terrain_shadow_shader.attach_file("terrain_vs.glsl", GL_VERTEX_SHADER);
 	terrain_shadow_shader.attach_file("terrain_tc.glsl", GL_TESS_CONTROL_SHADER);
 	terrain_shadow_shader.attach_file("terrain_te.glsl", GL_TESS_EVALUATION_SHADER);
+	terrain_shadow_shader.attach_file("terrain_shadow_gs.glsl", GL_GEOMETRY_SHADER);
 	terrain_shadow_shader.attach_file("terrain_shadow_fs.glsl", GL_FRAGMENT_SHADER);
 	terrain_shadow_shader.link();
 
@@ -272,6 +271,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	terrain_shadow_shader.set_uniform_uint("terrain_side", terrain_side);
 	terrain_shadow_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
 	terrain_shadow_shader.set_uniform("cam_pos", camera.position);
+	terrain_shadow_shader.set_uniform("light_direction", light_direction);
 
 	display_shader.attach_file("display_vs.glsl", GL_VERTEX_SHADER);
 	display_shader.attach_file("display_fs.glsl", GL_FRAGMENT_SHADER);
@@ -355,28 +355,14 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	fb_reflect.finalize();
 
 	float tex_color[] = {1.0f, 0.0f, 0.0f, 1.0f};
-	shadow_map[0].create_empty(4096, 4096, GL_DEPTH_COMPONENT32F, GL_FLOAT, GL_DEPTH_COMPONENT);
-	shadow_map[0].set_parameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-	shadow_map[0].set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	shadow_map[0].set_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	shadow_map[0].set_parameter(GL_TEXTURE_BORDER_COLOR, tex_color);
-	shadow_map[1].create_empty(4096, 4096, GL_DEPTH_COMPONENT32F, GL_FLOAT, GL_DEPTH_COMPONENT);
-	shadow_map[1].set_parameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-	shadow_map[1].set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	shadow_map[1].set_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	shadow_map[1].set_parameter(GL_TEXTURE_BORDER_COLOR, tex_color);
-	shadow_map[2].create_empty(4096, 4096, GL_DEPTH_COMPONENT32F, GL_FLOAT, GL_DEPTH_COMPONENT);
-	shadow_map[2].set_parameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-	shadow_map[2].set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	shadow_map[2].set_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	shadow_map[2].set_parameter(GL_TEXTURE_BORDER_COLOR, tex_color);
+	shadow_map.create_empty(4096, 4096, 3, GL_DEPTH_COMPONENT32F, GL_FLOAT, GL_DEPTH_COMPONENT);
+	shadow_map.set_parameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+	shadow_map.set_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	shadow_map.set_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	shadow_map.set_parameter(GL_TEXTURE_BORDER_COLOR, tex_color);
 
-	fb_shadow[0].attach_texture(GL_DEPTH_ATTACHMENT, shadow_map[0]);
-	fb_shadow[0].finalize();
-	fb_shadow[1].attach_texture(GL_DEPTH_ATTACHMENT, shadow_map[1]);
-	fb_shadow[1].finalize();
-	fb_shadow[2].attach_texture(GL_DEPTH_ATTACHMENT, shadow_map[2]);
-	fb_shadow[2].finalize();
+	fb_shadow.attach_texture(GL_DEPTH_ATTACHMENT, shadow_map);
+	fb_shadow.finalize();
 
 	display_mesh.model_matrix = glm::rotate((float)(M_PI / 2), glm::vec3(1, 0, 0));
 	display_mesh.setup_shader(&display_shader);
@@ -408,9 +394,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	terrain_tile.textures_misc.push_back(std::make_pair("grass_texture", &grass));
 	terrain_tile.textures_misc.push_back(std::make_pair("rock_texture", &rock));
 	terrain_tile.textures_misc.push_back(std::make_pair("snow_texture", &snow));
-	terrain_tile.textures_misc.push_back(std::make_pair("shadow_map_near", &shadow_map[0]));
-	terrain_tile.textures_misc.push_back(std::make_pair("shadow_map_mid", &shadow_map[1]));
-	terrain_tile.textures_misc.push_back(std::make_pair("shadow_map_far", &shadow_map[2]));
+	terrain_tile.textures_misc.push_back(std::make_pair("shadow_map", &shadow_map));
 
 	float water_size = terrain_side * tile_size * 1.1f;
 	water_mesh.model_matrix = glm::scale(glm::vec3(water_size, 1, water_size));
@@ -424,9 +408,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	water_mesh.textures_misc.push_back(std::make_pair("refraction_texture", &refraction_tex));
 	water_mesh.textures_misc.push_back(std::make_pair("reflection_texture", &reflection_tex));
 	water_mesh.textures_misc.push_back(std::make_pair("depth_texture", &depth_tex));
-	water_mesh.textures_misc.push_back(std::make_pair("shadow_map_near", &shadow_map[0]));
-	water_mesh.textures_misc.push_back(std::make_pair("shadow_map_mid", &shadow_map[1]));
-	water_mesh.textures_misc.push_back(std::make_pair("shadow_map_far", &shadow_map[2]));
+	water_mesh.textures_misc.push_back(std::make_pair("shadow_map", &shadow_map));
 
 	skybox.model_matrix = glm::scale(glm::vec3(terrain_side * tile_size));
 	skybox.setup_shader(&skybox_shader);
@@ -487,21 +469,20 @@ void Win::calculate_shadow_frustum() {
 	terrain_shader.set_uniform("light_matrix", false, light_matrix);
 	terrain_refr_shader.set_uniform("light_matrix", false, light_matrix);
 	terrain_refl_shader.set_uniform("light_matrix", false, light_matrix);
+	terrain_shadow_shader.set_uniform("light_matrix", false, light_matrix);
 	water_shader.set_uniform("light_matrix", false, light_matrix);
 }
 
 void Win::shadow_pass() {
-	for(unsigned int i = 0; i < shadow_map.size(); i++) {
-		fb_shadow[i].bind();
-		glViewport(0, 0, shadow_map[i].width, shadow_map[i].height);
-		glClearDepth(1.0);
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glDisable(GL_CLIP_DISTANCE0);
+	fb_shadow.bind();
+	glViewport(0, 0, shadow_map.width, shadow_map.height);
+	glClearDepth(1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_CLIP_DISTANCE0);
 
-		terrain_tile.setup_camera(&shadow_cam[i]);
-		terrain_tile.setup_shader(&terrain_shadow_shader);
-		terrain_tile.draw_instanced(GL_PATCHES, tile_positions.size());
-	}
+	terrain_tile.setup_camera(&shadow_cam[0]);
+	terrain_tile.setup_shader(&terrain_shadow_shader);
+	terrain_tile.draw_instanced(GL_PATCHES, tile_positions.size());
 }
 
 void Win::reflect_pass() {
@@ -654,6 +635,7 @@ void Win::handle_key_press(const std::string &key, bool pressed) {
 		terrain_shadow_shader.set_uniform_uint("terrain_side", terrain_side);
 		terrain_shadow_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
 		terrain_shadow_shader.set_uniform("cam_pos", camera.position);
+		terrain_shadow_shader.set_uniform("light_direction", light_direction);
 
 		display_shader.set_uniform("cam_pos", camera.position);
 		display_shader.set_uniform("light_direction", light_direction);

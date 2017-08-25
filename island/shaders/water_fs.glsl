@@ -20,9 +20,7 @@ uniform sampler2D depth_texture;
 uniform sampler2D water_dudv_texture;
 uniform sampler2D refraction_texture;
 uniform sampler2D reflection_texture;
-uniform sampler2DShadow shadow_map_near;
-uniform sampler2DShadow shadow_map_mid;
-uniform sampler2DShadow shadow_map_far;
+uniform sampler2DArrayShadow shadow_map;
 
 float lin_depth(in float depth, in float near, in float far) {
 	float d = 2.0 * depth - 1.0;
@@ -66,46 +64,46 @@ void main() {
 
 	float cam_dist = length(cam_pos - pos_w.xyz);
 
-	vec3 pos_shadow0 = pos_ls[0].xyz;
-	pos_shadow0 += vec3(distortion * 0.1, -0.035);
+	vec4 pos_shadow0 = vec4(pos_ls[0].xy, 0, pos_ls[0].z);
+	pos_shadow0 += vec4(distortion * 0.1, 0, -0.035);
 
-	vec3 pos_shadow1 = pos_ls[1].xyz;
-	pos_shadow1 += vec3(distortion * 0.1, -0.01);
+	vec4 pos_shadow1 = vec4(pos_ls[1].xy, 1, pos_ls[1].z);
+	pos_shadow1 += vec4(distortion * 0.1, 0, -0.01);
 
-	vec3 pos_shadow2 = pos_ls[2].xyz;
-	pos_shadow2 += vec3(distortion * 0.1, -0.002);
+	vec4 pos_shadow2 = vec4(pos_ls[2].xy, 2, pos_ls[2].z);
+	pos_shadow2 += vec4(distortion * 0.1, 0, -0.002);
 
 	shadow = 0.0;
 	if(cam_dist <= shadow_distance.x) {
-		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, -1));
-		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, 0));
-		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(-1, 1));
-		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, -1));
-		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, 0));
-		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(0, 1));
-		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, -1));
-		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, 0));
-		shadow += textureOffset(shadow_map_near, pos_shadow0, ivec2(1, 1));
+		shadow += textureOffset(shadow_map, pos_shadow0, ivec2(-1, -1));
+		shadow += textureOffset(shadow_map, pos_shadow0, ivec2(-1, 0));
+		shadow += textureOffset(shadow_map, pos_shadow0, ivec2(-1, 1));
+		shadow += textureOffset(shadow_map, pos_shadow0, ivec2(0, -1));
+		shadow += textureOffset(shadow_map, pos_shadow0, ivec2(0, 0));
+		shadow += textureOffset(shadow_map, pos_shadow0, ivec2(0, 1));
+		shadow += textureOffset(shadow_map, pos_shadow0, ivec2(1, -1));
+		shadow += textureOffset(shadow_map, pos_shadow0, ivec2(1, 0));
+		shadow += textureOffset(shadow_map, pos_shadow0, ivec2(1, 1));
 	} else if(cam_dist <= shadow_distance.y) {
-		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(-1, -1));
-		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(-1, 0));
-		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(-1, 1));
-		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(0, -1));
-		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(0, 0));
-		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(0, 1));
-		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(1, -1));
-		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(1, 0));
-		shadow += textureOffset(shadow_map_mid, pos_shadow1, ivec2(1, 1));
+		shadow += textureOffset(shadow_map, pos_shadow1, ivec2(-1, -1));
+		shadow += textureOffset(shadow_map, pos_shadow1, ivec2(-1, 0));
+		shadow += textureOffset(shadow_map, pos_shadow1, ivec2(-1, 1));
+		shadow += textureOffset(shadow_map, pos_shadow1, ivec2(0, -1));
+		shadow += textureOffset(shadow_map, pos_shadow1, ivec2(0, 0));
+		shadow += textureOffset(shadow_map, pos_shadow1, ivec2(0, 1));
+		shadow += textureOffset(shadow_map, pos_shadow1, ivec2(1, -1));
+		shadow += textureOffset(shadow_map, pos_shadow1, ivec2(1, 0));
+		shadow += textureOffset(shadow_map, pos_shadow1, ivec2(1, 1));
 	} else {
-		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(-1, -1));
-		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(-1, 0));
-		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(-1, 1));
-		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(0, -1));
-		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(0, 0));
-		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(0, 1));
-		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(1, -1));
-		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(1, 0));
-		shadow += textureOffset(shadow_map_far, pos_shadow2, ivec2(1, 1));
+		shadow += textureOffset(shadow_map, pos_shadow2, ivec2(-1, -1));
+		shadow += textureOffset(shadow_map, pos_shadow2, ivec2(-1, 0));
+		shadow += textureOffset(shadow_map, pos_shadow2, ivec2(-1, 1));
+		shadow += textureOffset(shadow_map, pos_shadow2, ivec2(0, -1));
+		shadow += textureOffset(shadow_map, pos_shadow2, ivec2(0, 0));
+		shadow += textureOffset(shadow_map, pos_shadow2, ivec2(0, 1));
+		shadow += textureOffset(shadow_map, pos_shadow2, ivec2(1, -1));
+		shadow += textureOffset(shadow_map, pos_shadow2, ivec2(1, 0));
+		shadow += textureOffset(shadow_map, pos_shadow2, ivec2(1, 1));
 	}
 	shadow = shadow / 9;
 
