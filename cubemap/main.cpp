@@ -140,7 +140,7 @@ void Win::handle_key_press(const std::string& key, bool pressed) {
 }
 
 void Win::handle_keyboard(const std::string& key) {
-	float rot_speed = 0.005f;
+	float rot_speed = 3.0f;
 
 	if(key == "E") {
 		cam.roll(rot_speed * static_cast<float>(delta_time));
