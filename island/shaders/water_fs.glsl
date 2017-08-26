@@ -107,7 +107,7 @@ void main() {
 	}
 	shadow = shadow / 9;
 
-	refl_refr *= max(shadow, 0.8);
+	refl_refr *= max(shadow, 0.9);
 	sp *= shadow;
 
 	color = vec4(refl_refr.rgb + sp, 1);

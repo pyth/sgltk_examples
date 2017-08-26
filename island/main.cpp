@@ -30,10 +30,6 @@ class Win : public Window {
 	std::vector<glm::mat4> light_matrix;
 
 	Texture_2d height_map;
-	Texture_2d sand;
-	Texture_2d grass;
-	Texture_2d rock;
-	Texture_2d snow;
 	Texture_2d color_tex;
 	Texture_2d normal_tex;
 	Texture_2d position_tex;
@@ -42,6 +38,7 @@ class Win : public Window {
 	Texture_2d refraction_tex;
 	Texture_2d reflection_tex;
 	Texture_2d shadow_tex;
+	Texture_2d_Array terrain_tex;
 	Texture_2d_Array shadow_map;
 	Texture_2d water_dudv;
 	Cubemap sky_tex;
@@ -302,26 +299,16 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	water_dudv.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	water_dudv.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
 	water_dudv.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	sand.load("terrain_sand.jpg");
-	sand.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	sand.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	sand.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	sand.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	grass.load("terrain_grass.jpg");
-	grass.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	grass.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	grass.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	grass.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	rock.load("terrain_rock.jpg");
-	rock.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	rock.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	rock.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	rock.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	snow.load("terrain_snow.jpg");
-	snow.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	snow.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	snow.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	snow.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	std::vector<std::string> terrain_textures = {"terrain_sand.jpg",
+						     "terrain_grass.jpg",
+						     "terrain_rock.jpg",
+						     "terrain_snow.jpg"};
+	terrain_tex.load(terrain_textures);
+	terrain_tex.set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	terrain_tex.set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	terrain_tex.set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	terrain_tex.set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	sky_tex.load("bluecloud_rt.jpg", "bluecloud_lf.jpg", "bluecloud_up.jpg",
 		     "bluecloud_dn.jpg", "bluecloud_ft.jpg", "bluecloud_bk.jpg");
@@ -390,11 +377,8 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	tile_buffer.load(tile_positions, GL_DYNAMIC_DRAW);
 	terrain_tile.set_buffer_vertex_attribute("tile_pos_in", &tile_buffer, 2, GL_FLOAT, 0, 0, 1);
 	terrain_tile.textures_displacement.push_back(&height_map);
-	terrain_tile.textures_misc.push_back(std::make_pair("sand_texture", &sand));
-	terrain_tile.textures_misc.push_back(std::make_pair("grass_texture", &grass));
-	terrain_tile.textures_misc.push_back(std::make_pair("rock_texture", &rock));
-	terrain_tile.textures_misc.push_back(std::make_pair("snow_texture", &snow));
 	terrain_tile.textures_misc.push_back(std::make_pair("shadow_map", &shadow_map));
+	terrain_tile.textures_misc.push_back(std::make_pair("terrain_texture", &terrain_tex));
 
 	float water_size = terrain_side * tile_size * 1.1f;
 	water_mesh.model_matrix = glm::scale(glm::vec3(water_size, 1, water_size));

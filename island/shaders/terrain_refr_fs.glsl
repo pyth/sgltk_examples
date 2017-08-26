@@ -19,11 +19,8 @@ uniform float grass_mix_level;
 uniform float rock_level;
 uniform float rock_mix_level;
 uniform vec3 shadow_distance;
-uniform sampler2D sand_texture;
-uniform sampler2D grass_texture;
-uniform sampler2D rock_texture;
-uniform sampler2D snow_texture;
 uniform sampler2D shadow_texture;
+uniform sampler2DArray terrain_texture;
 uniform sampler2DArrayShadow shadow_map;
 
 void main() {
@@ -31,10 +28,10 @@ void main() {
 	float eta = 0.0001;
 	float shadow_fade_dist = 5;
 
-	vec3 tex_sand = texture(sand_texture, tc).xyz;
-	vec3 tex_grass = texture(grass_texture, tc).xyz;
-	vec3 tex_rock = texture(rock_texture, tc).xyz;
-	vec3 tex_snow = texture(snow_texture, tc).xyz;
+	vec3 tex_sand = texture(terrain_texture, vec3(tc, 0)).xyz;
+	vec3 tex_grass = texture(terrain_texture, vec3(tc, 1)).xyz;
+	vec3 tex_rock = texture(terrain_texture, vec3(tc, 2)).xyz;
+	vec3 tex_snow = texture(terrain_texture, vec3(tc, 3)).xyz;
 
 	if(height <= sand_level) {
 		col = tex_sand;
