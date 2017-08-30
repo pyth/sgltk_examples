@@ -285,7 +285,7 @@ void GUI::display() {
 void GUI::handle_resize() {
 	glViewport(0, 0, width, height);
 	camera.width = static_cast<float>(width);
-	camera.width = static_cast<float>(height);
+	camera.height = static_cast<float>(height);
 	camera.update_projection_matrix();
 }
 

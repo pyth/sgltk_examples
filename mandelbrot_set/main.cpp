@@ -96,7 +96,7 @@ void Win::handle_mouse_wheel(int x, int y) {
 }
 
 void Win::handle_keyboard(const std::string& key) {
-	double mov_speed = 100.0;
+	double mov_speed = 50.0;
 
 	if(key == "D") {
 		center -= glm::dvec2(mov_speed * delta_time, 0) * scale;
