@@ -143,7 +143,7 @@ GUI::GUI(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	for(int i = 0; i < 4; i++) {
 		floor.set_vertex_attribute(loc + i, buf_ind, 4, GL_FLOAT,
 						sizeof(glm::mat4),
-						(const void*)(i * vec4_size), 1);
+						reinterpret_cast<const void*>(i * vec4_size), 1);
 	}
 
 	loc = floor_shader.get_attribute_location("normal_matrix");
@@ -151,7 +151,7 @@ GUI::GUI(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	for(int i = 0; i < 3; i++) {
 		floor.set_vertex_attribute(loc + i, buf_ind, 3, GL_FLOAT,
 						sizeof(glm::mat3),
-						(const void*)(i * vec3_size), 1);
+						reinterpret_cast<const void*>(i * vec3_size), 1);
 	}
 
 	floor.textures_diffuse.push_back(&floor_diff);

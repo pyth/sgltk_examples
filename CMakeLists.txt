@@ -25,9 +25,9 @@ set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${LIBRARY_PATH};${INCLUDE_PATH}")
 include_directories(${INCLUDE_PATH})
 link_directories(${LIBRARY_PATH})
 
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wno-int-to-pointer-cast")
-endif()
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 set(ExternalProjectCMakeArgs
 		-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
