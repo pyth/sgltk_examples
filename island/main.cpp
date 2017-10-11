@@ -168,7 +168,6 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	shadow_dist = glm::vec3(40, 200, camera.far_plane);
 
 	reflection_cam = P_Camera(camera);
-	reflection_cam.position = camera.position;
 	reflection_cam.position[1] -= 2 * (reflection_cam.position[1] - water_height);
 	reflection_cam.direction = camera.direction;
 	reflection_cam.direction[1] *= -1;
@@ -183,13 +182,8 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 					 glm::vec3(0, 1, 0), (float)width, (float)height, 0.1f, 100);
 	}
 
-	refl_ip_cam.position = reflection_cam.position;
-	refl_ip_cam.direction = reflection_cam.direction;
-	refl_ip_cam.up = reflection_cam.up;
-	refl_ip_cam.fovy = reflection_cam.fovy;
-	refl_ip_cam.width = reflection_cam.width;
-	refl_ip_cam.height = reflection_cam.height;
-	refl_ip_cam.near_plane = reflection_cam.near_plane;
+	refl_ip_cam = IP_Camera(reflection_cam.position, ip_cam.direction, reflection_cam.up, reflection_cam.fovy, (float)width, (float)height, 0.1f);
+	refl_ip_cam.direction[1] *= -1;
 	refl_ip_cam.update_view_matrix();
 	refl_ip_cam.update_projection_matrix();
 
@@ -641,9 +635,12 @@ void Win::handle_keyboard(const std::string& key) {
 	if(update) {
 		if(camera.position[1] <= 1.1 * water_height)
 			camera.position[1] = 1.1f * water_height;
+		if(ip_cam.position[1] <= 1.1 * water_height)
+			ip_cam.position[1] = 1.1f * water_height;
 		reflection_cam.position = camera.position;
 		reflection_cam.position[1] -= 2 * (reflection_cam.position[1] - water_height);
-		refl_ip_cam.position = reflection_cam.position;
+		refl_ip_cam.position = ip_cam.position;
+		refl_ip_cam.position[1] -= 2 * (refl_ip_cam.position[1] - water_height);
 		camera.update_view_matrix();
 		ip_cam.update_view_matrix();
 		reflection_cam.update_view_matrix();
