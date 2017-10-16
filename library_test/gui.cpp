@@ -380,9 +380,9 @@ void GUI::handle_key_press(const std::string& key, bool pressed) {
 			if(windowed) {
 				mode = App::sys_info.desktop_display_modes[get_display_index()];
 				set_display_mode(mode);
-				fullscreen_mode(FULLSCREEN);
+				fullscreen_mode(WINDOW_MODE::FULLSCREEN);
 			} else {
-				fullscreen_mode(WINDOWED);
+				fullscreen_mode(WINDOW_MODE::WINDOWED);
 			}
 			windowed = !windowed;
 		}
