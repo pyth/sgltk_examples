@@ -350,13 +350,13 @@ void Win::handle_resize() {
 	refraction_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
 	reflection_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
 	camera.width = static_cast<float>(width);
-	camera.width = static_cast<float>(height);
+	camera.height = static_cast<float>(height);
 	camera.update_projection_matrix();
 	reflection_cam.width = static_cast<float>(width);
-	reflection_cam.width = static_cast<float>(height);
+	reflection_cam.height = static_cast<float>(height);
 	reflection_cam.update_projection_matrix();
 	refl_ip_cam.width = static_cast<float>(width);
-	refl_ip_cam.width = static_cast<float>(height);
+	refl_ip_cam.height = static_cast<float>(height);
 	refl_ip_cam.update_projection_matrix();
 }
 
