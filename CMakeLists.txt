@@ -25,7 +25,7 @@ set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${LIBRARY_PATH};${INCLUDE_PATH}")
 include_directories(${INCLUDE_PATH})
 link_directories(${LIBRARY_PATH})
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(ExternalProjectCMakeArgs

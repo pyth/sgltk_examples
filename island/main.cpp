@@ -287,11 +287,11 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	display_mesh.model_matrix = glm::rotate((float)(M_PI / 2), glm::vec3(1, 0, 0));
 	display_mesh.setup_shader(&display_shader);
 	display_mesh.setup_camera(&camera);
-	display_mesh.textures_misc.push_back(std::make_pair("color_texture", &color_tex));
-	display_mesh.textures_misc.push_back(std::make_pair("normal_texture", &normal_tex));
-	display_mesh.textures_misc.push_back(std::make_pair("position_texture", &position_tex));
-	display_mesh.textures_misc.push_back(std::make_pair("spec_texture", &spec_tex));
-	display_mesh.textures_misc.push_back(std::make_pair("shadow_texture", &shadow_tex));
+	display_mesh.attach_texture("color_texture", color_tex);
+	display_mesh.attach_texture("normal_texture", normal_tex);
+	display_mesh.attach_texture("position_texture", position_tex);
+	display_mesh.attach_texture("spec_texture", spec_tex);
+	display_mesh.attach_texture("shadow_texture", shadow_tex);
 	display_mesh.add_vertex_attribute("pos_in", 4, GL_FLOAT, position);
 	display_mesh.add_vertex_attribute("tc_in", 2, GL_FLOAT, tc);
 	display_mesh.attach_index_buffer(ind);
@@ -309,9 +309,9 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	}
 	tile_buffer.load(tile_positions, GL_DYNAMIC_DRAW);
 	terrain_tile.set_buffer_vertex_attribute("tile_pos_in", &tile_buffer, 2, GL_FLOAT, 0, 0, 1);
-	terrain_tile.textures_displacement.push_back(&height_map);
-	terrain_tile.textures_misc.push_back(std::make_pair("shadow_map", &shadow_map));
-	terrain_tile.textures_misc.push_back(std::make_pair("terrain_texture", &terrain_tex));
+	terrain_tile.attach_texture("texture_displacement", height_map);
+	terrain_tile.attach_texture("shadow_map", shadow_map);
+	terrain_tile.attach_texture("terrain_texture", terrain_tex);
 
 	float water_size = terrain_side * tile_size * 1.1f;
 	water_mesh.model_matrix = glm::scale(glm::vec3(water_size, 1, water_size));
@@ -321,18 +321,18 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	water_mesh.add_vertex_attribute("pos_in", 4, GL_FLOAT, position);
 	water_mesh.add_vertex_attribute("tc_in", 2, GL_FLOAT, tc);
 	water_mesh.attach_index_buffer(ind);
-	water_mesh.textures_misc.push_back(std::make_pair("water_dudv_texture", &water_dudv));
-	water_mesh.textures_misc.push_back(std::make_pair("refraction_texture", &refraction_tex));
-	water_mesh.textures_misc.push_back(std::make_pair("reflection_texture", &reflection_tex));
-	water_mesh.textures_misc.push_back(std::make_pair("depth_texture", &depth_tex));
-	water_mesh.textures_misc.push_back(std::make_pair("shadow_map", &shadow_map));
+	water_mesh.attach_texture("water_dudv_texture", water_dudv);
+	water_mesh.attach_texture("refraction_texture", refraction_tex);
+	water_mesh.attach_texture("reflection_texture", reflection_tex);
+	water_mesh.attach_texture("depth_texture", depth_tex);
+	water_mesh.attach_texture("shadow_map", shadow_map);
 
 	skybox.model_matrix = glm::scale(glm::vec3((float)(terrain_side * tile_size)));
 	skybox.setup_shader(&skybox_shader);
 	skybox.setup_camera(&ip_cam);
 	skybox.add_vertex_attribute("pos_in", 4, GL_FLOAT, skybox_pos);
 	skybox.attach_index_buffer(skybox_ind);
-	skybox.textures_misc.push_back(std::make_pair("sky_texture", &sky_tex));
+	skybox.attach_texture("sky_texture", sky_tex);
 }
 
 Win::~Win() {

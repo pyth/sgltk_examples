@@ -56,7 +56,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	display_mesh.setup_camera(&cam);
 	display_mesh.setup_shader(&shader);
-	display_mesh.textures_ambient.push_back(&texture);
+	display_mesh.attach_texture("texture_ambient", texture);
 	display_mesh.add_vertex_attribute("pos_in", 4, GL_FLOAT, pos);
 	display_mesh.add_vertex_attribute("tc_in", 2, GL_FLOAT, tc);
 	display_mesh.attach_index_buffer(ind);

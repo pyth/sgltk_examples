@@ -93,13 +93,13 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	skybox.setup_shader(&skybox_shader);
 	skybox.setup_camera(&cam.view_matrix, &cam.projection_matrix);
 	skybox.set_vertex_attribute("pos_in", pos_buf, 4, GL_FLOAT, 0, 0);
-	skybox.textures_ambient = {&cubemap};
+	skybox.attach_texture("texture_ambient", cubemap);
 
 	obj_mat = glm::scale(glm::vec3(2));
 	obj.setup_camera(&cam.view_matrix, &cam.projection_matrix);
 	obj.setup_shader(&obj_shader);
 	obj.load("monkey.obj");
-	obj.attach_texture("cubemap", &cubemap);
+	obj.attach_texture("cubemap", cubemap);
 
 	set_relative_mode(rel_mode);
 }

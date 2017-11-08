@@ -9,7 +9,7 @@ uniform dvec2 center;
 uniform double scale;
 uniform int iter;
 
-uniform sampler1D textures_ambient;
+uniform sampler1D texture_ambient;
 
 void main() {
 	uint i;
@@ -23,5 +23,5 @@ void main() {
 		if(z.x * z.x + z.y * z.y > 4.0)
 			break;
 	}
-	color = texture(textures_ambient, (i == iter ? 0.0 : float(i)) / 100);
+	color = texture(texture_ambient, (i == iter ? 0.0 : float(i)) / 100);
 }

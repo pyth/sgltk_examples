@@ -119,8 +119,8 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	walls.attach_index_buffer(ind);
 	walls.set_vertex_attribute(pos_loc, pos_buf, 4, GL_FLOAT, 0, 0);
 	walls.model_matrix = glm::scale(glm::vec3(20.f, 20.f, 20.f));
-	walls.textures_diffuse.push_back(&wall_tex);
-	walls.textures_misc.push_back(std::make_pair("shadow_map", &depth_tex));
+	walls.attach_texture("texture_diffuse", wall_tex);
+	walls.attach_texture("shadow_map", depth_tex);
 
 	std::vector<glm::vec4> light_point = {glm::vec4(0, 0, 0, 1)};
 	std::vector<unsigned short> light_ind = {0};
@@ -146,7 +146,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	box.setup_shader(&box_shader);
 	box.setup_camera(&camera);
 	box.load("box.obj");
-	box.attach_texture("shadow_map", &depth_tex);
+	box.attach_texture("shadow_map", depth_tex);
 	box.set_texture_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	box.set_texture_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	box.setup_instanced_matrix(model_matrix);

@@ -123,8 +123,8 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	floor.set_vertex_attribute(pos_loc_floor, pos_buf, 4, GL_FLOAT, 0, 0);
 	floor.set_vertex_attribute(norm_loc_floor, norm_buf, 3, GL_FLOAT, 0, 0);
 	floor.set_vertex_attribute(tc_loc_floor, tc_buf, 2, GL_FLOAT, 0, 0);
-	floor.textures_diffuse.push_back(&floor_tex);
-	floor.textures_misc.push_back(std::make_pair("shadow_map", &depth_tex));
+	floor.attach_texture("texture_diffuse", floor_tex);
+	floor.attach_texture("shadow_map", depth_tex);
 
 	std::vector<glm::vec4> light_point = {glm::vec4(0, 0, 0, 1)};
 	std::vector<unsigned short> light_ind = {0};
@@ -141,7 +141,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	depth_display.attach_index_buffer(ind);
 	depth_display.set_vertex_attribute("pos_in", pos_buf, 4, GL_FLOAT, 0, 0);
 	depth_display.set_vertex_attribute("tc_in", tc_buf, 2, GL_FLOAT, 0, 0);
-	depth_display.textures_diffuse.push_back(&depth_tex);
+	depth_display.attach_texture("texture_diffuse", depth_tex);
 
 	model_matrix.resize(5);
 	model_matrix[0] = glm::rotate(glm::radians(0.0f), glm::vec3(0, 1, 0));
@@ -159,7 +159,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	box.setup_shader(&box_shader);
 	box.setup_camera(&camera);
 	box.load("box.obj");
-	box.attach_texture("shadow_map", &depth_tex);
+	box.attach_texture("shadow_map", depth_tex);
 	box.set_texture_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	box.set_texture_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	box.setup_instanced_matrix(model_matrix);

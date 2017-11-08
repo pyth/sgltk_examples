@@ -154,11 +154,11 @@ GUI::GUI(const std::string& title, int res_x, int res_y, int offset_x, int offse
 						reinterpret_cast<const void*>(i * vec3_size), 1);
 	}
 
-	floor.textures_diffuse.push_back(&floor_diff);
-	floor.textures_normals.push_back(&floor_norm);
-	floor.textures_specular.push_back(&floor_spec);
-	floor.textures_lightmap.push_back(&floor_light);
-	floor.textures_displacement.push_back(&floor_displ);
+	floor.attach_texture("texture_diffuse", floor_diff);
+	floor.attach_texture("texture_normals", floor_norm);
+	floor.attach_texture("texture_specular", floor_spec);
+	floor.attach_texture("texture_lightmap", floor_light);
+	floor.attach_texture("texture_displacement", floor_displ);
 
 	material_model.setup_shader(&material_shader);
 	material_model.setup_camera(&camera);
