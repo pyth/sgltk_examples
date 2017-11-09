@@ -289,12 +289,12 @@ void GUI::handle_resize() {
 	camera.update_projection_matrix();
 }
 
-void GUI::handle_hamepad_added(unsigned int gamepad_id) {
-	Gamepad::id_map[gamepad_id]->set_deadzone(1600);
+void GUI::handle_gamepad_added(std::shared_ptr<Gamepad> gamepad) {
+	gamepad->set_deadzone(1600);
 }
 
-void GUI::handle_gamepad_button_press(unsigned int id, int button, bool pressed) {
-	if(id != 0)
+void GUI::handle_gamepad_button_press(std::shared_ptr<Gamepad> gamepad, int button, bool pressed) {
+	if(gamepad->id != 0)
 		return;
 
 	if(pressed) {
@@ -306,8 +306,8 @@ void GUI::handle_gamepad_button_press(unsigned int id, int button, bool pressed)
 	}
 }
 
-void GUI::handle_gamepad_button(unsigned int id, int button) {
-	if(id != 0)
+void GUI::handle_gamepad_button(std::shared_ptr<Gamepad> gamepad, int button) {
+	if(gamepad->id != 0)
 		return;
 
 	switch(button) {
@@ -322,8 +322,8 @@ void GUI::handle_gamepad_button(unsigned int id, int button) {
 	}
 }
 
-void GUI::handle_gamepad_axis(unsigned int id, unsigned int axis, int value) {
-	if(id != 0)
+void GUI::handle_gamepad_axis(std::shared_ptr<Gamepad> gamepad, unsigned int axis, int value) {
+	if(gamepad->id != 0)
 		return;
 
 	switch(axis) {

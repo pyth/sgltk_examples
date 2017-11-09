@@ -59,10 +59,10 @@ class GUI : public Window {
 	Mesh *create_sphere(unsigned int slices, unsigned int stacks);
 
 	void handle_resize();
-	void handle_hamepad_added(unsigned int gamepad_id);
-	void handle_gamepad_button_press(unsigned int id, int button, bool pressed);
-	void handle_gamepad_button(unsigned int id, int button);
-	void handle_gamepad_axis(unsigned int id, unsigned int axis, int value);
+	void handle_gamepad_added(std::shared_ptr<Gamepad> gamepad);
+	void handle_gamepad_button_press(std::shared_ptr<Gamepad> gamepad, int button, bool pressed);
+	void handle_gamepad_button(std::shared_ptr<Gamepad> gamepad, int button);
+	void handle_gamepad_axis(std::shared_ptr<Gamepad> gamepad, unsigned int axis, int value);
 	void handle_keyboard(const std::string& key);
 	void handle_key_press(const std::string& key, bool pressed);
 	void handle_mouse_motion(int x, int y);

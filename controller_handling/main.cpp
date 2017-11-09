@@ -3,37 +3,34 @@
 using namespace std;
 
 class Win : public sgltk::Window {
-	void handle_gamepad_added(unsigned int gamepad_id) {
-		std::cout << "Gamepad #" << gamepad_id << ": connected" << std::endl;
+	void handle_gamepad_added(std::shared_ptr<sgltk::Gamepad> gamepad) {
+		cout << "Gamepad #" << gamepad->id << ": connected" << endl;
 	}
 
 	void handle_gamepad_removed(unsigned int gamepad_id) {
-		std::cout << "Gamepad #" << gamepad_id << ": removed" << std::endl;
+		cout << "Gamepad #" << gamepad_id << ": removed" << endl;
 	}
 
-	void handle_gamepad_button(unsigned int gamepad_id, int button) {
-		std::cout << "Gamepad #" << gamepad_id << ": button #" << button << " is being held down" << std::endl;
-		sgltk::Gamepad *gamepad = sgltk::Gamepad::id_map[gamepad_id];
+	void handle_gamepad_button(std::shared_ptr<sgltk::Gamepad> gamepad, int button) {
+		cout << "Gamepad #" << gamepad->id << ": button #" << button << " is being held down" << endl;
 		gamepad->play_rumble(1, 200);
 	}
 
-	void handle_gamepad_button_press(unsigned int gamepad_id, int button, bool pressed) {
-		sgltk::Gamepad *gamepad = sgltk::Gamepad::id_map[gamepad_id];
+	void handle_gamepad_button_press(std::shared_ptr<sgltk::Gamepad> gamepad, int button, bool pressed) {
 		if(pressed) {
-			std::cout << "Gamepad #" << gamepad_id << ": button #" << button << " was pressed" << std::endl;
+			cout << "Gamepad #" << gamepad->id << ": button #" << button << " was pressed" << endl;
 		} else {
-			std::cout << "Gamepad #" << gamepad_id << ": button #" << button << " was released" << std::endl;
+			cout << "Gamepad #" << gamepad->id << ": button #" << button << " was released" << endl;
 			gamepad->stop_rumble();
 		}
 	}
 
-	void handle_gamepad_axis_change(unsigned int gamepad_id, unsigned int axis, int value) {
-		std::cout << "Gamepad #" << gamepad_id << ": axis #" << axis << " was moved to " << value << std::endl;
+	void handle_gamepad_axis_change(std::shared_ptr<sgltk::Gamepad> gamepad, unsigned int axis, int value) {
+		cout << "Gamepad #" << gamepad->id << ": axis #" << axis << " was moved to " << value << endl;
 	}
 
-	void handle_joystick_added(unsigned int joystick_id) {
-		std::cout << "Joystick #" << joystick_id << ": connected" << std::endl;
-		sgltk::Joystick *joystick = sgltk::Joystick::id_map[joystick_id];
+	void handle_joystick_added(std::shared_ptr<sgltk::Joystick> joystick) {
+		cout << "Joystick #" << joystick->id << ": connected" << endl;
 		joystick->set_deadzone(200);
 		//On the X52 buttons 23 through 25 correspond to the three mode switch posissions
 		size_t found = joystick->name.find("Saitek X52");
@@ -45,27 +42,27 @@ class Win : public sgltk::Window {
 	}
 
 	void handle_joystick_removed(unsigned int joystick_id) {
-		std::cout << "Joystick #" << joystick_id << ": removed" << std::endl;
+		cout << "Joystick #" << joystick_id << ": removed" << endl;
 	}
 
-	void handle_joystick_button(unsigned int joystick_id, int button) {
-		std::cout << "Joystick #" << joystick_id << ": button #" << button << " is being held down" << std::endl;
+	void handle_joystick_button(std::shared_ptr<sgltk::Joystick> joystick, int button) {
+		cout << "Joystick #" << joystick->id << ": button #" << button << " is being held down" << endl;
 	}
 
-	void handle_joystick_button_press(unsigned int joystick_id, int button, bool pressed) {
+	void handle_joystick_button_press(std::shared_ptr<sgltk::Joystick> joystick, int button, bool pressed) {
 		if(pressed) {
-			std::cout << "Joystick #" << joystick_id << ": button #" << button << " was pressed" << std::endl;
+			cout << "Joystick #" << joystick->id << ": button #" << button << " was pressed" << endl;
 		} else {
-			std::cout << "Joystick #" << joystick_id << ": button #" << button << " was released" << std::endl;
+			cout << "Joystick #" << joystick->id << ": button #" << button << " was released" << endl;
 		}
 	}
 
-	void handle_joystick_axis_change(unsigned int joystick_id, unsigned int axis, int value) {
-		std::cout << "Joystick #" << joystick_id << ": axis #" << axis << " was moved to " << value << std::endl;
+	void handle_joystick_axis_change(std::shared_ptr<sgltk::Joystick> joystick, unsigned int axis, int value) {
+		cout << "Joystick #" << joystick->id << ": axis #" << axis << " was moved to " << value << endl;
 	}
 
-	void handle_joystick_hat_change(unsigned int joystick_id, unsigned int hat, unsigned int value) {
-		std::cout << "Joystick #" << joystick_id << ": hat #" << hat << " was moved to " << value << std::endl;
+	void handle_joystick_hat_change(std::shared_ptr<sgltk::Joystick> joystick, unsigned int hat, unsigned int value) {
+		cout << "Joystick #" << joystick->id << ": hat #" << hat << " was moved to " << value << endl;
 	}
 
 	void handle_key_press(const std::string& key, bool pressed) {
