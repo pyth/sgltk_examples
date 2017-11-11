@@ -42,9 +42,9 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	}
 
 	//create the triangle mesh
-	int pos_buf = mesh.attach_vertex_buffer<glm::vec4>(pos);
-	int color_buf = mesh.attach_vertex_buffer<glm::vec4>(color);
-	int mat_buf = mesh.attach_vertex_buffer<glm::mat4>(model_matrix);
+	int pos_buf = mesh.attach_vertex_buffer(pos);
+	int color_buf = mesh.attach_vertex_buffer(color);
+	int mat_buf = mesh.attach_vertex_buffer(model_matrix);
 	mesh.attach_index_buffer(ind);
 	mesh.setup_shader(&shader);
 	mesh.setup_camera(&cam.view_matrix, &cam.projection_matrix);

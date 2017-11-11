@@ -115,7 +115,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	wall_tex.load(img, img, img, img, img, img);
 
 	int pos_loc = wall_shader.get_attribute_location("pos_in");
-	int pos_buf = walls.attach_vertex_buffer<glm::vec4>(position);
+	int pos_buf = walls.attach_vertex_buffer(position);
 	walls.attach_index_buffer(ind);
 	walls.set_vertex_attribute(pos_loc, pos_buf, 4, GL_FLOAT, 0, 0);
 	walls.model_matrix = glm::scale(glm::vec3(20.f, 20.f, 20.f));
@@ -124,7 +124,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	std::vector<glm::vec4> light_point = {glm::vec4(0, 0, 0, 1)};
 	std::vector<unsigned short> light_ind = {0};
-	light.attach_vertex_buffer<glm::vec4>(light_point);
+	light.attach_vertex_buffer(light_point);
 	light.set_vertex_attribute("pos_in", 0, 4, GL_FLOAT, 0, 0);
 	light.attach_index_buffer(light_ind);
 	light.setup_camera(&camera);

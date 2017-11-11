@@ -79,23 +79,24 @@ GUI::GUI(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	point_shader.link();
 
 	//arrange a few vertices into a square
-	std::vector<sgltk::Vertex> vert;
-	vert.push_back(sgltk::Vertex(glm::vec3(-0.5, -0.5, 0.0),
-				     glm::vec3( 0.0,  0.0, 1.0),
-				     glm::vec3( 1.0,  0.0, 0.0),
-				     glm::vec3( 0.0,  1.0, 0.0)));
-	vert.push_back(sgltk::Vertex(glm::vec3( 0.5, -0.5, 0.0),
-				     glm::vec3( 0.0,  0.0, 1.0),
-				     glm::vec3( 1.0,  0.0, 0.0),
-				     glm::vec3( 1.0,  1.0, 0.0)));
-	vert.push_back(sgltk::Vertex(glm::vec3(-0.5,  0.5, 0.0),
-				     glm::vec3( 0.0,  0.0, 1.0),
-				     glm::vec3( 1.0,  0.0, 0.0),
-				     glm::vec3( 0.0,  0.0, 0.0)));
-	vert.push_back(sgltk::Vertex(glm::vec3( 0.5,  0.5, 0.0),
-				     glm::vec3( 0.0,  0.0, 1.0),
-				     glm::vec3( 1.0,  0.0, 0.0),
-				     glm::vec3( 1.0,  0.0, 0.0)));
+	std::vector<sgltk::Vertex> vert = {
+		sgltk::Vertex(glm::vec3(-0.5, -0.5, 0.0),
+			      glm::vec3( 0.0,  0.0, 1.0),
+			      glm::vec3( 1.0,  0.0, 0.0),
+			      glm::vec3( 0.0,  1.0, 0.0)),
+		sgltk::Vertex(glm::vec3( 0.5, -0.5, 0.0),
+			      glm::vec3( 0.0,  0.0, 1.0),
+			      glm::vec3( 1.0,  0.0, 0.0),
+			      glm::vec3( 1.0,  1.0, 0.0)),
+		sgltk::Vertex(glm::vec3(-0.5,  0.5, 0.0),
+			      glm::vec3( 0.0,  0.0, 1.0),
+			      glm::vec3( 1.0,  0.0, 0.0),
+			      glm::vec3( 0.0,  0.0, 0.0)),
+		sgltk::Vertex(glm::vec3( 0.5,  0.5, 0.0),
+			      glm::vec3( 0.0,  0.0, 1.0),
+			      glm::vec3( 1.0,  0.0, 0.0),
+			      glm::vec3( 1.0,  0.0, 0.0))
+	};
 
 	std::vector<unsigned short> floor_ind = {0, 1, 2, 3};
 	std::vector<unsigned short> fps_ind = {0, 1, 2, 1, 3, 2};

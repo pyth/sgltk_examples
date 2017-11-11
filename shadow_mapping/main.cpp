@@ -116,9 +116,9 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 	int pos_loc_floor = floor_shader.get_attribute_location("pos_in");
 	int norm_loc_floor = floor_shader.get_attribute_location("norm_in");
 	int tc_loc_floor = floor_shader.get_attribute_location("tc_in");
-	int pos_buf = floor.attach_vertex_buffer<glm::vec4>(position);
-	int norm_buf = floor.attach_vertex_buffer<glm::vec3>(norm);
-	int tc_buf = floor.attach_vertex_buffer<glm::vec2>(tex_coord);
+	int pos_buf = floor.attach_vertex_buffer(position);
+	int norm_buf = floor.attach_vertex_buffer(norm);
+	int tc_buf = floor.attach_vertex_buffer(tex_coord);
 	floor.attach_index_buffer(ind);
 	floor.set_vertex_attribute(pos_loc_floor, pos_buf, 4, GL_FLOAT, 0, 0);
 	floor.set_vertex_attribute(norm_loc_floor, norm_buf, 3, GL_FLOAT, 0, 0);
@@ -128,7 +128,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	std::vector<glm::vec4> light_point = {glm::vec4(0, 0, 0, 1)};
 	std::vector<unsigned short> light_ind = {0};
-	light.attach_vertex_buffer<glm::vec4>(light_point);
+	light.attach_vertex_buffer(light_point);
 	light.set_vertex_attribute("pos_in", 0, 4, GL_FLOAT, 0, 0);
 	light.attach_index_buffer(light_ind);
 	light.setup_camera(&camera);
@@ -136,8 +136,8 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	//create a mini display
 	depth_display.setup_shader(&display_shader);
-	pos_buf = depth_display.attach_vertex_buffer<glm::vec4>(position);
-	tc_buf = depth_display.attach_vertex_buffer<glm::vec2>(tex_coord);
+	pos_buf = depth_display.attach_vertex_buffer(position);
+	tc_buf = depth_display.attach_vertex_buffer(tex_coord);
 	depth_display.attach_index_buffer(ind);
 	depth_display.set_vertex_attribute("pos_in", pos_buf, 4, GL_FLOAT, 0, 0);
 	depth_display.set_vertex_attribute("tc_in", tc_buf, 2, GL_FLOAT, 0, 0);

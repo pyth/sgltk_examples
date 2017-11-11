@@ -427,7 +427,6 @@ void Win::set_uniforms() {
 
 void Win::calculate_shadow_frustum() {
 	std::vector<P_Camera> cams(3);
-	std::vector<glm::vec3> frustum_points(8);
 
 	cams[0] = P_Camera(camera);
 	cams[0].far_plane = shadow_dist[0];
@@ -682,12 +681,10 @@ int main(int argc, char **argv) {
 	Shader::add_path("../island/shaders");
 	Texture::add_path("../data/textures");
 
-	int w = (int)(0.75 * App::sys_info.display_bounds[App::sys_info.num_displays - 1].w);
-	int h = (int)(0.75 * App::sys_info.display_bounds[App::sys_info.num_displays - 1].h);
-	int x = App::sys_info.display_bounds[App::sys_info.num_displays - 1].x +
-		(int)(0.125 * App::sys_info.display_bounds[App::sys_info.num_displays - 1].w);
-	int y = App::sys_info.display_bounds[App::sys_info.num_displays - 1].y +
-		(int)(0.125 * App::sys_info.display_bounds[App::sys_info.num_displays - 1].h);
+	int w = (int)(0.75 * App::sys_info.display_bounds[0].w);
+	int h = (int)(0.75 * App::sys_info.display_bounds[0].h);
+	int x = App::sys_info.display_bounds[0].x + static_cast<int>(0.125 * App::sys_info.display_bounds[0].w);
+	int y = App::sys_info.display_bounds[0].y + static_cast<int>(0.125 * App::sys_info.display_bounds[0].h);
 
 	Win window("Island", w, h, x, y);
 	if(window.gl_maj < 4 && window.gl_min < 3)

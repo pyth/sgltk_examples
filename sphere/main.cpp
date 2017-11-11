@@ -78,7 +78,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 						5, 4, 3,
 						5, 1, 4};
 
-	sphere.attach_vertex_buffer<glm::vec3>(pos);
+	sphere.attach_vertex_buffer(pos);
 	sphere.attach_index_buffer(ind);
 	sphere.setup_camera(&cam.view_matrix, &cam.projection_matrix);
 	sphere.setup_shader(&sphere_shader);
@@ -98,7 +98,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	std::vector<glm::vec4> light_vert = {glm::vec4(0, 0, 0, 0)};
 	std::vector<unsigned short> light_ind = {0};
-	light.attach_vertex_buffer<glm::vec4>(light_vert);
+	light.attach_vertex_buffer(light_vert);
 	light.set_vertex_attribute("pos_in", 0, 4, GL_FLOAT, 0, 0);
 	light.attach_index_buffer(light_ind);
 	light.setup_camera(&cam);

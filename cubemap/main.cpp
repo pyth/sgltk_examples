@@ -88,7 +88,7 @@ Win::Win(const std::string& title, int res_x, int res_y, int offset_x, int offse
 
 	//create the triangle mesh
 	skybox_mat = glm::scale(glm::vec3(200));
-	int pos_buf = skybox.attach_vertex_buffer<glm::vec4>(position);
+	int pos_buf = skybox.attach_vertex_buffer(position);
 	skybox.attach_index_buffer(ind);
 	skybox.setup_shader(&skybox_shader);
 	skybox.setup_camera(&cam.view_matrix, &cam.projection_matrix);
