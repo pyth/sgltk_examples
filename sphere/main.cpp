@@ -6,7 +6,7 @@ class Win : public sgltk::Window {
 	bool normals;
 
 	glm::mat4 model_mat[2];
-	int tess_level;
+	float tess_level;
 	glm::vec3 light_pos;
 
 	sgltk::Shader normal_shader;
@@ -203,14 +203,14 @@ void Win::display() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
-	sphere_shader.set_uniform_float("tess_level", (float)tess_level);
+	sphere_shader.set_uniform("tess_level", tess_level);
 	sphere_shader.set_uniform("light_pos", light_pos);
 	sphere.setup_shader(&sphere_shader);
 	sphere.draw(GL_PATCHES, &model_mat[0]);
 	sphere.draw(GL_PATCHES, &model_mat[1]);
 
 	if(normals) {
-		normal_shader.set_uniform_float("tess_level", (float)tess_level);
+		normal_shader.set_uniform("tess_level", tess_level);
 		sphere.setup_shader(&normal_shader);
 		sphere.draw(GL_PATCHES, &model_mat[0]);
 		sphere.draw(GL_PATCHES, &model_mat[1]);

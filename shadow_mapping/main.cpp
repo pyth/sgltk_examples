@@ -217,12 +217,12 @@ void Win::normal_pass() {
 	box_shader.set_uniform("light_pos", light_pos);
 	box_shader.set_uniform("cam_pos", camera.position);
 	box_shader.set_uniform("light_matrix", false, light_matrix);
-	box_shader.set_uniform_int("soft_shadow", 4);
+	box_shader.set_uniform("soft_shadow", 4);
 
 	floor_shader.set_uniform("light_pos", light_pos);
 	floor_shader.set_uniform("cam_pos", camera.position);
 	floor_shader.set_uniform("light_matrix", false, light_matrix);
-	floor_shader.set_uniform_int("soft_shadow", 4);
+	floor_shader.set_uniform("soft_shadow", 4);
 
 	box.setup_shader(&box_shader);
 	box.set_instanced_matrix_attributes();
@@ -251,8 +251,8 @@ void Win::display() {
 	glCullFace(GL_BACK);
 	normal_pass();
 
-	display_shader.set_uniform_float("near", light_cam.near_plane);
-	display_shader.set_uniform_float("far", light_cam.far_plane);
+	display_shader.set_uniform("near", light_cam.near_plane);
+	display_shader.set_uniform("far", light_cam.far_plane);
 	display_shader.set_uniform("resolution", glm::vec2(width, height));
 	glm::mat4 mat = glm::rotate((float)(M_PI / 2), glm::vec3(1, 0, 0));
 	depth_display.draw(GL_TRIANGLE_STRIP, &mat);

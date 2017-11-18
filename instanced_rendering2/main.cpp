@@ -122,7 +122,7 @@ void Win::display() {
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	shader.set_uniform_float("light_pos", 25, 25, 20);
+	shader.set_uniform("light_pos", glm::vec3(25, 25, 20));
 	shader.set_uniform("cam_pos", cam.position);
 
 	box.draw_instanced(125);

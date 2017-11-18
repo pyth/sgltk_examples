@@ -252,7 +252,7 @@ void GUI::display() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glPolygonMode(GL_FRONT, GL_FILL);
 
-	fps_shader.set_uniform_int("Texture", 0);
+	fps_shader.set_uniform("Texture", 0);
 	fps_tex.bind();
 	fps_display.draw(GL_TRIANGLES);
 
@@ -263,7 +263,7 @@ void GUI::display() {
 
 	floor_shader.set_uniform("cam_pos", camera.position);
 	floor_shader.set_uniform("light_pos", light_pos);
-	floor_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
+	floor_shader.set_uniform("max_tess_level", App::sys_info.max_tess_level);
 	floor.draw_instanced(GL_PATCHES, NUM_TILES);
 
 	material_shader.set_uniform("light_pos", light_pos);

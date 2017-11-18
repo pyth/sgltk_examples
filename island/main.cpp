@@ -364,54 +364,54 @@ void Win::set_uniforms() {
 	calculate_shadow_frustum();
 
 	terrain_shader.set_uniform("shadow_distance", shadow_dist);
-	terrain_shader.set_uniform_float("max_height", terrain_max_height);
-	terrain_shader.set_uniform_float("sand_level", sand_level);
-	terrain_shader.set_uniform_float("sand_mix_level", sand_mix_level);
-	terrain_shader.set_uniform_float("grass_level", grass_level);
-	terrain_shader.set_uniform_float("grass_mix_level", grass_mix_level);
-	terrain_shader.set_uniform_float("rock_level", rock_level);
-	terrain_shader.set_uniform_float("rock_mix_level", rock_mix_level);
-	terrain_shader.set_uniform_int("tile_size", tile_size);
-	terrain_shader.set_uniform_uint("terrain_side", terrain_side);
-	terrain_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
+	terrain_shader.set_uniform("max_height", terrain_max_height);
+	terrain_shader.set_uniform("sand_level", sand_level);
+	terrain_shader.set_uniform("sand_mix_level", sand_mix_level);
+	terrain_shader.set_uniform("grass_level", grass_level);
+	terrain_shader.set_uniform("grass_mix_level", grass_mix_level);
+	terrain_shader.set_uniform("rock_level", rock_level);
+	terrain_shader.set_uniform("rock_mix_level", rock_mix_level);
+	terrain_shader.set_uniform("tile_size", tile_size);
+	terrain_shader.set_uniform("terrain_side", terrain_side);
+	terrain_shader.set_uniform("max_tess_level", App::sys_info.max_tess_level);
 	terrain_shader.set_uniform("cam_pos", camera.position);
 	terrain_shader.set_uniform("light_direction", light_direction);
 	terrain_shader.set_uniform("clip_plane", glm::vec4(0, -1, 0, 0));
 
 	terrain_refr_shader.set_uniform("shadow_distance", shadow_dist);
-	terrain_refr_shader.set_uniform_float("max_height", terrain_max_height);
-	terrain_refr_shader.set_uniform_float("sand_level", sand_level);
-	terrain_refr_shader.set_uniform_float("sand_mix_level", sand_mix_level);
-	terrain_refr_shader.set_uniform_float("grass_level", grass_level);
-	terrain_refr_shader.set_uniform_float("grass_mix_level", grass_mix_level);
-	terrain_refr_shader.set_uniform_float("rock_level", rock_level);
-	terrain_refr_shader.set_uniform_float("rock_mix_level", rock_mix_level);
-	terrain_refr_shader.set_uniform_int("tile_size", tile_size);
-	terrain_refr_shader.set_uniform_uint("terrain_side", terrain_side);
-	terrain_refr_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
+	terrain_refr_shader.set_uniform("max_height", terrain_max_height);
+	terrain_refr_shader.set_uniform("sand_level", sand_level);
+	terrain_refr_shader.set_uniform("sand_mix_level", sand_mix_level);
+	terrain_refr_shader.set_uniform("grass_level", grass_level);
+	terrain_refr_shader.set_uniform("grass_mix_level", grass_mix_level);
+	terrain_refr_shader.set_uniform("rock_level", rock_level);
+	terrain_refr_shader.set_uniform("rock_mix_level", rock_mix_level);
+	terrain_refr_shader.set_uniform("tile_size", tile_size);
+	terrain_refr_shader.set_uniform("terrain_side", terrain_side);
+	terrain_refr_shader.set_uniform("max_tess_level", App::sys_info.max_tess_level);
 	terrain_refr_shader.set_uniform("clip_plane", glm::vec4(0, -1, 0, 1.1 * water_height));
 	terrain_refr_shader.set_uniform("cam_pos", camera.position);
 	terrain_refr_shader.set_uniform("light_direction", light_direction);
 
 	terrain_refl_shader.set_uniform("shadow_distance", shadow_dist);
-	terrain_refl_shader.set_uniform_float("max_height", terrain_max_height);
-	terrain_refl_shader.set_uniform_float("sand_level", sand_level);
-	terrain_refl_shader.set_uniform_float("sand_mix_level", sand_mix_level);
-	terrain_refl_shader.set_uniform_float("grass_level", grass_level);
-	terrain_refl_shader.set_uniform_float("grass_mix_level", grass_mix_level);
-	terrain_refl_shader.set_uniform_float("rock_level", rock_level);
-	terrain_refl_shader.set_uniform_float("rock_mix_level", rock_mix_level);
-	terrain_refl_shader.set_uniform_int("tile_size", tile_size);
-	terrain_refl_shader.set_uniform_uint("terrain_side", terrain_side);
-	terrain_refl_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
+	terrain_refl_shader.set_uniform("max_height", terrain_max_height);
+	terrain_refl_shader.set_uniform("sand_level", sand_level);
+	terrain_refl_shader.set_uniform("sand_mix_level", sand_mix_level);
+	terrain_refl_shader.set_uniform("grass_level", grass_level);
+	terrain_refl_shader.set_uniform("grass_mix_level", grass_mix_level);
+	terrain_refl_shader.set_uniform("rock_level", rock_level);
+	terrain_refl_shader.set_uniform("rock_mix_level", rock_mix_level);
+	terrain_refl_shader.set_uniform("tile_size", tile_size);
+	terrain_refl_shader.set_uniform("terrain_side", terrain_side);
+	terrain_refl_shader.set_uniform("max_tess_level", App::sys_info.max_tess_level);
 	terrain_refl_shader.set_uniform("clip_plane", glm::vec4(0, 1, 0, -water_height));
 	terrain_refl_shader.set_uniform("cam_pos", camera.position);
 	terrain_refl_shader.set_uniform("light_direction", light_direction);
 
-	terrain_shadow_shader.set_uniform_float("max_height", terrain_max_height);
-	terrain_shadow_shader.set_uniform_int("tile_size", tile_size);
-	terrain_shadow_shader.set_uniform_uint("terrain_side", terrain_side);
-	terrain_shadow_shader.set_uniform_int("max_tess_level", App::sys_info.max_tess_level);
+	terrain_shadow_shader.set_uniform("max_height", terrain_max_height);
+	terrain_shadow_shader.set_uniform("tile_size", tile_size);
+	terrain_shadow_shader.set_uniform("terrain_side", terrain_side);
+	terrain_shadow_shader.set_uniform("max_tess_level", App::sys_info.max_tess_level);
 	terrain_shadow_shader.set_uniform("cam_pos", camera.position);
 	terrain_shadow_shader.set_uniform("light_direction", light_direction);
 
@@ -419,7 +419,7 @@ void Win::set_uniforms() {
 	water_shader.set_uniform("near_far", near_far);
 	water_shader.set_uniform("cam_pos", camera.position);
 	water_shader.set_uniform("light_direction", light_direction);
-	water_shader.set_uniform_uint("terrain_side", terrain_side);
+	water_shader.set_uniform("terrain_side", terrain_side);
 
 	display_shader.set_uniform("cam_pos", camera.position);
 	display_shader.set_uniform("light_direction", light_direction);
@@ -511,7 +511,7 @@ void Win::color_pass() {
 	terrain_tile.setup_shader(&terrain_shader);
 	terrain_tile.draw_instanced(GL_PATCHES, tile_positions.size());
 
-	water_shader.set_uniform_float("time", (float)time);
+	water_shader.set_uniform("time", static_cast<float>(time));
 	water_mesh.setup_camera(&camera);
 	water_mesh.setup_shader(&water_shader);
 	water_mesh.draw(GL_TRIANGLE_STRIP);

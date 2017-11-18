@@ -71,8 +71,8 @@ void Win::display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	shader.set_uniform("screen_res", glm::vec2(width, height));
-	shader.set_uniform_int("iter", interations);
-	shader.set_uniform_double("scale", scale);
+	shader.set_uniform("iter", interations);
+	shader.set_uniform("scale", scale);
 	shader.set_uniform("center", center);
 	display_mesh.draw(GL_TRIANGLE_STRIP);
 }

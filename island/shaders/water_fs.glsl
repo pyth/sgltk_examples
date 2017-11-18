@@ -1,4 +1,4 @@
-#version 330
+#version 400
 
 in vec3 cam_vec;
 in vec3 pos_w;

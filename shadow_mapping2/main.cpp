@@ -207,7 +207,7 @@ void Win::shadow_pass() {
 
 	shadow_inst_shader.set_uniform("light_pos", light_pos);
 	shadow_inst_shader.set_uniform("light_matrix", false, light_matrix);
-	shadow_inst_shader.set_uniform_float("far_plane", light_cam.far_plane);
+	shadow_inst_shader.set_uniform("far_plane", light_cam.far_plane);
 
 	box.setup_shader(&shadow_inst_shader);
 	box.set_instanced_matrix_attributes();
@@ -225,17 +225,17 @@ void Win::normal_pass() {
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	box_shader.set_uniform_float("far_plane", light_cam.far_plane);
+	box_shader.set_uniform("far_plane", light_cam.far_plane);
 	box_shader.set_uniform("light_pos", light_pos);
 	box_shader.set_uniform("cam_pos", camera.position);
 	box_shader.set_uniform("light_matrix", false, light_matrix);
-	box_shader.set_uniform_int("soft_shadow", 1);
+	box_shader.set_uniform("soft_shadow", 1);
 
-	wall_shader.set_uniform_float("far_plane", light_cam.far_plane);
+	wall_shader.set_uniform("far_plane", light_cam.far_plane);
 	wall_shader.set_uniform("light_pos", light_pos);
 	wall_shader.set_uniform("cam_pos", camera.position);
 	wall_shader.set_uniform("light_matrix", false, light_matrix);
-	wall_shader.set_uniform_int("soft_shadow", 1);
+	wall_shader.set_uniform("soft_shadow", 1);
 
 	box.setup_shader(&box_shader);
 	box.set_instanced_matrix_attributes();
