@@ -1,0 +1,7 @@
+Makefile
+CMakeFiles
+CMakeCache.txt
+CMakeDoxyfile.in
+bin
+*.make
+*.cmake

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 3.15)
 project(sgltk_example)
 
 set(TARGETS system_info
