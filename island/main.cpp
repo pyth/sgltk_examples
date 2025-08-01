@@ -341,8 +341,8 @@ Win::~Win() {
 void Win::handle_resize() {
 	glViewport(0, 0, width, height);
 	depth_buffer.set_size(width, height);
-	depth_tex.create_empty(width, height, GL_R32F, GL_FLOAT, GL_R);
-	shadow_tex.create_empty(width, height, GL_R16F, GL_FLOAT, GL_R);
+	depth_tex.create_empty(width, height, GL_R32F, GL_FLOAT, GL_RED);
+	shadow_tex.create_empty(width, height, GL_R16F, GL_FLOAT, GL_RED);
 	color_tex.create_empty(width, height, GL_RGBA, GL_UNSIGNED_BYTE, GL_RGBA);
 	normal_tex.create_empty(width, height, GL_RGB16F, GL_FLOAT, GL_RGB);
 	position_tex.create_empty(width, height, GL_RGBA16F, GL_FLOAT, GL_RGBA);
