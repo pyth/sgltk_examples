@@ -678,8 +678,8 @@ int main(int argc, char **argv) {
 	App::init();
 	App::chdir_to_bin(argv);
 
-	Shader::add_path("../island/shaders");
-	Texture::add_path("../data/textures");
+	Shader::add_path("../../island/shaders");
+	Texture::add_path("../../data/textures");
 
 	int w = (int)(0.75 * App::sys_info.display_bounds[0].w);
 	int h = (int)(0.75 * App::sys_info.display_bounds[0].h);

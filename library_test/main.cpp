@@ -8,10 +8,10 @@ int main(int argc, char** argv) {
 	App::chdir_to_bin(argv);
 
 	//set the paths to the resources
-	Model::add_path("../data/models");
-	Image::add_path("../data/textures");
-	Image::add_path("../data/fonts");
-	Shader::add_path("../library_test/shaders");
+	Model::add_path("../../data/models");
+	Image::add_path("../../data/textures");
+	Image::add_path("../../data/fonts");
+	Shader::add_path("../../library_test/shaders");
 
 	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
 	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);

@@ -3,12 +3,17 @@ set(BIN_HEADERS)
 
 set(TARGET particle_system)
 
-link_directories(${PROJECT_SOURCE_DIR}/sgltk/lib)
-include_directories(${PROJECT_SOURCE_DIR}/sgltk/include)
-
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-
 add_executable(${TARGET} ${BIN_SOURCE} ${BIN_HEADERS})
+target_link_libraries(${TARGET} PRIVATE
+	sgltk::sgltk
+	GLEW::GLEW
+	glm::glm
+	SDL2::SDL2
+	SDL2_image::SDL2_image
+	sdl_ttf::sdl_ttf
+	assimp::assimp
+	GL
+)
 
 if(WIN32)
 	if(MSVC)
@@ -19,7 +24,3 @@ if(WIN32)
 endif()
 
 target_compile_definitions(${TARGET} PRIVATE ${TYPE})
-
-foreach(lib ${LIBS})
-	target_link_libraries(${TARGET} ${lib})
-endforeach()

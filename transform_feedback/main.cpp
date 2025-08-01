@@ -5,7 +5,7 @@ using namespace sgltk;
 int main(int argc, char **argv) {
 	App::init();
 	App::chdir_to_bin(argv);
-	Shader::add_path("../transform_feedback/shaders");
+	Shader::add_path("../../transform_feedback/shaders");
 
 	Window win("transform_feedback", 100, 100, 100, 100, SDL_WINDOW_HIDDEN);
 	if(win.gl_maj < 3)

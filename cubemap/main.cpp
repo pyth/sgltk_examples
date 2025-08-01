@@ -177,9 +177,9 @@ int main(int argc, char **argv) {
 	sgltk::App::chdir_to_bin(argv);
 
 	//setup asset locations
-	sgltk::Shader::add_path("../cubemap/shaders");
-	sgltk::Image::add_path("../data/textures");
-	sgltk::Model::add_path("../data/models");
+	sgltk::Shader::add_path("../../cubemap/shaders");
+	sgltk::Image::add_path("../../data/textures");
+	sgltk::Model::add_path("../../data/models");
 
 	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
 	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);

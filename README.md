@@ -22,22 +22,9 @@ This is a collection of examples intended to show how to use [sgltk](http://www.
     2. Use `make` or open the project file in the appropriate IDE to build the project
 
 * **Linux**
-
-    1. If [sgltk](http://www.github.com/pyth/sgltk) is not yet installed you will have to either install it or initialize this repository's submodules. To do this use `git`:
-
-        `git submodule init`
-
-        `git submodule update`
-
-    2. Generate the makefiles using `cmake`:
-
-        `cmake .` or `cmake path/to/source`
-
-    3. Build the examples using `make`:
-
-        `make` or `make -j number-of-threads`
-
-        Every example has a separate build target identically titled to the name of the folder containing that example.
+    `conan install . --output-folder=build --build=missing`
+    `cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release`
+    `cmake --build build`
 
 ## Controls
 

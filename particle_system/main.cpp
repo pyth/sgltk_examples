@@ -103,7 +103,7 @@ void Win::display() {
 int main(int argc, char **argv) {
 	sgltk::App::init();
 	sgltk::App::chdir_to_bin(argv);
-	sgltk::Shader::add_path("../particle_system/shaders");
+	sgltk::Shader::add_path("../../particle_system/shaders");
 
 	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
 	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);

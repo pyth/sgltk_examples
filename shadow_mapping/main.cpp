@@ -318,9 +318,9 @@ int main(int argc, char **argv) {
 	App::chdir_to_bin(argv);
 
 	//set the pathes to search for assets and shaders
-	Model::add_path("../data/models");
-	Image::add_path("../data/textures");
-	Shader::add_path("../shadow_mapping/shaders");
+	Model::add_path("../../data/models");
+	Image::add_path("../../data/textures");
+	Shader::add_path("../../shadow_mapping/shaders");
 
 	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
 	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);

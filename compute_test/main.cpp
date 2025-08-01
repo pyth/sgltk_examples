@@ -5,7 +5,7 @@ using namespace sgltk;
 int main(int argc, char **argv) {
 	App::init();
 	App::chdir_to_bin(argv);
-	Shader::add_path("../compute_test/shaders");
+	Shader::add_path("../../compute_test/shaders");
 
 	Window win("compute_test", 100, 100, 100, 100, SDL_WINDOW_HIDDEN);
 	if(win.gl_maj < 4 || win.gl_min < 3)

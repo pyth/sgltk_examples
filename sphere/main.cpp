@@ -230,7 +230,7 @@ int main(int argc, char **argv) {
 	//change the current working directory to the location of the executable
 	sgltk::App::chdir_to_bin(argv);
 	sgltk::App::set_msaa_sample_number(8);
-	sgltk::Shader::add_path("../sphere/shaders");
+	sgltk::Shader::add_path("../../sphere/shaders");
 
 	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
 	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);

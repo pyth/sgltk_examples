@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
 	sgltk::App::chdir_to_bin(argv);
 
 	//setup the shader files location
-	sgltk::Shader::add_path("../instanced_rendering/shaders");
+	sgltk::Shader::add_path("../../instanced_rendering/shaders");
 
 	int w = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].w);
 	int h = (int)(0.75 * sgltk::App::sys_info.display_bounds[0].h);

@@ -175,9 +175,9 @@ int main(int argc, char **argv) {
 	App::chdir_to_bin(argv);
 
 	//set the pathes to search for assets and shaders
-	Model::add_path("../data/models");
-	Image::add_path("../data/textures");
-	Shader::add_path("../loading_models/shaders");
+	Model::add_path("../../data/models");
+	Image::add_path("../../data/textures");
+	Shader::add_path("../../loading_models/shaders");
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
