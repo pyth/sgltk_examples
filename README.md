@@ -22,10 +22,11 @@ This is a collection of examples intended to show how to use [sgltk](http://www.
     2. Use `make` or open the project file in the appropriate IDE to build the project
 
 * **Linux**
+
     `conan install . --output-folder=build --build=missing`
 
     `cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release`
-	
+
     `cmake --build build`
 
 ## Controls
