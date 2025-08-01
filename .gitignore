@@ -3,5 +3,7 @@ CMakeFiles
 CMakeCache.txt
 CMakeDoxyfile.in
 bin
+build
 *.make
 *.cmake
+CMakeUserPresets.json
