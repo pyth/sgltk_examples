@@ -23,7 +23,9 @@ This is a collection of examples intended to show how to use [sgltk](http://www.
 
 * **Linux**
     `conan install . --output-folder=build --build=missing`
+
     `cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release`
+	
     `cmake --build build`
 
 ## Controls
