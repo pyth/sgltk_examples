@@ -11,18 +11,6 @@ This is a collection of examples intended to show how to use [sgltk](http://www.
 
 ## Building the  examples
 
-* **Windows**
-
-    1. Generate the makefiles or project files using `cmake`:
-
-        `cmake -G` to get the list of available generators
-
-        `cmake -G "generator_name" -DCMAKE_PREFIX_PATH="path/to/include;path/to/lib" .`
-
-    2. Use `make` or open the project file in the appropriate IDE to build the project
-
-* **Linux**
-
     1. `conan install . --output-folder=build --build=missing`
 
     2. `cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release`
