@@ -63,11 +63,10 @@ void Win::handle_resize() {
 }
 
 void Win::handle_mouse_motion(int x, int y) {
-	float rot_speed = 20.0f;
-	set_title(std::to_string(glm::atan(float(y))));
 	if (rel_mode) {
-		cam.yaw(-glm::atan((float)x) * rot_speed * static_cast<float>(delta_time));
-		cam.pitch(-glm::atan((float)y) * rot_speed * static_cast<float>(delta_time));
+		float sens = 0.002f;
+		cam.yaw(-x * sens);
+		cam.pitch(-y * sens);
 		cam.update_view_matrix();
 	}
 }
@@ -85,7 +84,7 @@ void Win::handle_key_press(const std::string& key, bool pressed) {
 
 void Win::handle_keyboard(const std::string& key) {
 	bool update = false;
-	float mov_speed = 10000.0f;
+	float mov_speed = 20.0f;
 	float rot_speed = 2.0f;
 
 	if(key == "D") {
@@ -154,7 +153,7 @@ int main(int argc, char **argv) {
 	if(window.gl_maj == 3 && window.gl_min < 3)
 		return -1;
 
-	window.run();
+	window.run(100);
 
 	return 0;
 }
