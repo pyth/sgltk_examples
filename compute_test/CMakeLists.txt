@@ -14,5 +14,5 @@ target_link_libraries(${TARGET} PRIVATE
 	SDL2_image::SDL2_image
 	sdl_ttf::sdl_ttf
 	assimp::assimp
-	GL
+	opengl::opengl
 )
