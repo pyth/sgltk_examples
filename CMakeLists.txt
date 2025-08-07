@@ -20,6 +20,8 @@ set(TARGETS system_info
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_BUILD_TYPE Release)
 
 find_package(sgltk REQUIRED)
 find_package(GLEW REQUIRED)

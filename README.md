@@ -13,7 +13,7 @@ This is a collection of examples intended to show how to use [sgltk](http://www.
 
     1. `conan install . --output-folder=build --build=missing`
 
-    2. `cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release`
+    2. `cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake`
 
     3. `cmake --build build`
 
